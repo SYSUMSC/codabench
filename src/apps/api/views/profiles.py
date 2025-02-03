@@ -128,6 +128,8 @@ class OrganizationViewSet(mixins.CreateModelMixin,
         return [permission() for permission in self.permission_classes]
 
     def create(self, request, *args, **kwargs):
+        if hasattr(request.user, "membership"):
+            return Response({"error": "你已经加入了一个组织!"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.perform_create(serializer)
@@ -165,13 +167,19 @@ class OrganizationViewSet(mixins.CreateModelMixin,
     @action(detail=True, methods=['post'], permission_classes=[IsOrganizationEditor])
     def invite_users(self, request, pk=None):
         org = self.get_object()
-        if type(request.data['users']) != list:
-            raise ValidationError(f'Required data is an Array of User ID\'s not a {type(request.data["users"])} ')
-        # Getting users, but filtering out any that are already in the organization
-        users = User.objects.filter(id__in=request.data['users']).exclude(organizations=pk)
+        user_ids = request.data.get('users', [])
+
+        # 筛选出尚未加入任何组织的用户
+        users = User.objects.filter(id__in=user_ids).exclude(membership__isnull=False)
+
+        if not users:
+            return Response({"message": "邀请的某些用户已经在其他组织了"}, status=status.HTTP_400_BAD_REQUEST)
+
         org.users.add(*users)
-        # Getting membership so we can access invite token
+
+        # 获取 Membership 记录，方便后续处理
         members = org.membership_set.filter(user__in=[user.id for user in users])
+
         for member in members:
             if member.user.allow_organization_invite_emails:
                 send_mail(
@@ -186,7 +194,8 @@ class OrganizationViewSet(mixins.CreateModelMixin,
                     to_email=member.user.email
                 )
 
-        return Response({})
+        return Response({"message": "邀请成功"}, status=status.HTTP_200_OK)
+
 
     @action(detail=True, methods=['delete'], permission_classes=[IsOrganizationEditor])
     def delete_member(self, request, pk=None):
