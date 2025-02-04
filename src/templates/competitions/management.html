@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <competition-management></competition-management>
+{% if user.is_authenticated and user.is_superuser %}
+<competition-management></competition-management>
+{% else %}
+<div class="ui container">
+    <div class="ui red message">
+        You do not have access to this page!
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

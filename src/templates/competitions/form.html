@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <competition-form competition_id="{{ object.pk }}">
-    </competition-form>
+{% if user.is_authenticated and user.is_superuser %}
+<competition-form competition_id="{{ object.pk }}">
+</competition-form>
 
-    {# NOTE: First added for phase task sorting, SemanticUI does not come with sorting..! #}
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+{# NOTE: First added for phase task sorting, SemanticUI does not come with sorting..! #}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+{% else %}
+<div class="ui container">
+    <div class="ui red message">
+        You do not have access to this page!
+    </div>
+</div>
+{% endif %}
 {% endblock %}

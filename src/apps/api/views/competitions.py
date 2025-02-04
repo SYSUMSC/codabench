@@ -209,9 +209,13 @@ class CompetitionViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         """Mostly a copy of the underlying base create, however we return some additional data
         in the response to remove a GET from the frontend"""
-
+        if not request.user.is_staff:
+            raise PermissionDenied("只支持员工创建题目")
+        # 遍历请求中的每个阶段
         for phase in request.data['phases']:
+            # 遍历每个阶段中的任务
             for index in range(len(phase['tasks'])):
+                # 将任务列表中的每个任务简化为任务的ID
                 phase['tasks'][index] = phase['tasks'][index]['task']
 
         # TODO - This is Temporary. Need to change Leaderboard to Phase connect to M2M and handle this correctly.
