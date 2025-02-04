@@ -18,6 +18,8 @@ urlpatterns = [
     path('tasks/', include('tasks.urls', namespace='tasks')),
     path('queues/', include('queues.urls', namespace="queues")),
     path('forums/', include('forums.urls', namespace="forums")),
+    # 新增致谢
+    path('acknowledgement/', include('acknowledgement.urls', namespace="acknowledgement")),
 
     # Third party
     path('api/', include('api.urls')),
