@@ -98,22 +98,24 @@
                     <div id="competition_dropdown" class="ui dropdown item">
                         <div class="text">
                             <i class="ui small trophy icon"></i>
-                            Benchmarks
+                            基准测试
                         </div>
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             <div class="header"></div>
+                            {% if request.user.is_staff %}
                             <a class="item" href="{% url "competitions:management" %}">管理</a>
-                            <a class="item" href="{% url "competitions:public" %}">公开比赛</a>
+                            {% endif %}
+                            <a class="item" href="{% url "competitions:public" %}">题目列表</a>
                         </div>
                     </div>
                     <a class="item" href="{% url "tasks:task_management" %}">
                         <i selenium="tasks" class="ui small file icon"></i>
-                        Resources
+                        资源
                     </a>
                     <a class="item" href="{% url "queues:management" %}">
                         <i class="ui small computer icon"></i>
-                        Queue Management
+                        队列管理
                     </a>
                     {% if user.is_authenticated %}
                         <div id="user_dropdown" class="ui dropdown item">
@@ -124,7 +126,7 @@
                             <i class="dropdown icon"></i>
                             <div class="menu">
 
-                                    <div class="header">Admin management</div>
+                                    <div class="header">管理员菜单</div>
 {#                                    <a class="item" href="#">Customize Codalab</a>#}
                                     <a class="item" href="{% url "pages:server_status" %}">Server Status</a>
                                 {% if request.user.is_staff %}
@@ -142,30 +144,30 @@
                                 <div class="header">Account</div>
                                 <a class="item" href="{% url 'profiles:user_profile' username=user.username %}">
                                     <i class="icon user"></i>
-                                    View Profile
+                                    查看个人信息
                                 </a>
                                 <a class="item" href="{% url 'profiles:user_edit' username=user.username %}">
                                     </i><i class="edit icon"></i>
-                                    Edit profile
+                                    编辑个人信息
                                 </a>
                                 <a class="item" href="{% url 'accounts:user_account' username=user.username %}">
                                     <i class="cog icon"></i>
-                                    Account
+                                    账户
                                 </a>
                                 <a class="item" href="{% url 'profiles:user_notifications' username=user.username %}">
                                     </i><i class="bell icon"></i>
-                                    Notifications
+                                    通知
                                 </a>
                                 <a class="item" href="{% url 'accounts:password_reset' %}">
                                     <i class="lock icon"></i>
-                                    Change Password
+                                    修改密码
                                 </a>
                                 <a class="item" href="{% url 'accounts:logout' %}">
                                     <i class="icon sign out"></i>
-                                    Logout
+                                    退出登录
                                 </a>
                                 <div class="ui divider"></div>
-                                <div class="header">Organizations</div>
+                                <div class="header">队伍</div>
                             {% for org in user.organizations.all %}
                                 {% if user in org.user_record.all %}
                                 <a class="item" href="{% url 'profiles:organization_profile' pk=org.id %}">
@@ -176,7 +178,7 @@
                             {% endfor %}
                                 <a class="item" href="{% url 'profiles:organization_create' %}">
                                     <i class="plus icon"></i>
-                                    Create Organization
+                                    创建队伍
                                 </a>
                             </div>
                         </div>
