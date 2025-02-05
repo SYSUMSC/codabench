@@ -1,23 +1,23 @@
 <bundle-management>
-    <!--  Search -->
+    <!-- 搜索 -->
     <div class="ui icon input">
-        <input type="text" placeholder="Search..." ref="search" onkeyup="{ filter.bind(this, undefined) }">
+        <input type="text" placeholder="搜索..." ref="search" onkeyup="{ filter.bind(this, undefined) }">
         <i class="search icon"></i>
     </div>
     <button class="ui red right floated labeled icon button {disabled: marked_datasets.length === 0}" onclick="{delete_datasets}">
         <i class="icon delete"></i>
-        Delete Selected
+        删除选中的数据集
     </button>
 
-    <!-- Data Table -->
+    <!-- 数据表 -->
     <table id="bundlesTable" class="ui {selectable: datasets.length > 0} celled compact sortable table">
         <thead>
             <tr>
-                <th>File Name</th>
-                <th>Benchmark</th>
-                <th width="175px">Size</th>
-                <th width="125px">Uploaded</th>
-                <th width="50px" class="no-sort">Delete?</th>
+                <th>文件名称</th>
+                <th>基准测试</th>
+                <th width="175px">大小</th>
+                <th width="125px">上传时间</th>
+                <th width="50px" class="no-sort">删除？</th>
                 <th width="25px" class="no-sort"></th>
             </tr>
         </thead>
@@ -33,7 +33,7 @@
                     </div>
                 </td>
                 <td>{ format_file_size(dataset.file_size) }</td>
-                <td>{ timeSince(Date.parse(dataset.created_when)) } ago</td>
+                <td>{ timeSince(Date.parse(dataset.created_when)) } 之前</td>
                 <td class="center aligned">
                     <button show="{dataset.created_by === CODALAB.state.user.username}" class="ui mini button red icon" onclick="{ delete_dataset.bind(this, dataset) }">
                         <i class="icon delete"></i>
@@ -48,13 +48,13 @@
             </tr>
             <tr if="{datasets.length === 0}">
                 <td class="center aligned" colspan="6">
-                    <em>No Datasets Yet!</em>
+                    <em>暂无数据集！</em>
                 </td>
             </tr>
         </tbody>
 
         <tfoot>
-            <!-- Pagination -->
+            <!-- 分页 -->
             <tr>
                 <th colspan="8" if="{datasets.length > 0}">
                     <div class="ui right floated pagination menu" if="{datasets.length > 0}">
@@ -73,19 +73,19 @@
         </tfoot>
     </table>
 
-    <!--  Dataset Detail Model  -->
+    <!-- 数据集详情弹窗 -->
     <div ref="info_modal" class="ui modal">
         <div class="header">
             {selected_row.name}
         </div>
         <div class="content">
-            <h3>Details</h3>
+            <h3>详情</h3>
             <table class="ui basic table">
                 <thead>
                     <tr>
-                        <th>Key</th>
-                        <th>Created By</th>
-                        <th>Created</th>
+                        <th>键值</th>
+                        <th>创建者</th>
+                        <th>创建时间</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,12 +97,12 @@
                 </tbody>
             </table>
             <virtual if="{!!selected_row.description}">
-                <div>Description:</div>
+                <div>描述：</div>
                 <div class="ui segment">
                     {selected_row.description}
                 </div>
             </virtual>
-            <div show="{!!_.get(selected_row.in_use, 'length')}"><strong>Used by:</strong>
+            <div show="{!!_.get(selected_row.in_use, 'length')}"><strong>使用于：</strong>
                 <div class="ui bulleted list">
                     <div class="item" each="{comp in selected_row.in_use}">
                         <a href="{URLS.COMPETITION_DETAIL(comp.pk)}" target="_blank">{comp.title}</a>
@@ -112,9 +112,9 @@
         </div>
         <div class="actions">
             <a href="{URLS.DATASET_DOWNLOAD(selected_row.key)}" class="ui green icon button">
-                <i class="download icon"></i>Download File
+                <i class="download icon"></i>下载文件
             </a>
-            <button class="ui cancel button">Close</button>
+            <button class="ui cancel button">关闭</button>
         </div>
     </div>
 
@@ -122,7 +122,7 @@
         var self = this
 
         /*---------------------------------------------------------------------
-         Init
+         初始化
         ---------------------------------------------------------------------*/
 
         self.datasets = []
@@ -138,7 +138,7 @@
         })
 
         /*---------------------------------------------------------------------
-         Methods
+         方法
         ---------------------------------------------------------------------*/
 
         self.pretty_date = date => luxon.DateTime.fromISO(date).toLocaleString(luxon.DateTime.DATE_FULL)
@@ -158,7 +158,7 @@
                 self.page += 1
                 self.filter({page: self.page})
             } else {
-                alert("No valid page to go to!")
+                alert("没有可跳转的下一页！")
             }
         }
 
@@ -167,7 +167,7 @@
                 self.page -= 1
                 self.filter({page: self.page})
             } else {
-                alert("No valid page to go to!")
+                alert("没有可跳转的上一页！")
             }
         }
 
@@ -185,16 +185,16 @@
                     self.update()
                 })
                 .fail(function (response) {
-                    toastr.error("Could not load datasets...")
+                    toastr.error("无法加载数据集...")
                 })
         }
 
         self.delete_dataset = function (dataset, e) {
-            if (confirm(`Are you sure you want to delete '${dataset.name}'?`)) {
+            if (confirm(`你确定要删除 '${dataset.name}' 吗？`)) {
                 CODALAB.api.delete_dataset(dataset.id)
                     .done(function () {
                         self.update_datasets()
-                        toastr.success("Dataset deleted successfully!")
+                        toastr.success("数据集删除成功！")
                         CODALAB.events.trigger('reload_quota_cleanup')
                     })
                     .fail(function (response) {
@@ -205,11 +205,11 @@
         }
 
         self.delete_datasets = function () {
-            if (confirm(`Are you sure you want to delete multiple datasets?`)) {
+            if (confirm(`你确定要删除多个数据集吗？`)) {
                 CODALAB.api.delete_datasets(self.marked_datasets)
                     .done(function () {
                         self.update_datasets()
-                        toastr.success("Dataset deleted successfully!")
+                        toastr.success("数据集删除成功！")
                         self.marked_datasets = []
                         CODALAB.events.trigger('reload_quota_cleanup')
                     })
@@ -232,40 +232,12 @@
         }
 
         self.show_info_modal = function (row, e) {
-            // Return here so the info modal doesn't pop up when a checkbox is clicked
             if (e.target.type === 'checkbox' || e.target.id === 'competitionLink') {
                 return
             }
             self.selected_row = row
             self.update()
             $(self.refs.info_modal).modal('show')
-        }
-
-        // Function to format file size 
-        self.format_file_size = function(file_size) {
-            // parse file size from string to float
-            try {
-                n = parseFloat(file_size)
-            }
-            catch(err) {
-                // return empty string if parsing fails
-                return ""
-            }
-            // a file_size of -1 indicated an error
-            if(n < 0) {
-                return ""
-            }
-            // constant units to show with files size
-            // file size is in KB, converting it to MB and GB 
-            const units = ['KB', 'MB', 'GB']
-            // loop incrementer for selecting desired unit
-            let i = 0
-            // loop over n until it is greater than 1000
-            while(n >= 1000 && ++i){
-                n = n/1000;
-            }
-            // restrict file size to 1 decimal number concatinated with unit
-            return(n.toFixed(1) + ' ' + units[i]);
         }
 
     </script>
