@@ -5,7 +5,7 @@
                 <table class="ui padded table">
                     <thead>
                     <tr>
-                        <th colspan="2">Leaderboards</th>
+                        <th colspan="2">排行榜</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -28,7 +28,7 @@
                     </tr>
                     <tr show="{leaderboards.length === 0}">
                         <td colspan="2" class="center aligned">
-                            <em>No leaderboards added yet, at least 1 is required!</em>
+                            <em>尚未添加排行榜，至少需要一个排行榜！</em>
                         </td>
                     </tr>
                     </tbody>
@@ -36,10 +36,10 @@
                     <tr>
                         <th colspan="2" class="right aligned">
                             <button if="{leaderboards.length === 0}" class="ui tiny inverted green icon button" onclick="{ add }">
-                                <i selenium='add-leaderboard' class="add icon"></i> Add leaderboard
+                                <i selenium='add-leaderboard' class="add icon"></i> 添加排行榜
                             </button>
                             <button if="{leaderboards.length > 0}" disabled="disabled" class="ui tiny inverted green icon button disabled">
-                                <i selenium='add-leaderboard' class="add icon"></i> Add leaderboard
+                                <i selenium='add-leaderboard' class="add icon"></i> 添加排行榜
                             </button>
                         </th>
                     </tr>
@@ -52,12 +52,12 @@
     <div class="ui large modal" ref="modal">
         <i class="close icon"></i>
         <div class="header">
-            Leaderboard form
+            排行榜表单
         </div>
         <div class="scrolling content">
             <div class="ui warning message" show="{!_.isEmpty(error_messages)}">
                 <div class="header">
-                    Leaderboard Errors
+                    排行榜错误
                 </div>
                 <ul class="list">
                     <li each="{message in error_messages}">
@@ -68,18 +68,17 @@
             <div ref="leaderboard_form" class="ui form">
                 <input type="hidden" name="id" value="{_.get(selected_leaderboard, 'id', null)}">
                 <div class="field">
-                    <label>Leaderboard Settings</label>
+                    <label>排行榜设置</label>
                     <div class="two fields">
                         <div class="field required">
-                            <label>Title</label>
+                            <label>标题</label>
                             <input selenium="title1" name="title" value="{_.get(selected_leaderboard, 'title')}"
                                    onchange="{ modal_updated }">
                         </div>
                         <div class="field required">
                             <label>
-                                Key
-                                <span data-tooltip="This is the key you will use to assign scores to leaderboards in your scoring program"
-                                      data-inverted=""
+                                键
+                                <span data-tooltip="这是你将在评分程序中用于分配排行榜分数的键" data-inverted=""
                                       data-position="right center">
                                     <i class="help icon circle"></i>
                                 </span>
@@ -90,12 +89,12 @@
                     <div class="field">
                         <div class="ui checkbox">
                             <input type="checkbox" ref="hidden_leaderboard">
-                            <label>Leaderboard is Hidden</label>
+                            <label>排行榜隐藏</label>
                         </div>
                     </div>
                 </div>
                 <div class="field" style="width: 50%; padding: 0 7px">
-                    <label>Submission Rule</label>
+                    <label>提交规则</label>
                     <div class="ui fluid submission-rule selection dropdown">
                         <input type="hidden" name="submission_rule" ref="submission_rule" value="{_.get(selected_leaderboard, 'submission_rule', 'Add')}">
                         <div class="default text"></div>
@@ -120,28 +119,28 @@
 
                     <tbody>
                     <tr>
-                        <td>Primary Column</td>
-                        <td if="{_.isEmpty(columns)}" rowspan="5"><em>No Columns Yet!</em></td>
+                        <td>主要列</td>
+                        <td if="{_.isEmpty(columns)}" rowspan="5"><em>尚未添加列！</em></td>
                         <td each="{ column, index in columns || [] }" class="center aligned">
                             <input type="radio" name="primary_index" data-index="{index}" checked="{ index === _.get(selected_leaderboard, 'primary_index') }">
                         </td>
                     </tr>
                     <tr>
-                        <td>Computation</td>
+                        <td>计算</td>
                         <td each="{ column, index in columns || [] }">
                             <div class="ui fluid computation selection dropdown">
                                 <input type="hidden" name="computation_{index}" value="{column.computation || 'none'}" onchange="{ modal_updated }">
                                 <div class="default text"></div>
                                 <i class="dropdown icon"></i>
                                 <div class="menu">
-                                    <div class="item" data-index="{index}" data-value="none">None</div>
-                                    <div class="item" data-index="{index}" data-value="avg">Average</div>
-                                    <div class="item" data-index="{index}" data-value="sum">Sum</div>
-                                    <div class="item" data-index="{index}" data-value="min">Min</div>
-                                    <div class="item" data-index="{index}" data-value="max">Max</div>
+                                    <div class="item" data-index="{index}" data-value="none">无</div>
+                                    <div class="item" data-index="{index}" data-value="avg">平均值</div>
+                                    <div class="item" data-index="{index}" data-value="sum">求和</div>
+                                    <div class="item" data-index="{index}" data-value="min">最小值</div>
+                                    <div class="item" data-index="{index}" data-value="max">最大值</div>
                                 </div>
                             </div>
-                            <label if="{column.computation}" style="display: block; padding-top: 10px;">Apply to:</label>
+                            <label if="{column.computation}" style="display: block; padding-top: 10px;">应用于:</label>
                             <select class="ui fluid multiselect index_{index} dropdown"
                                     if="{column.computation}"
                                     multiple=""
@@ -158,35 +157,35 @@
                     </tr>
                     <tr>
                         <td>
-                            Sorting
-                            <span data-tooltip="Asc: smaller is better -- Desc: larger is better" data-position="right center"><i class="circle question icon"></i></span>
+                            排序
+                            <span data-tooltip="升序: 越小越好 -- 降序: 越大越好" data-position="right center"><i class="circle question icon"></i></span>
                         </td>
                         <td each="{ column, index in columns || [] }">
                             <div class="ui fluid sorting selection dropdown">
                                 <input type="hidden" name="sorting_{index}" value="{column.sorting || 'desc'}">
-                                <div class="default text">Sorting</div>
+                                <div class="default text">排序</div>
                                 <i class="dropdown icon"></i>
                                 <div class="menu">
-                                    <div class="item" data-value="desc">Descending</div>
-                                    <div class="item" data-value="asc">Ascending</div>
+                                    <div class="item" data-value="desc">降序</div>
+                                    <div class="item" data-value="asc">升序</div>
                                 </div>
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td>Column Key <span style="color: red;">*</span></td>
+                        <td>列键 <span style="color: red;">*</span></td>
                         <td each="{ column, index in columns || [] }">
                             <input selenium="column-key" type="text" class="ui field" name="column_key_{index}" value="{_.get(column, 'key')}" onchange="{ modal_updated }">
                         </td>
                     </tr>
                     <tr>
-                        <td>Column Precision <span style="color: red;">*</span></td>
+                        <td>列精度 <span style="color: red;">*</span></td>
                         <td each="{ column, index in columns || [] }">
                             <input selenium="column-precision" type="number" class="ui field" name="column_precision_{index}" value="{_.get(column, 'precision') || 2}" min="1" max="10" onchange="{ modal_updated }">
                         </td>
                     </tr>
                     <tr>
-                        <td>Hidden</td>
+                        <td>隐藏</td>
                         <td each="{ column, index in columns || [] }" style="text-align: center;">
                             <input selenium="hidden" type="checkbox" ref="hidden_{index}" checked="{column.hidden}" onchange="{ modal_updated }">
                         </td>
@@ -204,9 +203,9 @@
             </div>
         </div>
         <div class="actions">
-            <div selenium="add-column" class="ui inverted green icon button" onclick="{ add_column }"><i class="ui plus icon"></i> Add column</div>
-            <div class="ui button" onclick="{ close_modal }">Cancel</div>
-            <div selenium="save3" class="ui button primary {disabled: !modal_is_valid}" onclick="{ save }">Save</div>
+            <div selenium="add-column" class="ui inverted green icon button" onclick="{ add_column }"><i class="ui plus icon"></i> 添加列</div>
+            <div class="ui button" onclick="{ close_modal }">取消</div>
+            <div selenium="save3" class="ui button primary {disabled: !modal_is_valid}" onclick="{ save }">保存</div>
         </div>
     </div>
 
@@ -214,7 +213,7 @@
         var self = this
 
         /*---------------------------------------------------------------------
-         Initializing
+         初始化
         ---------------------------------------------------------------------*/
         self.leaderboards = []
         self.selected_leaderboard_index = undefined
@@ -240,7 +239,7 @@
         })
 
         /*---------------------------------------------------------------------
-         Methods
+         方法
         ---------------------------------------------------------------------*/
         self.initialize_dropdowns = function () {
             $('.ui.sorting.dropdown').dropdown()
@@ -259,7 +258,7 @@
                         self.update()
                         $(`.ui.multiselect.index_${index}.dropdown`)
                             .dropdown('clear')
-                            // .dropdown('hide') and ('remove visible) do nothing, have to force hide w/ css
+                            // dropdown('hide') 和 ('remove visible') 无效，需通过 css 强制隐藏
                             .css('display', 'none')
                     } else {
                         self.columns[index].computation = value
@@ -286,7 +285,7 @@
 
         self.edit = function (index) {
             self.selected_leaderboard_index = index
-            // have to clone the leaderboard here so we can interact w/ selected_leaderboard as its own object, not a reference
+            // 克隆排行榜，避免直接引用原对象
             self.selected_leaderboard = _.cloneDeep(self.leaderboards[index])
             self.refs.hidden_leaderboard.checked = self.selected_leaderboard.hidden
             self.columns = self.selected_leaderboard.columns || []
@@ -308,7 +307,7 @@
         }
 
         self.delete_leaderboard = function (index) {
-            if (confirm("Are you sure you want to delete this?")) {
+            if (confirm("你确定要删除吗？")) {
                 self.leaderboards.splice(index, 1)
                 self.update()
                 self.form_updated()
@@ -382,7 +381,7 @@
                             let reference_column = leaderboard.columns[index]
                             if (_.includes(_.get(reference_column, 'computation_indexes', []), column.index.toString())) {
                                 is_valid = false
-                                self.error_messages.push(`Cyclical computation references at column indexes: ${_.join(_.sortBy([reference_column.index, column.index]), ', ')}.`)
+                                self.error_messages.push(`计算引用循环发生在列索引: ${_.join(_.sortBy([reference_column.index, column.index]), ', ')}.`)
                             }
                         })
                     }
@@ -420,7 +419,7 @@
                         column.computation = computation
                         column.computation_indexes = _.get(data, `computation_indexes_${i}`)
                     } else {
-                        column.computation = null 
+                        column.computation = null
                         column.computation_indexes = null
                     }
                     return column
@@ -438,7 +437,7 @@
         }
 
         self.add_column = function () {
-            self.columns.push({title: 'New Column'})
+            self.columns.push({title: '新列'})
             self.update()
             _.delay(() => self.update_leaderboard(), 10)
         }
@@ -459,7 +458,7 @@
                 column.index = i
                 return column
             })
-            // computation indexes are lists of indexes as strings
+            // computation indexes 是以字符串形式保存的索引列表
             from_index = from_index.toString()
             to_index = to_index.toString()
             self.columns = _.map(self.columns, column => {
@@ -489,7 +488,7 @@
         }
 
         /*---------------------------------------------------------------------
-         Events
+         事件
         ---------------------------------------------------------------------*/
         CODALAB.events.on('competition_loaded', function(competition){
             self.leaderboards = competition.leaderboards

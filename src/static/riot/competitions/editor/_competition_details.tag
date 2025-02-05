@@ -1,19 +1,19 @@
 <competition-details>
     <div class="ui form">
 
-        <!--  Title  -->
+        <!--  标题  -->
         <div class="field required">
-            <label>Title</label>
+            <label>标题</label>
             <input type="text" ref="title" onchange="{form_updated}">
         </div>
 
-        <!--  Logo  -->
+        <!--  标志  -->
         <div class="field required">
-            <label>Logo</label>
-            <!-- This is the SINGLE FILE with NO OTHER OPTIONS example -->
-            <!-- In the future, we'll have this type AND a type that is pre-filled with nice options -->
+            <label>标志</label>
+            <!-- 这是仅支持单文件上传，没有其他选项的示例 -->
+            <!-- 将来，我们会同时支持这种类型以及预填选项的类型 -->
             <label show="{ uploaded_logo }">
-                Uploaded Logo: <a href="{ uploaded_logo }" target="_blank">{ uploaded_logo_name }</a>
+                已上传标志: <a href="{ uploaded_logo }" target="_blank">{ uploaded_logo_name }</a>
             </label>
             <div class="ui left action file input">
                 <button class="ui icon button" onclick="document.getElementById('form_file_logo').click()">
@@ -21,32 +21,32 @@
                 </button>
                 <input id="form_file_logo" type="file" ref="logo" accept="image/*">
 
-                <!-- Just showing the file after it is uploaded -->
+                <!-- 上传后显示文件名 -->
                 <input value="{ logo_file_name }" readonly onclick="document.getElementById('form_file_logo').click()">
             </div>
         </div>
 
-        <!--  Description  -->
+        <!--  描述  -->
         <div class="field smaller-mde">
-            <label>Description</label>
+            <label>描述</label>
             <textarea class="markdown-editor" ref="comp_description" name="description" onchange="{form_updated}"></textarea>
         </div>
 
-        <!--  Queue  -->
+        <!--  队列  -->
         <div class="field">
-            <label>Queue</label>
+            <label>队列</label>
             <select class="ui fluid search selection dropdown" ref="queue"></select>
         </div>
 
-        <!--  Docker Image  -->
+        <!--  竞赛 Docker 镜像  -->
         <div class="field required">
-            <label>Competition Docker Image</label>
-            <input type="text" ref="docker_image" placeholder="Example: codalab/codalab-legacy:py37" onchange="{form_updated}">
+            <label>竞赛 Docker 镜像</label>
+            <input type="text" ref="docker_image" placeholder="示例: codalab/codalab-legacy:py37" onchange="{form_updated}">
         </div>
 
-        <!--  Type  -->
+        <!--  竞赛类型  -->
         <div class="field">
-            <label>Competition Type</label>
+            <label>竞赛类型</label>
             <div ref="competition_type" class="ui selection dropdown">
                 <input type="hidden" name="competition_type" value="{ data.competition_type || 'competition' }" onchange="{form_updated}">
                 <div class="text">Competition</div>
@@ -58,124 +58,124 @@
             </div>
         </div>
 
-        <!--  Reward  -->
+        <!--  竞赛奖励  -->
         <div class="field">
-            <label>Competition Reward</label>
-            <input type="text" ref="reward" placeholder="Example: $1000 for the top participant" onchange="{form_updated}">
+            <label>竞赛奖励</label>
+            <input type="text" ref="reward" placeholder="示例: 顶级参赛者奖金 $1000" onchange="{form_updated}">
         </div>
-        <!--  Contact Email  -->
+        <!--  主办方联系邮箱  -->
         <div class="field">
-            <label>Organizer Contact Email</label>
-            <input type="email" ref="contact_email" placeholder="Example: email@example.com" onchange="{form_updated}">
+            <label>主办方联系邮箱</label>
+            <input type="email" ref="contact_email" placeholder="示例: email@example.com" onchange="{form_updated}">
         </div>
-        <!--  Report  -->
+        <!--  竞赛报告  -->
         <div class="field">
-            <label>Competition Report</label>
-            <input type="text" ref="report" placeholder="Example: https://example.com/report.pdf" onchange="{form_updated}">
+            <label>竞赛报告</label>
+            <input type="text" ref="report" placeholder="示例: https://example.com/report.pdf" onchange="{form_updated}">
         </div>
 
-        <!--  Fact Sheet  -->
+        <!--  信息表  -->
         <div class="field smaller-mde">
-            <label>Fact Sheet</label>
+            <label>信息表</label>
             <div class="row">
-                <button class="ui basic blue button" onclick="{ add_question.bind(this, 'boolean') }">Boolean +</button>
-                <button class="ui basic blue button" onclick="{ add_question.bind(this, 'text') }">Text +</button>
-                <button class="ui basic blue button" onclick="{ add_question.bind(this, 'selection') }">Selection +</button>
+                <button class="ui basic blue button" onclick="{ add_question.bind(this, 'boolean') }">布尔型 +</button>
+                <button class="ui basic blue button" onclick="{ add_question.bind(this, 'text') }">文本 +</button>
+                <button class="ui basic blue button" onclick="{ add_question.bind(this, 'selection') }">选择 +</button>
             </div>
             <br>
             <form ref="comp_fact_sheet">
             <div class="fact-sheet-question" each="{question in fact_sheet_questions}">
                 <div class="row" id="q-div-{question.id}">
-                    <p  if="{ question.type === 'checkbox' }">Type: Boolean
+                    <p  if="{ question.type === 'checkbox' }">类型: 布尔型
                     <input type="hidden" name="type-{question.id}" value="checkbox">
                     </p>
-                    <p if="{ question.type === 'text' }">Type: Text
+                    <p if="{ question.type === 'text' }">类型: 文本
                     <input type="hidden" name="type-{question.id}" value="text">
                     </p>
-                    <p if="{ question.type === 'select' }">Type: Select
+                    <p if="{ question.type === 'select' }">类型: 选择
                     <input type="hidden" name="type-{question.id}" value="select">
                     </p>
                     <p>
-                        <label style="font-size: 1em; font-weight: 500;" for="key-{question.id}">Key name: </label>
-                        <a class="float-right" data-tooltip="Key is required for programmatic access to data. Best Practice is to have no whitespace." data-position="right center">
+                        <label style="font-size: 1em; font-weight: 500;" for="key-{question.id}">键名: </label>
+                        <a class="float-right" data-tooltip="程序访问数据时需要键。最佳实践是不包含空格。" data-position="right center">
                             <i class="grey question circle icon"></i>
                         </a>
                         <input name="key-{question.id}" id="key-{question.id}" type="text" value="{question.key}">
                     </p>
                     <p if="{ question.type === 'select' }">
-                        <label for="selection-{question.id}">Choices (Comma Separated): </label>
+                        <label for="selection-{question.id}">选项（逗号分隔）: </label>
                         <input name="selection-{question.id}" id="selection-{question.id}" type="text" value="{question.selection.join()}">
                     </p>
                     <p>
-                        <label for="is_on_leaderboard-{question.id}">Show On Leaderboard: </label>
+                        <label for="is_on_leaderboard-{question.id}">在排行榜上显示: </label>
                         <input type="hidden" name="is_on_leaderboard-{question.id}" value="false">
                         <input if="{question.is_on_leaderboard === 'true'}" type="checkbox" name="is_on_leaderboard-{question.id}" value="true" onchange="{form_updated}" checked>
                         <input if="{question.is_on_leaderboard !== 'true'}" type="checkbox" name="is_on_leaderboard-{question.id}" value="true" onchange="{form_updated}">
                     </p>
                     <p>
-                        <label for="title-{question.id}">Display Name: </label>
-                        <a class="float-right" data-tooltip="This is what the user sees when prompted for an answer, and the category name on the leaderboard." data-position="right center">
+                        <label for="title-{question.id}">显示名称: </label>
+                        <a class="float-right" data-tooltip="用户在作答时看到的内容，以及排行榜上的类别名称。" data-position="right center">
                             <i class="grey question circle icon"></i>
                         </a>
                         <input name="title-{question.id}" id="title-{question.id}" type="text" value="{question.title}">
                     </p>
                     <p>
-                        <label for="is-required-{question.id}">Is Required:</label>
+                        <label for="is-required-{question.id}">是否必填: </label>
                         <input type="hidden" name="is_required-{question.id}" value="false">
                         <input if="{question.is_required === 'true'}" type="checkbox" name="is_required-{question.id}" value="true" onchange="{form_updated}" checked>
                         <input if="{question.is_required !== 'true'}" type="checkbox" name="is_required-{question.id}" value="true" onchange="{form_updated}">
                     </p>
                 </div>
                 <br>
-                <button class="ui basic red button" onclick="{remove_question.bind(this, question.id)}">Remove</button>
+                <button class="ui basic red button" onclick="{remove_question.bind(this, question.id)}">移除</button>
             </div>
             </form>
         </div>
 
-        <!--  Files Available  -->
+        <!--  可用文件  -->
         <div class="field smaller-mde">
             <label>
-                Files Available
+                可用文件
                 <sup>
                     <a href="https://github.com/codalab/codabench/wiki/Yaml-Structure"
                        target="_blank"
-                       data-tooltip="What's this?">
+                       data-tooltip="这是什么？">
                         <i class="grey question circle icon"></i>
                     </a>
                 </sup>
             </label>
             <div class="ui checkbox">
-                <label>Make Programs Available</label>
+                <label>提供程序</label>
                 <input type="checkbox" ref="make_programs_available" onchange="{form_updated}">
             </div>
             <br>
             <div class="ui checkbox">
-                <label>Make Input Data Available</label>
+                <label>提供输入数据</label>
                 <input type="checkbox" ref="make_input_data_available" onchange="{form_updated}">
             </div>
         </div>
 
-        <!--  Detailed results  -->
+        <!--  详细结果  -->
         <div class="field">
-            <label>Detailed Results</label>
+            <label>详细结果</label>
             <div class="ui checkbox">
-                <label>Enable Detailed Results</label>
+                <label>启用详细结果</label>
                 <input type="checkbox" ref="detailed_results" onchange="{form_updated}">
             </div>
             <sup>
                 <a href="https://github.com/codalab/competitions-v2/wiki/Detailed-Results-and-Visualizations"
                    target="_blank"
-                   data-tooltip="What's this?">
+                   data-tooltip="这是什么？">
                     <i class="grey question circle icon"></i>
                 </a>
             </sup>
             <br>
             <div class="ui checkbox">
-                <label>Show Detailed Results in submission pannel</label>
+                <label>在提交面板中显示详细结果</label>
                 <input type="checkbox" ref="show_detailed_results_in_submission_panel" onchange="{form_updated}">
             </div>
             <sup>
-                <span data-tooltip="If checked and detailed results are enabled, participants can see detailed results in submission panel"
+                <span data-tooltip="如果勾选且启用了详细结果，参与者可以在提交面板中看到详细结果"
                           data-inverted=""
                           data-position="bottom center">
                     <i class="help icon circle"></i>
@@ -183,11 +183,11 @@
             </sup>
             <br>
             <div class="ui checkbox">
-                <label>Show Detailed Results in leaderboard</label>
+                <label>在排行榜中显示详细结果</label>
                 <input type="checkbox" ref="show_detailed_results_in_leaderboard" onchange="{form_updated}">
             </div>
             <sup>
-                <span data-tooltip="If checked and detailed results are enabled, participants can see detailed results in leaderboard"
+                <span data-tooltip="如果勾选且启用了详细结果，参与者可以在排行榜中看到详细结果"
                           data-inverted=""
                           data-position="bottom center">
                     <i class="help icon circle"></i>
@@ -195,15 +195,15 @@
             </sup>
         </div>
 
-        <!--  Auto Run submissions  -->
+        <!--  提交执行  -->
         <div class="field">
-            <label>Submission execution</label>
+            <label>提交执行</label>
             <div class="ui checkbox">
-                <label>Auto-run submissions</label>
+                <label>自动运行提交</label>
                 <input type="checkbox" ref="auto_run_submissions" onchange="{form_updated}">
             </div>
             <sup>
-                <span data-tooltip="If unchecked, organizers will have to manually run each submission"
+                <span data-tooltip="如果未勾选，主办方将需要手动运行每个提交"
                           data-inverted=""
                           data-position="bottom center">
                     <i class="help icon circle"></i>
@@ -211,15 +211,15 @@
             </sup>
         </div>
 
-        <!--  Public submissions  -->
+        <!--  公开提交  -->
         <div class="field">
-            <label>Public Submissions</label>
+            <label>公开提交</label>
             <div class="ui checkbox">
-                <label>Participants can make submission public</label>
+                <label>参与者可以将提交设为公开</label>
                 <input type="checkbox" ref="can_participants_make_submissions_public" onchange="{form_updated}">
             </div>
             <sup>
-                <span data-tooltip="If unchecked, participants cannot make their submissions public from submission panel"
+                <span data-tooltip="如果未勾选，参与者将无法在提交面板中将提交设为公开"
                           data-inverted=""
                           data-position="bottom center">
                     <i class="help icon circle"></i>
@@ -227,30 +227,29 @@
             </sup>
         </div>
 
-        
+
     </div>
 
     <script>
         var self = this
         self.fact_sheet_questions = []
         /*---------------------------------------------------------------------
-         Init
+         初始化
         ---------------------------------------------------------------------*/
         self.data = {}
         self.is_editing_competition = false
-        // We temporarily store this to display it nicely to the user, could be a behavior we break out into its own
-        // component later!
+        // 暂时存储该值以便美观地显示给用户，后续可拆分成独立组件
         self.logo_file_name = ''
 
         self.one("mount", function () {
-            // Set placeholder here so we can have multiple lines
+            // 设置占位符，这样可以多行显示
             $(self.refs.comp_fact_sheet).attr('placeholder', '{\n  "key": ["value1","value2",true,false]\n  "leave_blank_to_accept_any": ""\n}\n')
             self.markdown_editor = create_easyMDE(self.refs.comp_description)
             $('.ui.checkbox', self.root).checkbox({
                 onChange: self.form_updated
             })
 
-            // Draw in logo filename as it's changed
+            // 显示已上传的 logo 文件名，当文件改变时更新
             $(self.refs.logo).change(function () {
                 self.logo_file_name = self.refs.logo.value.replace(/\\/g, '/').replace(/.*\//, '')
                 self.update()
@@ -265,7 +264,7 @@
                 onChange: self.form_updated,
             })
             $(self.refs.queue).dropdown({
-                // Note: Passing `public=true` so default behavior is users can search for public queues
+                // 注意：传递 `public=true`，使默认行为为用户可搜索公共队列
                 apiSettings: {
                     url: `${URLS.API}queues/?search={query}&public=true`,
                     cache: false
@@ -283,12 +282,12 @@
         })
 
         /*---------------------------------------------------------------------
-         Methods
+         方法
         ---------------------------------------------------------------------*/
         self.form_updated = function () {
             var is_valid = true
 
-            // NOTE: logo is excluded here because it is converted to 64 upon changing and set that way
+            // 注意：logo 不在此处，因为上传后转换为 base64 后才设置
             self.data["title"] = self.refs.title.value
             self.data["description"] = self.markdown_editor.value()
             self.data["queue"] = self.refs.queue.value
@@ -309,16 +308,14 @@
                 is_valid = false
             }
 
-            // Require title, logo is optional IF we are editing -- will just keep the old one if
-            // a new one is not provided
+            // 当非编辑状态时，必须填写标题、docker 镜像和 logo（编辑时若未提供新 logo，则保留旧的）
             if (!self.data['title'] || !self.data['docker_image'] || (!self.data['logo'] && !self.is_editing_competition)) {
                 is_valid = false
             }
             CODALAB.events.trigger('competition_is_valid_update', 'details', is_valid)
 
             if (is_valid) {
-                // If we don't have logo data AND we're editing, put in empty data (otherwise
-                // we send garbage to the backend)
+                // 如果没有 logo 数据且处于编辑状态，则置为 undefined（否则会发送错误数据至后端）
                 if (!self.data['logo'] && self.is_editing_competition) {
                     self.data['logo'] = undefined
                 }
@@ -383,7 +380,7 @@
                         selection = selection.map(s => s.trim()).filter(s => s !== '')
                         form_json[question_key][entry.name.split('-')[0]] = selection
                     } else if (entry.name.split('-')[0] === 'key'){
-                        // Check to make sure key isn't empty
+                        // 检查键是否为空
                         if(!entry.value){
                             return false
                         }
@@ -414,14 +411,14 @@
 
 
         /*---------------------------------------------------------------------
-         Events
+         事件
         ---------------------------------------------------------------------*/
         CODALAB.events.on('competition_loaded', function (competition) {
             self.is_editing_competition = true
             self.refs.title.value = competition.title
             self.markdown_editor.value(competition.description || '')
 
-            // Value comes like c:/fakepath/file_name.txt -- cut out everything but file_name.txt
+            // 文件路径类似 c:/fakepath/file_name.txt —— 只取 file_name.txt
             self.uploaded_logo_name = competition.logo.replace(/\\/g, '/').replace(/.*\//, '')
             self.uploaded_logo = competition.logo
             if (competition.queue) {
@@ -452,9 +449,9 @@
             }
             self.update()
             self.form_updated()
-            // Put dropdown 'set selected' here so it doesn't trigger on_change:form_updated() before fact_sheet_questions is set
+            // 在这里设置下拉框选项，以免在 fact_sheet_questions 设置之前触发 on_change:form_updated()
             $(self.refs.competition_type).dropdown('set selected', competition.competition_type)
-            // Form change events
+            // 表单变更事件
             $(':input', self.root).not('[type="file"]').not('button').not('[readonly]').each(function (i, field) {
                 this.addEventListener('keyup', self.form_updated)
             })
