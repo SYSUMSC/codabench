@@ -20,6 +20,7 @@ urlpatterns = [
     path('forums/', include('forums.urls', namespace="forums")),
     # 新增致谢
     path('acknowledgement/', include('acknowledgement.urls', namespace="acknowledgement")),
+    path('leaderboards/', include('leaderboards.urls', namespace="leaderboards")),
 
     # Third party
     path('api/', include('api.urls')),

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="ui container">
+  <h1 class="ui header">总排行榜</h1>
+  <table class="ui celled table">
+    <thead>
+      <tr>
+        <th>排名</th>
+        <th>用户名</th>
+        <th>总得分</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in leaderboard_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ entry.user.username }}</td>
+        <td>{{ entry.total_score }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">暂无数据</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
