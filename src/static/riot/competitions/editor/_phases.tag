@@ -1,7 +1,7 @@
 <competition-phases>
     <div class="ui warning message" if="{warnings.length > 0}">
         <div class="header">
-            Phase Errors
+            阶段错误
         </div>
         <ul class="list">
             <li each="{item in warnings}">{item}</li>
@@ -14,7 +14,7 @@
                 <table class="ui padded table">
                     <thead>
                     <tr>
-                        <th colspan="2">Phases</th>
+                        <th colspan="2">阶段</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -38,7 +38,7 @@
                     </tr>
                     <tr show="{phases.length === 0}">
                         <td colspan="2" class="center aligned">
-                            <em>No phases added yet, at least 1 is required!</em>
+                            <em>尚未添加阶段，至少需要1个阶段！</em>
                         </td>
                     </tr>
                     </tbody>
@@ -46,7 +46,7 @@
                     <tr>
                         <th colspan="2" class="right aligned">
                             <button class="ui tiny inverted green icon button" onclick="{ add }">
-                                <i selenium="add-phase" class="add circle icon"></i> Add phase
+                                <i selenium="add-phase" class="add circle icon"></i> 添加阶段
                             </button>
                         </th>
                     </tr>
@@ -59,31 +59,30 @@
     <div class="ui large modal" ref="modal">
         <i class="close icon"></i>
         <div class="header">
-            <!--  When no phase is selected selected_phase_index is undefined  -->
-            { typeof selected_phase_index === 'undefined' ?  'Add Phase' : 'Edit Phase' }
+            <!--  当未选择阶段时，selected_phase_index 未定义  -->
+            { typeof selected_phase_index === 'undefined' ?  '添加阶段' : '编辑阶段' }
         </div>
         <div class="content">
             <form selenium="phase-form" class="ui form" ref="form">
                 <div class="field required">
-                    <label>Name</label>
+                    <label>名称</label>
                     <input name="name">
                 </div>
 
-                <!--  Start Date and Time  -->
+                <!--  开始日期和时间  -->
                 <div class="two fields">
                     <div class="ui calendar field required" ref="calendar_start_date">
-                        <label>Start Date</label>
+                        <label>开始日期</label>
                         <div class="ui input left icon">
                             <i class="calendar icon"></i>
                             <input type="text" name="start_date">
                         </div>
                     </div>
                     <div class="ui calendar field required" ref="calendar_start_time">
-                        <label>Start Time
-                        <span data-tooltip="Select time in UTC+0 time zone" data-inverted=""
+                        <label>开始时间
+                        <span data-tooltip="选择UTC+0时区的时间" data-inverted=""
                               data-position="bottom center"><i class="help icon circle"></i></span>
-                        </label> 
-                        
+                        </label>
                         <div class="ui input left icon">
                             <i class="clock icon"></i>
                             <input type="text" name="start_time">
@@ -91,10 +90,10 @@
                     </div>
                 </div>
 
-                <!--  End Date and Time  -->
+                <!--  结束日期和时间  -->
                 <div class="two fields">
                     <div class="ui calendar field" ref="calendar_end_date">
-                        <label>End Date</label>
+                        <label>结束日期</label>
                         <div class="ui input left icon">
                             <i class="calendar icon"></i>
                             <input type="text" name="end_date">
@@ -102,8 +101,8 @@
                     </div>
 
                     <div class="ui calendar field" ref="calendar_end_time">
-                        <label>End Time
-                        <span data-tooltip="Select time in UTC+0 time zone" data-inverted=""
+                        <label>结束时间
+                        <span data-tooltip="选择UTC+0时区的时间" data-inverted=""
                               data-position="bottom center"><i class="help icon circle"></i></span>
                         </label>
                         <div class="ui input left icon">
@@ -115,19 +114,19 @@
 
                 <div class="fluid field required" ref="tasks_select_container" id="tasks_select_container">
                     <label for="tasks">
-                        Tasks (Order will be saved) Note: Adding a new task will cause all submissions to be run against it.
-                        <span data-tooltip="Use Resources section to create new tasks" data-inverted=""
+                        任务（保存顺序） 注意：添加新任务将导致所有提交重新运行。
+                        <span data-tooltip="使用资源部分创建新任务" data-inverted=""
                               data-position="bottom center"><i class="help icon circle"></i></span>
                     </label>
                     <select name="tasks" id="tasks" class="ui search selection dropdown" ref="multiselect"
                             multiple="multiple">
                     </select>
                 </div>
-                <!--  BB Adding public_data and starting_kit dropdowns  -->
+                <!--  BB 添加公共数据和起始工具包的下拉菜单  -->
                 <div class="fluid field" ref="public_data_select_container" id="public_data_select_container">
                     <label for="public_data">
-                        Public Data (Only 1 per phase)
-                        <span data-tooltip="Use Resources section to create new public datasets" data-inverted=""
+                        公共数据（每个阶段仅允许1个）
+                        <span data-tooltip="使用资源部分创建新的公共数据集" data-inverted=""
                               data-position="bottom center"><i class="help icon circle"></i></span>
                     </label>
                     <select name="public_data" id="public_data" class="ui search selection dropdown" ref="public_data_multiselect"
@@ -136,8 +135,8 @@
                 </div>
                 <div class="fluid field" ref="starting_kit_select_container" id="starting_kit_select_container">
                     <label for="starting_kit">
-                        Starting Kit (Only 1 per phase)
-                        <span data-tooltip="Use Resources section to create new starting kits" data-inverted=""
+                        起始工具包（每个阶段仅允许1个）
+                        <span data-tooltip="使用资源部分创建新的起始工具包" data-inverted=""
                               data-position="bottom center"><i class="help icon circle"></i></span>
                     </label>
                     <select name="starting_kit" id="starting_kit" class="ui search selection dropdown" ref="starting_kit_multiselect"
@@ -146,21 +145,21 @@
                 </div>
 
                 <div class="field smaller-mde">
-                    <label>Description</label>
+                    <label>描述</label>
                     <textarea class="markdown-editor" ref="description" name="description"></textarea>
                 </div>
 
                 <div class="ui accordion" ref="advanced_settings">
                     <div class="title">
                         <i class="dropdown icon"></i>
-                        Advanced
+                        高级设置
                         <i class="cogs icon"></i>
                     </div>
                     <div class="content">
                         <div class="three fields">
                             <div class="field">
                                 <label>
-                                    Execution Time Limit (seconds)<span data-tooltip="600s if unset, { CODALAB.state.public_env_variables.MAX_EXECUTION_TIME_LIMIT }s max with default queue."
+                                    执行时间限制（秒）<span data-tooltip="默认为600秒，最大限制取决于队列设置。"
                                                                data-inverted=""
                                                                data-position="bottom center">
                                     <i class="help icon circle"></i></span>
@@ -169,8 +168,8 @@
                             </div>
                             <div class="field">
                                 <label>
-                                    Max Submissions Per Day <span
-                                        data-tooltip="The maximum number of submissions a user can be made per day"
+                                    每日最大提交数 <span
+                                        data-tooltip="用户每天可提交的最大次数"
                                         data-inverted=""
                                         data-position="bottom center">
                                     <i class="help icon circle"></i></span>
@@ -179,8 +178,8 @@
                             </div>
                             <div class="field">
                                 <label>
-                                    Max Submissions Per Person <span
-                                        data-tooltip="The maximum number of submissions any single user can make to the phase"
+                                    每人最大提交数 <span
+                                        data-tooltip="单个用户可提交的最大次数"
                                         data-inverted=""
                                         data-position="bottom center">
                                     <i class="help icon circle"></i></span>
@@ -190,7 +189,7 @@
                         </div>
                         <div class="field">
                             <div class="ui checkbox">
-                                <label>Hide Submission Output</label>
+                                <label>隐藏提交输出</label>
                                 <input type="checkbox" ref="hide_output">
                             </div>
                         </div>
@@ -199,7 +198,7 @@
                             <div class="ui checkbox">
                                 <input type="checkbox" name="auto_migrate_to_this_phase" ref="auto_migrate">
                                 <label>
-                                    Auto migrate to this phase <span data-tooltip="Re-submit all leaderboard submissions automatically when the phase starts."
+                                    自动迁移到此阶段 <span data-tooltip="阶段开始时自动重新提交所有排行榜提交。"
                                                                data-inverted=""
                                                                data-position="bottom center">
                                     <i class="help icon circle"></i></span>
@@ -212,10 +211,10 @@
         </div>
         <div class="actions">
             <a href="{ URLS.TASK_MANAGEMENT }" class="ui inverted green button" target="_blank">
-                <i class="logout icon"></i>Manage Tasks / Datasets
+                <i class="logout icon"></i>管理任务/数据集
             </a>
-            <div class="ui button" onclick="{ close_modal }">Cancel</div>
-            <div selenium="save2" class="ui button primary { disabled: !form_is_valid }" onclick="{ save }">Save</div>
+            <div class="ui button" onclick="{ close_modal }">取消</div>
+            <div selenium="save2" class="ui button primary { disabled: !form_is_valid }" onclick="{ save }">保存</div>
         </div>
     </div>
 
@@ -264,7 +263,7 @@
                 onAdd: self.public_data_added,
                 onRemove: self.public_data_removed,
             })
-            
+
             $(self.refs.starting_kit_multiselect).dropdown({
                 apiSettings: {
                     url: `${URLS.API}datasets/?search={query}&type=starting_kit`,
@@ -424,11 +423,11 @@
                 // with an additional option to link the end date calendar. This ensures that the start date
                 // cannot be after the selected end date.
                 var start_options = Object.assign({}, date_options, {endCalendar: self.refs.calendar_end_date})
-                
+
                 // Similarly, create a new options object for the end date calendar, linking it to the start date.
                 // This ensures that the end date cannot be before the selected start date.
                 var end_options = Object.assign({}, date_options, {startCalendar: self.refs.calendar_start_date})
-                
+
                 // Initialize the start date calendar using the options defined above, including the end date limitation.
                 $(self.refs.calendar_start_date).calendar(start_options)
 
@@ -437,7 +436,7 @@
 
 
 
-                // Initialize the start time calendar with the defined options. 
+                // Initialize the start time calendar with the defined options.
                 // This will create a time picker for the 'start time' field.
                 $(self.refs.calendar_start_time).calendar(time_options)
 
@@ -451,7 +450,7 @@
             // This condition is executed when selected_phase_index is not undefined i.e. a phase is selected
             // This means that user is updating a phase and is not creating a new phase
             if(!(self.selected_phase_index === undefined)){
-                
+
                 // Set Dates
                 $(self.refs.calendar_start_date).calendar('set date', self.getDate(self.phases[self.selected_phase_index].start))
                 $(self.refs.calendar_end_date).calendar('set date', self.getDate(self.phases[self.selected_phase_index].end))
@@ -499,8 +498,8 @@
             // format: 'HH:MM' 24-hour format in UTC
             if (dt != null){
                 dt = new Date(dt)
-                return dt.toLocaleTimeString('en-GB', { 
-                    hour: '2-digit', 
+                return dt.toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
                     minute: '2-digit',
                     timeZone: 'UTC' // Set time zone to UTC
                 })
@@ -528,7 +527,7 @@
                 var minutes = dateObject.getMinutes().toString().padStart(2, '0')
                 // Extract seconds
                 var seconds = dateObject.getSeconds().toString().padStart(2, '0')
-                
+
                 // Return formatted date string
                 return year + '-' + month + '-' + day + 'T' + hours + ':' + minutes + ':' + seconds
             }
@@ -590,7 +589,7 @@
         self.form_check_is_valid = function () {
             // This checks our current form to make sure it's valid
             var data = get_form_data(self.refs.form)
-            // Phase add/update form is valid if it has 
+            // Phase add/update form is valid if it has
             // name, start_date, start_time, and at least one task
             self.form_is_valid = !!data.name && !!data.start_date && !!data.start_time && self.phase_tasks.length > 0
         }
@@ -784,11 +783,11 @@
             // Fill default start time if start time is empty
             if (data.start_time == "") {
                 data.start_time = "00:00"
-            } 
+            }
             // Change phase start format to ISO date format "Y-m-dTH:M:S"
             data.start = self.formatDateTo_Y_m_d_T_H_M_S(data.start_date + " " + data.start_time)
 
-            
+
             if (data.end_date) {
                 // Fill default end time if end time is empty
                 if (data.end_time == "") {
