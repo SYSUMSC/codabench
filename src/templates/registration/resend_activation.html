@@ -4,11 +4,12 @@
 {% block content %}
 <div class="six wide centered column">
     <h2 class="ui blue centered header">
-        Resend Activation
+        重新发送激活邮件
     </h2>
     <div class="ui stacked segment">
-        <h5>Activation link expired?</h5>
-        <p>Enter your email in the form below and we'll send you a new activation link for your account.</p>
+        <!-- Activation link expired? -->
+        <h5>未及时激活账号？</h5>
+        <p>在下方输入您的邮箱，我们将重新发送激活邮件。</p>
         <div class="ui divider"></div>
         <form class="ui form" method="post">
             {% csrf_token %}
@@ -18,14 +19,15 @@
                     <i class="envelope icon"></i>
                     <input type="email"
                            name="email"
-                           placeholder="email"
+                           placeholder="邮箱"
                            id="id_email"
                            value="{{ form.email.value|default:''}}"
                            maxlength="{{ form.email.field.max_length }}"
                            required>
                 </div>
             </div>
-            <button class="ui blue fluid submit button" type="submit">Resend Activation Email</button>
+            <!-- @todo 原：Resend Activation Email，存疑 -->
+            <button class="ui blue fluid submit button" type="submit">发送</button>
         </form>
     </div>
 

@@ -9,7 +9,7 @@
     </div>
     {% endif %}
     <h2 class="ui blue centered header">
-        Sign Up
+        注册
     </h2>
     <div class="ui stacked segment">
         <form class="ui form" method="post">
@@ -19,7 +19,7 @@
                     <i class="user icon"></i>
                     <input type="text"
                            name="username"
-                           placeholder="username"
+                           placeholder="用户名"
                            id="id_username"
                            value="{{ form.username.value|default:''}}"
                            maxlength="{{ form.username.field.max_length }}"
@@ -38,7 +38,7 @@
                     <i class="envelope icon"></i>
                     <input type="email"
                            name="email"
-                           placeholder="email"
+                           placeholder="邮箱"
                            id="id_email"
                            value="{{ form.email.value|default:''}}"
                            maxlength="{{ form.email.field.max_length }}"
@@ -56,7 +56,7 @@
                     <i class="lock icon"></i>
                     <input type="password"
                            name="password1"
-                           placeholder="password"
+                           placeholder="密码"
                            id="id_password1"
                            value="{{ form.password1.value|default:''}}"
                            maxlength="{{ form.password1.field.max_length }}"
@@ -74,7 +74,7 @@
                     <i class="lock icon"></i>
                     <input type="password"
                            name="password2"
-                           placeholder="confirm password"
+                           placeholder="确认密码"
                            id="id_password2"
                            value="{{ form.password2.value|default:''}}"
                            maxlength="{{ form.password2.field.max_length }}"
@@ -89,13 +89,15 @@
 
             <div>
                 <input type="checkbox" name="checkbox" id="id_checkbox" required>
-                <label for="id_checkbox">I accept the <a href="https://github.com/codalab/codalab-competitions/wiki/Privacy" target="_blank">terms and conditions</a>.</label>
+                <!-- @todo 同，存疑 -->
+                <label for="id_checkbox">我同意<a href="https://github.com/codalab/codalab-competitions/wiki/Privacy"
+                        target="_blank">《隐私条款》</a>。</label>
             </div>
 
-            <button class="ui blue fluid submit button" type="submit">Sign Up</button>
+            <button class="ui blue fluid submit button" type="submit">注册</button>
         </form>
         <div class="ui divider"></div>
-        <p>Already have an account? <a href="{% url 'accounts:login' %}">Log In</a> instead.</p>
+        <p>已经有帐号了？<a href="{% url 'accounts:login' %}">登录</a>。</p>
     </div>
 
 </div>
