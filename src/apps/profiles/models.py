@@ -359,7 +359,7 @@ class Membership(models.Model):
 
     group = models.TextField(choices=PERMISSIONS, default=INVITED, null=False, blank=False)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  # 改成一对一关系
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # 最好别改这里为OneToOneField
     date_joined = models.DateTimeField(default=now)
     token = models.UUIDField(default=uuid.uuid4, unique=True)
 
