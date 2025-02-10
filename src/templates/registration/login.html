@@ -5,11 +5,12 @@
 <div class="sixteen wide mobile six wide computer centered column">
     {% if ENABLE_SIGN_IN %}
     <h2 class="ui blue centered header">
-        Login
+        登录
     </h2>
+    <!-- @todo 翻译这里的错误信息 -->
     {% if activation_error %}
     <div class="ui red message">
-        {{ activation_error }} or click <a href="{% url 'accounts:resend_activation' %}">here</a> to send the activation email again
+        {{ activation_error }}或点击<a href="{% url 'accounts:resend_activation' %}">这里</a>重新发送激活邮件
     </div>
     {% endif %}
     <div class="ui stacked segment">
@@ -30,7 +31,7 @@
                     <i class="user icon"></i>
                     <input type="text"
                            name="username"
-                           placeholder="username or email"
+                           placeholder="用户名或邮箱"
                            id="id_username"
                            value="{{ form.username.value|default:''}}"
                            maxlength="{{ form.username.field.max_length }}"
@@ -49,19 +50,19 @@
                     <i class="lock icon"></i>
                     <input type="password"
                            name="password"
-                           placeholder="password"
+                           placeholder="密码"
                            id="id_password"
                            value="{{ form.password.value|default:''}}"
                            maxlength="{{ form.password.field.max_length }}"
                            required>
                 </div>
             </div>
-            <button class="ui fluid blue submit button" type="submit">Log In</button>
+            <button class="ui fluid blue submit button" type="submit">登录</button>
             <div class="ui divider"></div>
             {% if ENABLE_SIGN_UP %}
-                <p>Don't have an account? <a href="{% url 'accounts:signup' %}">Sign Up</a></p>
+                <p>还没有账号？<a href="{% url 'accounts:signup' %}">注册</a>。</p>
             {% endif %}
-            <p><a href="{% url 'accounts:password_reset' %}">Forgot your password?</a></p>
+            <p><a href="{% url 'accounts:password_reset' %}">忘记密码？</a></p>
 
             <div class="ui error message"></div>
         </form>
@@ -71,12 +72,15 @@
     <!-- Auth Organization Buttons -->
     {% if auth_organizations %}
     <div class="sixteen wide mobile six wide computer centered column">
-        <h3 class="ui centered header">Organization Login</h3>
+        <!-- @todo 原：Organization Login存疑 -->
+        <h3 class="ui centered header">作为组织登录</h3>
         <form method="POST" action="{% url 'oidc_configurations:organization_oidc_login' %}">
             {% csrf_token %}
             <div>
                 <input type="checkbox" name="checkbox" id="id_checkbox" required>
-                <label for="id_checkbox">I accept the <a href="https://github.com/codalab/codalab-competitions/wiki/Privacy" target="_blank">terms and conditions</a>.</label>
+                <!-- @todo 原：terms and conditions存疑 -->
+                <label for="id_checkbox">我同意<a href="https://github.com/codalab/codalab-competitions/wiki/Privacy"
+                        target="_blank">使用条款</a>.</label>
             </div>
             {% for organization in auth_organizations %}
             <button class="ui fluid primary submit button"
@@ -86,11 +90,11 @@
                     style="background-color: {{ organization.button_bg_color }};
                            color: {{ organization.button_text_color }};
                            margin-bottom:5px;">
-                Login with {{ organization.name }}
+                使用{{ organization.name }}登录
             </button>
             {% endfor %}
         </form>
-        
+
     </div>
     {% endif %}
 </div>

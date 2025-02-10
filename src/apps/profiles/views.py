@@ -79,21 +79,25 @@ def activate(request, uidb64, token):
         user = User.objects.get(pk=uid)
     except User.DoesNotExist:
         user = None
-        messages.error(request, f"User not found. Please sign up again.")
+        # User not found. Please sign up again.
+        messages.error(request, f"找不到用户，请重新注册。")
         return redirect('accounts:signup')
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        messages.success(request, f'Your account is fully setup! Please login.')
+        # Your account is fully setup! Please login.
+        messages.success(request, f'你的账号已激活，请登录。')
         return redirect('accounts:login')
     else:
-        messages.error(request, f"Activation link is invalid or expired. Please double check your link.")
+        # Activation link is invalid or expired. Please double check your link.
+        messages.error(request, f"激活邮箱无效或已过期，请再次确认激活链接。")
         return redirect('accounts:resend_activation')
     return redirect('pages:home')
 
 
 def activateEmail(request, user, to_email):
-    mail_subject = 'Activate your user account.'
+    # Activate your user account.
+    mail_subject = '激活你的账号'
     message = render_to_string('profiles/emails/template_activate_account.html', {
         'user': user.username,
         'domain': get_current_site(request).domain,
@@ -103,10 +107,12 @@ def activateEmail(request, user, to_email):
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
     if email.send():
-        messages.success(request, f'Dear {user.username}, please go to you email {to_email} inbox and click on \
-            received activation link to confirm and complete the registration. *Note: Check your spam folder.')
+        # @todo 存疑 'Dear {user.username}, please go to you email {to_email} inbox and click on received activation link to confirm and complete the registration. *Note: Check your spam folder.'
+        messages.success(request, f'{user.username}你好，请检查你的邮箱 {to_email} 并点击\
+            收到的激活链接来确认并完成注册。 注意：如果没有收到邮件，请检查垃圾邮件。')
     else:
-        messages.error(request, f'Problem sending confirmation email to {to_email}, check if you typed it correctly.')
+        # Problem sending confirmation email to {to_email}, check if you typed it correctly.
+        messages.error(request, f'无法向 {to_email}发送邮件，请确认你的输入是否正确')
 
 
 def send_delete_account_confirmation_mail(request, user):
@@ -278,7 +284,7 @@ def log_in(request):
             try:
                 user = User.objects.get((Q(username=username) | Q(email=username)) & Q(is_deleted=False))
             except User.DoesNotExist:
-                messages.error(request, "User does not exist!")
+                messages.error(request, "用户不存在！")
             else:
                 # Authenticate user with credentials
                 user = authenticate(username=username, password=password)
@@ -293,7 +299,8 @@ def log_in(request):
                         else:
                             return redirect(next)
                     else:
-                        context['activation_error'] = "Your account is not activated. Please check your email for the activation link"
+                        # Your account is not activated. Please check your email for the activation link
+                        context['activation_error'] = "你的账户尚未激活，请检查您的邮箱中的激活链接。"
                 else:
                     messages.error(request, "Wrong Credentials!")
         else:
