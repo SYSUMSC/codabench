@@ -4,15 +4,33 @@
             <div class="row">
                 <div class="fourteen wide column">
                     <div class="ui fluid secondary pointing tabular menu">
-                        <a class="active item" data-tab="running">我正在运行的基准测试</a>
-                        <a class="item" data-tab="participating">我参与的基准测试</a>
+                        <a class="active item" data-tab="participating">我参与的基准测试</a>
+                        <a class="item" data-tab="running">我正在运行的基准测试</a>
                         <div class="right menu">
                             <div class="item">
                                 <help_button href="https://github.com/codalab/competitions-v2/wiki/Competition-Management-&-List"></help_button>
                             </div>
                         </div>
                     </div>
-                    <div class="ui active tab" data-tab="running">
+                    <div class="ui active tab" data-tab="participating">
+                        <table class="ui celled compact table">
+                            <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th width="125px">上传时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr each="{ competition in participating_competitions }" style="height: 42px;">
+                                <td><a href="{ URLS.COMPETITION_DETAIL(competition.id) }">{ competition.title }</a></td>
+                                <td>{ timeSince(Date.parse(competition.created_when)) } 之前</td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="ui tab" data-tab="running">
                         <table class="ui celled compact table participation">
                             <thead>
                             <tr>
@@ -50,24 +68,6 @@
                                         <i class="icon delete"></i>
                                     </button>
                                 </td>
-                            </tr>
-                            </tbody>
-                            <tfoot>
-                            </tfoot>
-                        </table>
-                    </div>
-                    <div class="ui tab" data-tab="participating">
-                        <table class="ui celled compact table">
-                            <thead>
-                            <tr>
-                                <th>名称</th>
-                                <th width="125px">上传时间</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr each="{ competition in participating_competitions }" style="height: 42px;">
-                                <td><a href="{ URLS.COMPETITION_DETAIL(competition.id) }">{ competition.title }</a></td>
-                                <td>{ timeSince(Date.parse(competition.created_when)) } 之前</td>
                             </tr>
                             </tbody>
                             <tfoot>
