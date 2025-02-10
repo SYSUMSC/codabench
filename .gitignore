@@ -5,6 +5,7 @@ __pycache__
 .env
 .envrc
 
+.vscode/
 node_modules/
 staticfiles/
 uploads/
