@@ -4,27 +4,31 @@
 {% block content %}
     <div class="ui container">
         <div class="ui raised compact segment">
-            <h1 class="header">Notifications:</h1>
+            <h1 class="header">通知：</h1>
             <div class="ui form" id="notification_form">
                 <div class="inline field">
                     <div class="ui toggle checkbox">
                         <input name="organizer_direct_message_updates" type="checkbox" tabindex="0" class="hidden">
-                        <label>Allow Emails from Competition Organizers</label>
+                        <!-- Allow Emails from Competition Organizers -->
+                        <label>允许来自比赛组织者的电子邮件</label>
                     </div>
                 </div>
                 <div class="inline field">
                     <div class="ui toggle checkbox">
                         <input name="allow_forum_notifications" type="checkbox" tabindex="0" class="hidden">
-                        <label>Allow Emails for Forum Notifications</label>
+                        <!-- Allow Emails for Forum Notifications -->
+                        <label>允许来自平台通知的电子邮件</label>
                     </div>
                 </div>
                 <div class="inline field">
                     <div class="ui toggle checkbox">
                         <input name="allow_organization_invite_emails" type="checkbox" tabindex="0" class="hidden">
-                        <label>Allow Invite Emails for Organizations</label>
+                        <!-- Allow Invite Emails for Organizations -->
+                        <label>允许来自组织邀请的电子邮件</label>
                     </div>
                 </div>
-                <div class="ui button primary" onclick="{self.submit_notifications()}">Submit</div>
+                <!-- @todo 存疑，原：Submit -->
+                <div class="ui button primary" onclick="{self.submit_notifications()}">确认</div>
             </div>
         </div>
     </div>
