@@ -216,8 +216,13 @@ def sign_up(request):
         if form.is_valid():
             # Check if the email is in the DeletedUser table
             email = form.cleaned_data.get('email')
+            if not (email.endswith('@mail2.sysu.edu.cn') or email.endswith('@mail3.sysu.edu.cn')):
+                messages.error(request, "邮箱必须以 @mail2.sysu.edu.cn 或 @mail3.sysu.edu.cn 结尾。")
+                context['form'] = form
+                return render(request, 'registration/signup.html', context)
+
             if DeletedUser.objects.filter(email=email).exists():
-                messages.error(request, "This email has been previously deleted and cannot be used.")
+                messages.error(request, "此邮箱已被删除，无法使用。")
                 context['form'] = form
             else:
                 form.save()
@@ -368,7 +373,7 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
     form_class = CustomPasswordResetForm  # auth_forms.PasswordResetForm
     # email_template_name = ''  # Defaults to registration/password_reset_email.html if not supplied.
     # subject_template_name = ''  # Defaults to registration/password_reset_subject.txt if not supplied.
-    # token_generator = ''  # This will default to default_token_generator, it’s an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
+    # token_generator = ''  # This will default to default_token_generator, it's an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
     success_url = django.urls.reverse_lazy("accounts:password_reset_done")
     from_email = "info@codalab.org"
 
@@ -382,7 +387,7 @@ class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     """
     # template_name = '' # Default value is registration/password_reset_confirm.html.
     # form_class = '' # Defaults to django.contrib.auth.forms.SetPasswordForm.
-    # token_generator = '' # This will default to default_token_generator, it’s an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
+    # token_generator = '' # This will default to default_token_generator, it's an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
     # post_reset_login = '' # Defaults to False.
     success_url = django.urls.reverse_lazy("accounts:password_reset_complete")
 
