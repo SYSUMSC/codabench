@@ -7,7 +7,7 @@
                 <div if="{selected_user.photo}"><img id="avatar" class="ui centered small rounded image" src="{selected_user.photo}"></div>
 
                 <!-- Competition Divider -->
-                <div class="ui horizontal divider">Organizations</div>
+                <div class="ui horizontal divider">组织</div>
 
                 <!-- Competition Cards -->
                 <div each="{org in selected_user.organizations}" class="ui fluid card">
@@ -18,6 +18,7 @@
                                  src="{org.photo}">
                         </div>
                     </div>
+                    <!-- admin账户没有显示可能没有翻译完全 -->
                     <div class="content">
                         <div class="description">
                             <p>{ org.description.length > 225 ? org.description.substring(0, 222) + "..." : org.description}</p>
@@ -25,7 +26,7 @@
                     </div>
                     <div class="right aligned extra content">
                         <a class="status" href="/profiles/organization/{org.id}/">
-                            View Organization
+                            查看组织
                             <i class="angle right icon"></i>
                         </a>
                     </div>
@@ -36,12 +37,12 @@
             <div class="eight wide column">
 
                 <!--  Section Personal Info  -->
-                <div id="horiz-margin" class="ui horizontal divider">Personal Info</div>
-                
+                <div id="horiz-margin" class="ui horizontal divider">个人信息</div>
+
                 <!-- Name -->
                 <div if="{ selected_user.first_name && selected_user.last_name}" class="about-block">
                     <div class="flex-container">
-                        <div class="label">Name</div>
+                        <div class="label">姓名</div>
                         <div class="value">{selected_user.first_name} {selected_user.last_name}</div>
                     </div>
                 </div>
@@ -51,7 +52,7 @@
                     <!-- Email -->
                     <div if="{ selected_user.email }" class="about-block">
                         <div class="flex-container">
-                            <div class="label">Email</div>
+                            <div class="label">邮箱</div>
                             <div class="value">{selected_user.email}</div>
                         </div>
                     </div>
@@ -59,7 +60,7 @@
                     <!-- Username -->
                     <div if="{ selected_user.username }" class="about-block">
                         <div class="flex-container">
-                            <div class="label">Username</div>
+                            <div class="label">用户名</div>
                             <div class="value">{selected_user.username}</div>
                         </div>
                     </div>
@@ -67,19 +68,20 @@
                     <!-- Display Name -->
                     <div if="{ selected_user.display_name }" class="about-block">
                         <div class="flex-container">
-                            <div class="label">Display Name</div>
+                            <div class="label">昵称</div>
                             <div class="value">{selected_user.display_name}</div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!--  Section About  -->
-                <div id="horiz-margin" class="ui horizontal divider">About</div>
+                <div id="horiz-margin" class="ui horizontal divider">关于</div>
 
                 <!-- Location -->
                 <div if="{ selected_user.location }" class="about-block">
                     <div class="flex-container">
-                        <div class="label"></i>Location</div>
+                        <!-- @todo 原：Location -->
+                        <div class="label"></i>地理位置</div>
                         <div class="value">{selected_user.location}</div>
                     </div>
                 </div>
@@ -87,32 +89,35 @@
                 <!-- Job title -->
                 <div if="{ selected_user.title }" class="about-block">
                     <div class="flex-container">
-                        <div class="label">Job Title</div>
+                        <!-- @todo 存疑，原：Job Title -->
+                        <div class="label">职位</div>
                         <div class="value">{selected_user.title}</div>
                     </div>
                 </div>
 
                 <!--  Empty About Message  -->
-                <span if="{!selected_user.location && !selected_user.title}" class="text-placeholder">Update your profile to show your job title and location here.</span>
-                
-                
+                  <!-- Update your profile to show your job title and location here. -->
+                <span if="{!selected_user.location && !selected_user.title}" class="text-placeholder">更新你的个人资料以显示。</span>
+                <!-- 你的职位和地理位置。 -->
+
+
 
                 <!--  Section Bio  -->
-                <div id="horiz-margin" class="ui horizontal divider">Bio</div>
+                <div id="horiz-margin" class="ui horizontal divider">简介</div>
                 <!-- Bio  -->
                 <div if="{selected_user.biography}"  class="ui justified container">{selected_user.biography}</div>
-                
+
                 <!--  Empty Bio Message   -->
-                <span if="{!selected_user.biography}" class="text-placeholder">Update your profile to show your bio here.</span>
-                
-                
+                <span if="{!selected_user.biography}" class="text-placeholder">更新你的个人资料以显示。</span>
+
+
                 <!--  Section Links  -->
-                <div id="horiz-margin" class="ui horizontal divider">Links</div>
+                <div id="horiz-margin" class="ui horizontal divider">链接</div>
 
                 <!--  Website   -->
                 <div if="{ selected_user.personal_url }" class="about-block">
                     <div class="flex-container">
-                        <div class=""><i class="world icon"></i>Website:</div>
+                        <div class=""><i class="world icon"></i>个人网站：</div>
                         <div class="value">
                             <a href="{selected_user.personal_url}" target="_blank">{selected_user.personal_url}</a>
                         </div>
@@ -122,7 +127,7 @@
                 <!--  GitHub   -->
                 <div if="{ selected_user.github_url }" class="about-block">
                     <div class="flex-container">
-                        <div class=""><i class="github icon"></i>GitHub:</div>
+                        <div class=""><i class="github icon"></i>GitHub：</div>
                         <div class="value">
                             <a href="{ selected_user.github_url }" target="_blank">{selected_user.github_url}</a>
                         </div>
@@ -132,7 +137,7 @@
                 <!--  LinkedIn   -->
                 <div if="{ selected_user.linkedin_url }" class="about-block">
                     <div class="flex-container">
-                        <div class=""><i class="linkedin icon"></i>LinkedIn:</div>
+                        <div class=""><i class="linkedin icon"></i>LinkedIn：</div>
                         <div class="value">
                             <a href="{ selected_user.linkedin_url }" target="_blank">{selected_user.linkedin_url}</a>
                         </div>
@@ -142,7 +147,7 @@
                 <!--  Twitter   -->
                 <div if="{ selected_user.twitter_url }" class="about-block">
                     <div class="flex-container">
-                        <div class=""><i class="twitter icon"></i>Twitter:</div>
+                        <div class=""><i class="twitter icon"></i>Twitter：</div>
                         <div class="value">
                             <a href="{ selected_user.twitter_url }" target="_blank">{selected_user.twitter_url}</a>
                         </div>
@@ -150,8 +155,8 @@
                 </div>
 
                 <!--  Empty Links Message   -->
-                <span if="{!selected_user.personal_url && !selected_user.github_url && !selected_user.linkedin_url && !selected_user.twitter_url}" class="text-placeholder">Update your profile to show your social links here.</span>
-                
+                <span if="{!selected_user.personal_url && !selected_user.github_url && !selected_user.linkedin_url && !selected_user.twitter_url}" class="text-placeholder">更新你的个人资料以显示。</span>
+
 
             </div>
         </div>
@@ -159,7 +164,7 @@
     <script>
         self.selected_user = selected_user
     </script>
-  
+
     <!--  CSS Styling   -->
     <style type="text/stylus">
         :scope
@@ -230,7 +235,7 @@
 
         .linkedin.icon
             color #0077B5
-        
+
         .social-block
             margin-bottom 10px
             margin-top 5px
@@ -246,8 +251,8 @@
 
         .text-placeholder
             color #9e9e9e
-        
-        .label 
+
+        .label
             width 100px
             color: #999
         .value

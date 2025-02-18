@@ -1,11 +1,12 @@
 <profile-edit>
     <div class="ui raised segment">
-    <h1>User Edit:</h1>
+    <h1>编辑个人资料</h1>
     <form class="ui form" id="user-form">
         <div class="field">
-            <label>Profile Photo</label>
+            <!-- Profile Photo -->
+            <label>头像</label>
             <label show="{ photo }">
-                Uploaded Photo: <a href="{ photo }" target="_blank">{ photo_name }</a>
+                更换为：<a href="{ photo }" target="_blank">{ photo_name }</a>
             </label>
             <div class="ui left action file input">
                 <button class="ui icon button" type="button" onclick="document.getElementById('profile_phtoto').click()">
@@ -19,56 +20,56 @@
         </div>
         <div class="two fields">
             <div class="field" id="first_name">
-                <label>First Name</label>
-                <input type="text" name="first_name" placeholder="First Name">
+                <label>名字</label>
+                <input type="text" name="first_name" placeholder="名字">
             </div>
             <div class="field" id="last_name">
-                <label>Last Name</label>
-                <input type="text" name="last_name" placeholder="Last Name">
+                <label>姓氏</label>
+                <input type="text" name="last_name" placeholder="姓氏">
             </div>
         </div>
         <div class="two fields">
             <div class="field" id="display_name">
-                <label>Display Name</label>
-                <input type="text" name="display_name" placeholder="Display Name">
+                <label>昵称</label>
+                <input type="text" name="display_name" placeholder="昵称">
             </div>
             <div class="field" id="title">
-                <label>Job Title</label>
-                <input type="text" name="title" placeholder="Job Title"></div>
+                <label>职位</label>
+                <input type="text" name="title" placeholder="职位"></div>
         </div>
         <div class="field" id="location">
-            <label>Location</label>
-            <input type="text" name="location" placeholder="Location"></div>
+            <label>地理位置</label>
+            <input type="text" name="location" placeholder="地理位置"></div>
         <div class="field" id="email">
-            <label>Email</label>
-            <input disabled type="text" name="email" placeholder="Email">
+            <label>邮箱</label>
+            <input disabled type="text" name="email" placeholder="邮箱">
         </div>
         <div class="two fields">
             <div class="field" id="personal_url">
-                <label>Personal Website</label>
-                <input type="text" name="personal_url" placeholder="Personal URL">
+                <label>个人网站</label>
+                <input type="text" name="personal_url" placeholder="个人网站地址">
             </div>
             <div class="field" id="twitter_url">
-                <label>Twitter URL</label>
-                <input type="text" name="twitter_url" placeholder="Twitter URL">
+                <label>Twitter地址</label>
+                <input type="text" name="twitter_url" placeholder="Twitter地址">
             </div>
         </div>
         <div class="two fields">
             <div class="field" id="linkedin_url">
-                <label>LinkedIn URL</label>
-                <input type="text" name="linkedin_url" placeholder="LinkedIn URL">
+                <label>LinkedIn地址</label>
+                <input type="text" name="linkedin_url" placeholder="LinkedIn地址">
             </div>
             <div class="field" id="github_url">
-                <label>Github URL</label>
-                <input type="text" name="github_url" placeholder="Github URL">
+                <label>Github地址</label>
+                <input type="text" name="github_url" placeholder="Github地址">
             </div>
         </div>
         <div class="field" id="biography">
-            <label>Bio</label>
+            <label>简介</label>
             <textarea name="biography"></textarea>
         </div>
         <div class="ui error message"></div>
-        <button type="button" class="ui primary button" onclick="{save.bind(this)}" ref="submit_button">Submit</button>
+        <button type="button" class="ui primary button" onclick="{save.bind(this)}" ref="submit_button">提交</button>
     </form>
     </div>
 
@@ -163,7 +164,7 @@
                  onSuccess: function () {
                      // get form values from user-form
                      const formValues = $('#user-form').form('get values')
-                     
+
                      // delete email from form values
                      delete formValues.email;
 
