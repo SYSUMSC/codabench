@@ -212,26 +212,26 @@ services:
           # appear on Heroku ahead of time
           memory: 256M
 
-  compute_worker:
-    command: bash -c "watchmedo auto-restart -p '*.py' --recursive -- celery -A compute_worker worker -l info -Q compute-worker -n compute-worker@%n"
-    working_dir: /app
-    build:
-      context: .
-      dockerfile: Dockerfile.compute_worker
-    depends_on:
-      - django
-      - rabbit
-    volumes:
-      - ./compute_worker:/app
-      - ${HOST_DIRECTORY:-/tmp/codabench}:/codabench
-      # Actual connection back to docker parent to run things
-      - /var/run/docker.sock:/var/run/docker.sock
-    env_file: .env
-    environment:
-      - BROKER_URL=pyamqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@${RABBITMQ_HOST}:${RABBITMQ_PORT}//
-      # Make the worker leave behind the submission so we can examine it
-      - CODALAB_IGNORE_CLEANUP_STEP=1
-    logging:
-      options:
-        max-size: "20m"
-        max-file: "5"
+  # compute_worker:
+  #   command: bash -c "watchmedo auto-restart -p '*.py' --recursive -- celery -A compute_worker worker -l info -Q compute-worker -n compute-worker@%n"
+  #   working_dir: /app
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.compute_worker
+  #   depends_on:
+  #     - django
+  #     - rabbit
+  #   volumes:
+  #     - ./compute_worker:/app
+  #     - ${HOST_DIRECTORY:-/tmp/codabench}:/codabench
+  #     # Actual connection back to docker parent to run things
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   env_file: .env
+  #   environment:
+  #     - BROKER_URL=pyamqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@${RABBITMQ_HOST}:${RABBITMQ_PORT}//
+  #     # Make the worker leave behind the submission so we can examine it
+  #     - CODALAB_IGNORE_CLEANUP_STEP=1
+  #   logging:
+  #     options:
+  #       max-size: "20m"
+  #       max-file: "5"
