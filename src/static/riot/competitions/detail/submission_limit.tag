@@ -3,31 +3,31 @@
     <div class="ui sixteen wide column submission-container">
         <div class="col">
             <div class="col-content">
-                Number of submissions used for the day
-                <a class="float-left" data-tooltip="The submission limit resets at midnight server time." data-position="right center">
+                今日已使用提交次数
+                <a class="float-left" data-tooltip="提交限制将在服务器时间午夜重置。" data-position="right center">
                     <i class="grey question circle icon"></i>
                 </a>
             </div>
             <!-- Badge for when there is a limit -->
             <span if="{selected_phase.max_submissions_per_day > 0}" class="badge {badgeColor(selected_phase.used_submissions_per_day, selected_phase.max_submissions_per_day)}">
-                {selected_phase.used_submissions_per_day} out of {selected_phase.max_submissions_per_day}
+                {selected_phase.used_submissions_per_day} / {selected_phase.max_submissions_per_day}
             </span>
             <!-- Badge for when there is no limit -->
             <span if="{selected_phase.max_submissions_per_day == 0}" class="badge badge-green">
-                {selected_phase.used_submissions_per_day} out of ∞
+                {selected_phase.used_submissions_per_day} / ∞
             </span>
         </div>
         <div class="col">
             <div class="col-content">
-                Number of total submissions used
+                总提交次数
             </div>
             <!-- Badge for when there is a limit -->
             <span if="{selected_phase.max_submissions_per_person > 0}" class="badge {badgeColor(selected_phase.used_submissions_per_person, selected_phase.max_submissions_per_person)}">
-                {selected_phase.used_submissions_per_person} out of {selected_phase.max_submissions_per_person}
+                {selected_phase.used_submissions_per_person} / {selected_phase.max_submissions_per_person}
             </span>
             <!-- Badge for when there is no limit -->
             <span if="{selected_phase.max_submissions_per_person == 0}" class="badge badge-green">
-                {selected_phase.used_submissions_per_person} out of ∞
+                {selected_phase.used_submissions_per_person} / ∞
             </span>
         </div>
     </div>
@@ -38,10 +38,10 @@
 
         self.badgeColor = function(used, max) {
 
-            // Calculate the percentage of used submissions
+            // 计算已使用提交次数的百分比
             var percentage = (used / max) * 100;
 
-            // Determine the badge color based on the percentage
+            // 根据百分比确定徽章颜色
             if (percentage < 5) {
                 return "badge-green";
             } else if (percentage < 25) {
@@ -63,12 +63,13 @@
     </script>
 
     <style type="text/stylus">
-        .submission-container
+        .submission-container {
             margin-top 1em
             background-color white
             padding 2em
             border solid 1px #dcdcdcdc
             display flex
+        }
 
         .col
             flex 1
@@ -91,9 +92,9 @@
 
         .badge-green
             background-color #a5d6a7
-        
+
         .badge-yellow
-            background-color #fff59d 
+            background-color #fff59d
 
         .badge-orange
             background-color #ffcc80
@@ -104,6 +105,6 @@
         .badge-red
             background-color #e57373
 
-        
+
     </style>
 </submission-limit>

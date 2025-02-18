@@ -1,6 +1,6 @@
 <help_button>
     <a class="ui mini circular icon button"
-       data-tooltip="{opts.tooltip || 'Help'}"
+       data-tooltip="{opts.tooltip || '帮助'}"
        data-position="{opts.tooltip_position || 'top center'}"
        href="{opts.href}"
        target="_blank">

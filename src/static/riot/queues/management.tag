@@ -3,7 +3,7 @@
         <div class="item">
             <div class="ui icon input">
                 <input type="text"
-                       placeholder="Search by name..."
+                       placeholder="依名称查找..."
                        ref="search"
                        onkeyup="{filter.bind(this, undefined)}">
                 <i class="search icon"></i>
@@ -11,7 +11,7 @@
         </div>
         <div class="item">
             <div class="ui checkbox" onclick="{ filter.bind(this, undefined) }">
-                <label>Show Public Queues</label>
+                <label>显示公共队列</label>
                 <input type="checkbox" ref="public">
             </div>
         </div>
@@ -23,39 +23,39 @@
     </div>
 
     <div class="ui green right floated labeled icon button" onclick="{ show_modal.bind(this, undefined) }">
-        <i class="add circle icon"></i> Create Queue
+        <i class="add circle icon"></i> 创建队列
     </div>
 
     <table class="ui {selectable: queues.length > 0} celled compact table">
         <thead>
         <tr>
-            <th>Name</th>
-            <th width="150px">Owner</th>
-            <th width="125px">Created</th>
-            <th width="50px">Public</th>
-            <th class="right aligned" width="150px">Actions</th>
+            <th>名称</th>
+            <th width="150px">创建者</th>
+            <th width="125px">创建时间</th>
+            <th width="125px">是否公开</th>
+            <th class="right aligned" width="150px">操作</th>
         </tr>
         </thead>
         <tbody>
         <tr each="{ queue in queues }" class="queue-row">
             <td>{ queue.name }</td>
             <td>{ queue.owner }</td>
-            <td>{ timeSince(Date.parse(queue.created_when)) } ago</td>
+            <td>{ timeSince(Date.parse(queue.created_when)) } 之前</td>
             <td class="center aligned">
                 <i class="checkmark box icon green" if="{ queue.is_public }"></i>
             </td>
             <td class="right aligned">
-                <span data-tooltip="View Queue Details">
+                <span data-tooltip="队列详细信息">
                     <i class="grey icon eye popup-button" if="{ !!queue.broker_url }" onclick="{ show_broker_modal.bind(this, queue) }"></i>
                 </span>
-                <span data-tooltip="Copy Broker URL">
+                <span data-tooltip="复制中间人链接">
                     <i class="icon copy outline popup-button" if="{ !!queue.broker_url }"
                        onclick="{ copy_queue_url.bind(this, queue) }"></i>
                 </span>
-                <span data-tooltip="Edit Queue">
+                <span data-tooltip="修改队列信息">
                     <i class="blue icon edit popup-button" if="{ queue.is_owner && !!queue.broker_url }" onclick="{ show_modal.bind(this, queue) }"></i>
                 </span>
-                <span data-tooltip="Delete Queue">
+                <span data-tooltip="删除队列">
                     <i class="red icon trash alternate outline popup-button" if="{ queue.is_owner && !!queue.broker_url }"
                        onclick="{ delete_queue.bind(this, queue) }"></i>
                 </span>
@@ -64,7 +64,7 @@
 
         <tr if="{queues.length === 0}">
             <td class="center aligned" colspan="5">
-                <em>No Queues Yet!</em>
+                <em>还没有队列!</em>
             </td>
         </tr>
         </tbody>
@@ -91,30 +91,30 @@
 
     <!--  Server status page button  -->
     <a href="/server_status" target="_blank">
-        <div class="ui blue right floated button">Open Server status page</div>
+         <div class="ui blue right floated button">打开比赛状况界面</div>
     </a>
 
     <div class="ui modal" ref="modal">
         <div class="header">
-            Queue Form
+            队列表单
         </div>
         <div class="content">
             <form class="ui form" ref="form">
                 <div class="required field">
-                    <label>Name</label>
+                    <label>名称</label>
                     <input name="name" placeholder="Name" ref="queue_name">
                 </div>
                 <div class="field">
                     <div class="ui checkbox">
-                        <label>Make Public?</label>
+                        <label>是否公开？</label>
                         <input type="checkbox" ref="queue_public">
                     </div>
                 </div>
                 <div class="field">
-                    <label>Collaborators</label>
+                    <label>协作者</label>
                     <select name="collaborators" class="ui fluid search multiple selection dropdown" multiple ref="collab_search">
                         <i class="dropdown icon"></i>
-                        <div class="default text">Select Collaborator</div>
+                        <div class="default text">选择协作者</div>
                         <div class="menu">
                         </div>
                     </select>
@@ -122,31 +122,32 @@
             </form>
         </div>
         <div class="actions">
-            <div class="ui primary button" onclick="{ handle_queue }">Submit</div>
-            <div class="ui basic red cancel button" onclick="{ close_modal }">Cancel</div>
+            <div class="ui primary button" onclick="{ handle_queue }">提交</div>
+            <div class="ui basic red cancel button" onclick="{ close_modal }">取消</div>
         </div>
     </div>
 
     <div class="ui modal" ref="broker_modal">
         <div class="header">
-            Queue Details
+            <!-- Queue Details -->
+             队列详细信息
         </div>
         <div class="content">
-            <h4>Broker URL:</h4>
+            <h4>中间人链接:</h4>
             <span>{selected_queue.broker_url}</span>
-            
-            <h4>Vhost:</h4>
+
+            <h4>虚拟host:</h4>
             <span>{selected_queue.vhost}</span>
 
             <!--  Competitions using this queue  -->
-            <h4 if="{ _.get(selected_queue, 'competitions.length', 0) }">Competitions using this queue:</h4>
+            <h4 if="{ _.get(selected_queue, 'competitions.length', 0) }">正在使用该队列的比赛:</h4>
             <ul if="{ _.get(selected_queue, 'competitions.length', 0) }">
                 <li each="{ comp in selected_queue.competitions }">
-                
+
                 <a class="link-no-deco" target="_blank" href="../competitions/{ comp.id }">{comp.title}</a>
                 </li>
             </ul>
- 
+
         </div>
         <div class="actions">
             <div class="ui cancel button" onclick="{ close_broker_modal }">Close</div>
@@ -205,7 +206,7 @@
                     self.update()
                 })
                 .fail(function (response) {
-                    toastr.error("Could not load queues")
+                    toastr.error("无法加载队列")
                 })
         }
 
@@ -268,7 +269,7 @@
                 : CODALAB.api.create_queue
             endpoint(data, _.get(self.selected_queue, 'id'))
                 .done(function (response) {
-                    toastr.success("Success!")
+                    toastr.success("成功！")
                     self.close_modal()
                     // Todo: Handle this better
                     // Necessary to reset page to 1, because we re-grab our results regardless of page after update/create.
@@ -276,7 +277,7 @@
                     self.update_queues()
                 })
                 .fail(function (response) {
-                    toastr.error("An error occurred!")
+                    toastr.error("发生了错误！")
                 })
         }
 
@@ -307,14 +308,14 @@
         }
 
         self.delete_queue = function (queue) {
-            if (confirm(`Are you sure you want to delete the queue: "${queue.name}"?`)) {
+            if (confirm(`确认删除: "${queue.name}"?`)) {
                 CODALAB.api.delete_queue(queue.id)
                     .done(function () {
                         self.update_queues()
-                        toastr.success("Queue deleted successfully!")
+                        toastr.success("队列删除成功!")
                     })
                     .fail(function () {
-                        toastr.error("Could not delete queue!")
+                        toastr.error("无法删除队列!")
                     })
             }
         }
@@ -322,10 +323,10 @@
         self.copy_queue_url = function (queue) {
             navigator.clipboard.writeText(queue.broker_url).then(function () {
                 // clipboard successfully set
-                toastr.success("Successfully copied broker url to clipboard!")
+                toastr.success("成功将中间人链接复制到剪切板!")
             }, function () {
                 // clipboard write failed
-                toastr.error("Failed to copy broker url to clipboard!")
+                toastr.error("复制中间人链接失败!")
             });
         }
     </script>

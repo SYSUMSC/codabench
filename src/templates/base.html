@@ -103,10 +103,8 @@
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             <div class="header"></div>
-                            {% if request.user.is_staff %}
-                            <a class="item" href="{% url "competitions:management" %}">管理</a>
-                            {% endif %}
-                            <a class="item" href="{% url "competitions:public" %}">题目列表</a>
+                            <a class="item" href="{% url "competitions:management" %}">比赛管理</a>
+                            <a class="item" href="{% url "competitions:public" %}">公共比赛列表</a>
                         </div>
                     </div>
                     <a class="item" href="{% url "tasks:task_management" %}">
@@ -117,7 +115,7 @@
                         <i class="ui small computer icon"></i>
                         队列管理
                     </a>
-                    <a class="item" href="{% url 'leaderboards:leaderboard_list' %}">
+                    <a class="item" href="{% url 'leaderboards:overall_leaderboard' %}">
                         <i class="ui small chart bar icon"></i>
                         总排行榜
                     </a>

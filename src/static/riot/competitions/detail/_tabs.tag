@@ -1,22 +1,22 @@
 <comp-tabs>
     <div class="ui grid comp-tabs">
-        <!-- Tab menu -->
+        <!-- 选项卡菜单 -->
         <div class="ui tiny fluid four secondary pointing tabular menu details-menu">
-            <!-- <div class="item" data-tab="home-tab">Home</div> -->
-            <div class="item" data-tab="pages-tab">Get Started</div>
-            <div class="item" data-tab="phases-tab">Phases</div>
-            <div class="item" data-tab="participate-tab">My Submissions</div>
-            <div class="item" data-tab="results-tab">Results</div>
-            <a class="item" href="{URLS.FORUM(competition.forum)}">Forum</a>
+            <!-- <div class="item" data-tab="home-tab">主页</div> -->
+            <div class="item" data-tab="pages-tab">开始使用</div>
+            <div class="item" data-tab="phases-tab">阶段</div>
+            <div class="item" data-tab="participate-tab">我的提交</div>
+            <div class="item" data-tab="results-tab">结果</div>
+            <a class="item" href="{URLS.FORUM(competition.forum)}">论坛</a>
             <div class="right menu">
                 <div class="item">
                     <help_button href="https://github.com/codalab/competitions-v2/wiki/Competition-Detail-Page"
-                                 tooltip_position="left center"></help_button>
+                                 tooltip_position="left center">帮助</help_button>
                 </div>
             </div>
         </div>
 
-        <!--Get Started tab-->
+        <!-- 开始使用选项卡 -->
         <div class="pages-tab ui tab" data-tab="pages-tab">
             <div show="{loading}">
                 <loader></loader>
@@ -31,50 +31,50 @@
                             </div>
                             <div if="{competition_has_no_terms_page()}" class="item"
                                  data-tab="_tab_page_term">
-                                Terms
+                                条款
                             </div>
-                            <div  if={competition.files && competition.files.length != 0} class="{active: _.get(competition.pages, 'length') === 0} item" data-tab="files">
-                                Files
+                            <div  if={competition.files && competition.files.length!= 0} class="{active: _.get(competition.pages, 'length') === 0} item" data-tab="files">
+                                文件
                             </div>
                         </div>
                     </div>
                     <div class="twelve wide column">
-                        <!-- Competition Pages  -->
+                        <!-- 竞赛页面  -->
                         <div each="{ page, i in competition.pages }" class="ui {active: i === 0} tab"
                              data-tab="_tab_page{page.index}">
                             <div class="ui" id="page_{i}">
                             </div>
                         </div>
-                        <!--  Terms page  -->
+                        <!--  条款页面  -->
                         <div if="{competition_has_no_terms_page()}" class="ui tab" data-tab="_tab_page_term">
                             <div class="ui" id="page_term">
                             </div>
                         </div>
-                        
-                        <!--  Files page  -->
+
+                        <!--  文件页面  -->
                         <div class="ui tab {active: _.get(competition.pages, 'length') === 0}" data-tab="files">
                             <div class="ui" id="files">
-                                <!--  Login message if not loggedin  -->
+                                <!--  如果未登录显示的登录消息  -->
                                 <div if="{!CODALAB.state.user.logged_in}" class="ui yellow message">
-                                    <a href="{URLS.LOGIN}?next={location.pathname}">Log In</a> or
-                                    <a href="{URLS.SIGNUP}" target="_blank">Sign Up</a> to view availbale files.
+                                    <a href="{URLS.LOGIN}?next={location.pathname}">登录</a> 或
+                                    <a href="{URLS.SIGNUP}" target="_blank">注册</a> 以查看可用文件。
                                 </div>
 
-                                <!--  Files table if loggedin  -->
+                                <!--  如果已登录显示的文件表格  -->
                                 <table if="{CODALAB.state.user.logged_in}" class="ui celled table">
                                     <thead>
                                     <tr>
-                                        <th class="index-column">Download</th>
-                                        <th>Phase</th>
-                                        <th>Task</th>
-                                        <th>Type</th>
-                                        <th if="{competition.is_admin}">Available <span class="ui mini circular icon button"
-                                                          data-tooltip="Available for download to participants."
+                                        <th class="index-column">下载</th>
+                                        <th>阶段</th>
+                                        <th>任务</th>
+                                        <th>类型</th>
+                                        <th if="{competition.is_admin}">可用 <span class="ui mini circular icon button"
+                                                          data-tooltip="可供参与者下载。"
                                                           data-position="top center">
                                                           <i class="question icon"></i>
                                                       </span>
                                         </th>
-                                        <th>Size</th>
+                                        <th>大小</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -87,16 +87,16 @@
                                         <td>{file.phase}</td>
                                         <td>{file.task}</td>
                                         <td>{file.type}</td>
-                                        <!--  <td>{file.type === 'Public Data' || file.type === 'Starting Kit' ? 'yes': 'no'}</td>  -->
+                                        <!--  <td>{file.type === 'Public Data' || file.type === 'Starting Kit'? '是': '否'}</td>  -->
                                         <td if="{competition.is_admin}" class="center aligned">
                                             <i if="{file.available}" class="checkmark box icon green"></i>
                                         </td>
                                         <td>{filesize(file.file_size * 1024)}</td>
                                     </tr>
-                                    <!-- Conditional row if no files to show -->
+                                    <!-- 如果没有文件显示，显示此条件行 -->
                                     <tr class="center aligned">
                                         <td if = {competition.files === undefined ||competition.files.length === 0} colspan="100%">
-                                            <em>No Files Available Yet</em>
+                                            <em>暂无可用文件</em>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -109,7 +109,7 @@
             </div>
         </div>
 
-        <!--Phases tab-->
+        <!-- 阶段选项卡 -->
         <div class="phases-tab ui tab" data-tab="phases-tab">
             <div show="{loading}">
                 <loader></loader>
@@ -124,11 +124,11 @@
                                     {phase.name}
                                 </div>
                                 <div class="ui bottom attached content {active: selected_phase_index === phase.id}">
-                                    <div class="phase-label">Start:</div>
+                                    <div class="phase-label">开始时间:</div>
                                     <div class="phase-info">{pretty_date(phase.start)}</div>
-                                    <div class="phase-label">End:</div>
+                                    <div class="phase-label">结束时间:</div>
                                     <div class="phase-info">{pretty_date(phase.end)}</div>
-                                    <span class="phase-label">Description: </span>
+                                    <span class="phase-label">描述: </span>
                                     <div class="phase-markdown" id="phase_{i}"></div>
                                 </div>
                             </virtual>
@@ -138,9 +138,9 @@
             </div>
         </div>
 
-        <!-- Submissions tab-->
+        <!-- 提交选项卡 -->
         <div class="submission-tab ui tab" data-tab="participate-tab">
-            <!-- Tab Content !-->
+            <!-- 选项卡内容!-->
             <div show="{loading}">
                 <loader></loader>
             </div>
@@ -161,23 +161,23 @@
                         <submission-manager id="user-submission-table" competition="{ competition }"></submission-manager>
                     </div>
                 </div>
-                <div if="{competition.participant_status !== 'approved'}">
+                <div if="{competition.participant_status!== 'approved'}">
                     <registration></registration>
                 </div>
             </div>
         </div>
 
-        <!-- Leaderboard tab-->
+        <!-- 排行榜选项卡 -->
         <div class="results-tab ui tab" data-tab="results-tab">
             <div show="{loading}">
                 <loader></loader>
             </div>
-            <!-- Tab Content !-->
+            <!-- 选项卡内容!-->
             <div class="row" if="{!CODALAB.state.user.logged_in}">
                 <div class="column">
                     <div class="ui yellow message">
-                        <a href="{URLS.LOGIN}?next={location.pathname}">Log In</a> or
-                        <a href="{URLS.SIGNUP}" target="_blank">Sign Up</a> to view this competition results.
+                        <a href="{URLS.LOGIN}?next={location.pathname}">登录</a> 或
+                        <a href="{URLS.SIGNUP}" target="_blank">注册</a> 以查看此竞赛结果。
                     </div>
                 </div>
             </div>
@@ -188,29 +188,29 @@
                          onclick="{ phase_selected.bind(this, phase) }">{ phase.name }
                     </div>
                 </div>
-                    <div show="{competition.admin}" class="float-right">
-                        <div class="ui compact menu">
-                            <div class="ui simple dropdown item" style="padding: 0px 5px">
-                                <i class="download icon" style="font-size: 1.5em; margin: 0;"></i>
-                                <div style="padding-top: 8px; right: 0; left: auto;" class="menu">
-                                    <a href="{URLS.COMPETITION_GET_ZIP(competition.id)}" target="new" class="item">All CSV</a>
-                                    <a href="{URLS.COMPETITION_GET_JSON(competition.id)}" target="new" class="item">All JSON</a>
-                                </div>
+                <div show="{competition.admin}" class="float-right">
+                    <div class="ui compact menu">
+                        <div class="ui simple dropdown item" style="padding: 0px 5px">
+                            <i class="download icon" style="font-size: 1.5em; margin: 0;"></i>
+                            <div style="padding-top: 8px; right: 0; left: auto;" class="menu">
+                                <a href="{URLS.COMPETITION_GET_ZIP(competition.id)}" target="new" class="item">所有CSV</a>
+                                <a href="{URLS.COMPETITION_GET_JSON(competition.id)}" target="new" class="item">所有JSON</a>
                             </div>
                         </div>
                     </div>
-                <!-- If there's no leaderboard, show this message -->
-                <div show="{_.isEmpty(competition.leaderboards)}">
-                    <div class="center aligned"><h2>No visible leaderboard for this benchmark</h2></div>
                 </div>
-                <!-- Else, show the leaderboard -->
+                <!-- 如果没有排行榜，显示此消息 -->
+                <div show="{_.isEmpty(competition.leaderboards)}">
+                    <div class="center aligned"><h2>此基准测试无可见排行榜</h2></div>
+                </div>
+                <!-- 否则，显示排行榜 -->
                 <div show="{!_.isEmpty(competition.leaderboards)}">
                     <leaderboards class="leaderboard-table"
-                              phase_id="{ self.selected_phase_index }"
-                              is_admin="{competition.admin}">
+                                  phase_id="{ self.selected_phase_index }"
+                                  is_admin="{competition.admin}">
                     </leaderboards>
                 </div>
-            </div>           
+            </div>
         </div>
     </div>
 
@@ -275,7 +275,7 @@
 
                 })
                 // Need code for public_data and starting_kit at phase level
-                if(self.competition.participant_status === 'approved'){    
+                if(self.competition.participant_status === 'approved'){
                     _.forEach(phase.tasks, task => {
                         _.forEach(task.solutions, solution => {
                             soln = {
@@ -318,8 +318,8 @@
             })
             // loop over competition phases to mark if phase has started or ended
             self.competition.phases.forEach(function (phase, index) {
-                
-                phase_ended = false 
+
+                phase_ended = false
                 phase_started = false
 
                 // check if phase has started
@@ -371,7 +371,7 @@
                 rendered_content.forEach(node => {
                     $(`#page_${index}`)[0].appendChild(node.cloneNode(true)); // Append each node
                 });
-                
+
             })
             if(self.competition_has_no_terms_page()){
                 const rendered_content = renderMarkdownWithLatex(self.competition.terms)

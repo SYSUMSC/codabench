@@ -36,7 +36,7 @@
             If you wish to delete your submissions or competitions, please do so before deleting your account.
             <br><br>
             You will also no longer be eligible for any cash prizes in competitions you are participating in.
-            </p> -->
+</p> -->
             <div class="ui divider"></div>
 
             <form class="ui form" id="delete-account-form" onsubmit="{handleDeleteAccountSubmit}">

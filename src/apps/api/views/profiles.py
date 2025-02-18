@@ -128,7 +128,8 @@ class OrganizationViewSet(mixins.CreateModelMixin,
         return [permission() for permission in self.permission_classes]
 
     def create(self, request, *args, **kwargs):
-        if hasattr(request.user, "membership"):
+        #改为在membership_set查找该用户是否存在
+        if request.user.membership_set.exists():
             return Response({"error": "你已经加入了一个组织!"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

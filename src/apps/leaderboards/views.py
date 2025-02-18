@@ -1,45 +1,68 @@
 from django.shortcuts import render
-from competitions.models import Submission
 from django.db.models import Sum
-from django.contrib.auth import get_user_model
+from competitions.models import Submission
+from django.apps import apps
 
-def leaderboard_list(request):
-    # 获取所有已上榜且状态为 Finished 的提交，并计算每个提交的总得分
+def overall_leaderboard(request):
+    """
+    统计所有排行榜中各组织获得的积分，并按总积分排名。
+    假设：
+      - 只统计提交状态为 Finished 且已上榜（leaderboard 非空）的提交
+      - 每个排行榜内，按组织取最佳提交得分进行排名
+      - 每个排行榜总积分为 100，按照等差数列分配
+    """
+    # 筛选出满足条件的提交，且要求提交所属组织不为空
     submissions = Submission.objects.filter(
         leaderboard__isnull=False,
-        status='Finished'
-    ).annotate(
-        overall_score=Sum('scores__score')
-    )
+        status='Finished',
+        organization__isnull=False
+    ).distinct()
 
-    # 分组：按用户和比赛（通过 leaderboard_id）分组，取每个用户在每个比赛中的最高得分
-    best_scores = {}
+    # 按排行榜和组织分组，取出每个组织在每个排行榜的最高得分
+    # 结构：{ leaderboard_id: { organization_id: best_score, ... }, ... }
+    leaderboard_org_scores = {}
     for sub in submissions:
-        key = (sub.owner_id, sub.leaderboard_id)
-        score = sub.overall_score or 0
-        if key not in best_scores or score > best_scores[key]:
-            best_scores[key] = score
+        lb_id = sub.leaderboard_id
+        org_id = sub.organization_id
+        # 这里假设每个提交的得分为其所有 SubmissionScore 的 score 之和
+        score = sub.scores.aggregate(total=Sum('score'))['total'] or 0
+        if lb_id not in leaderboard_org_scores:
+            leaderboard_org_scores[lb_id] = {}
+        # 如果当前组织已经存在，则保留更高的得分
+        if org_id not in leaderboard_org_scores[lb_id] or score > leaderboard_org_scores[lb_id][org_id]:
+            leaderboard_org_scores[lb_id][org_id] = score
 
-    # 按用户汇总各比赛的得分
-    user_totals = {}
-    for (owner_id, _), score in best_scores.items():
-        user_totals[owner_id] = user_totals.get(owner_id, 0) + score
-
-    # 构造排行榜列表（包含用户对象及总得分）
-    User = get_user_model()
-    leaderboard_list = []
-    for user_id, total in user_totals.items():
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
+    # 根据每个排行榜内组织的得分进行排名，并分配积分（总积分 100）
+    # 最后将各排行榜中的积分累计到各组织上
+    org_total_points = {}  # { organization_id: total_points }
+    for lb_id, org_scores in leaderboard_org_scores.items():
+        # 按得分降序排序，得分高者排名靠前
+        sorted_orgs = sorted(org_scores.items(), key=lambda x: x[1], reverse=True)
+        n = len(sorted_orgs)
+        if n == 0:
             continue
-        leaderboard_list.append({
-            'user': user,
-            'total_score': total
+        total_factor = n * (n + 1) / 2  # 等差数列的分母：1+2+...+n
+        for rank, (org_id, _) in enumerate(sorted_orgs, start=1):
+            points = (n - rank + 1) / total_factor * 100
+            org_total_points[org_id] = org_total_points.get(org_id, 0) + points
+
+    # 获取组织对象。这里假设组织模型为 Organization，且在 app "profiles" 下
+    Organization = apps.get_model('profiles', 'Organization')
+    overall_leaderboard_list = []
+    for org_id, points in org_total_points.items():
+        try:
+            organization = Organization.objects.get(id=org_id)
+        except Organization.DoesNotExist:
+            continue
+        overall_leaderboard_list.append({
+            'organization': organization,
+            'total_points': points,
         })
 
-    # 按总得分降序排序
-    leaderboard_list.sort(key=lambda x: x['total_score'], reverse=True)
+    # 按总积分降序排序
+    overall_leaderboard_list.sort(key=lambda x: x['total_points'], reverse=True)
 
-    context = {'leaderboard_list': leaderboard_list}
-    return render(request, 'leaderboards/index.html', context)
+    context = {
+        'leaderboard_list': overall_leaderboard_list,
+    }
+    return render(request, 'leaderboards/overall.html', context)

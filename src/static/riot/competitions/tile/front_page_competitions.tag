@@ -2,7 +2,7 @@
     <div class="ui two column grid">
         <div class="eight wide column">
             <div class="ui large header">
-                Popular Benchmarks
+                热门基准
             </div>
             <div class="loader-container popular">
                 <div class="lds-ring">
@@ -13,12 +13,12 @@
                 </div>
             </div>
             <competition-tile each="{popular_competitions}"></competition-tile>
-            <a class="show-more" href="/competitions/public/">Show more</a>
+            <a class="show-more" href="/competitions/public/">显示更多</a>
         </div>
 
         <div class="eight wide column">
             <div class="ui large header">
-                Featured Benchmarks
+                精选基准
             </div>
             <div class="loader-container popular">
                 <div class="lds-ring">
@@ -29,7 +29,7 @@
                 </div>
             </div>
             <competition-tile each="{featured_competitions}"></competition-tile>
-            <a class="show-more" href="/competitions/public/">Show more</a>
+            <a class="show-more" href="/competitions/public/">显示更多</a>
         </div>
     </div>
 
@@ -44,7 +44,7 @@
         self.get_frontpage_competitions = function (data) {
             return CODALAB.api.get_front_page_competitions(data)
                 .fail(function (response) {
-                    toastr.error("Could not load competition list")
+                    toastr.error("无法加载比赛列表")
                 })
                 .done(function (data) {
                     self.featured_competitions = data["featured_comps"]

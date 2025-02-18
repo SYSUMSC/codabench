@@ -4,9 +4,9 @@
             <table class="ui tiny unstackable single line table">
                 <thead>
                 <tr>
-                    <th>Rank</th>
-                    <th>Username</th>
-                    <th class="score">Score</th>
+                    <th>排名</th>
+                    <th>用户名</th>
+                    <th class="score">分数</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -43,7 +43,7 @@
             <table class="ui unstackable single line table">
                 <thead>
                 <tr>
-                    <th>Public Submissions</th>
+                    <th>公开提交</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -70,7 +70,7 @@
             <table class="ui unstackable single line table">
                 <thead>
                 <tr>
-                    <th>Comment Feed</th>
+                    <th>评论反馈</th>
                 </tr>
                 </thead>
                 <tbody>

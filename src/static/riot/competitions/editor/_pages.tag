@@ -5,7 +5,7 @@
                 <table class="ui padded striped table">
                     <thead>
                     <tr>
-                        <th colspan="2">Pages</th>
+                        <th colspan="2">页面</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -33,7 +33,7 @@
                     </tr>
                     <tr show="{pages.length === 0}">
                         <td class="center aligned" colspan="2">
-                            <em>No pages added yet, at least 1 is required!</em>
+                            <em>尚未添加页面，至少需要1个页面！</em>
                         </td>
                     </tr>
                     </tbody>
@@ -41,7 +41,7 @@
                     <tr>
                         <th colspan="2" class="right aligned">
                             <button class="ui tiny inverted green icon button" onclick="{ add }">
-                                <i class="add icon"></i> Add page
+                                <i class="add icon"></i> 添加页面
                             </button>
                         </th>
                     </tr>
@@ -54,32 +54,31 @@
     <div class="ui modal" ref="edit_modal">
         <i class="close icon"></i>
         <div class="header">
-            Page form
+            页面表单
         </div>
         <div class="content">
             <form class="ui form" onsubmit="{ save }">
                 <div class="field required">
-                    <label>Title</label>
+                    <label>标题</label>
                     <input selenium="title" ref="title"/>
                 </div>
 
                 <div class="field required">
-                    <label>Content</label>
+                    <label>内容</label>
                     <textarea class="markdown-editor" ref="content"></textarea>
                 </div>
             </form>
         </div>
         <div class="actions">
-            <div class="ui button" onclick="{ close_edit }">Cancel</div>
-            <div class="ui button primary" selenium="save1" onclick="{ save }">Save</div>
+            <div class="ui button" onclick="{ close_edit }">取消</div>
+            <div class="ui button primary" selenium="save1" onclick="{ save }">保存</div>
         </div>
     </div>
-
 
     <div class="ui modal" ref="view_modal">
         <i class="close icon"></i>
         <div class="header">
-            Page Preview
+            页面预览
         </div>
         <div class="scrolling content">
             <div ref="page_content">
@@ -87,8 +86,8 @@
             </div>
         </div>
         <div class="actions">
-            <div class="ui button primary" onclick="{ edit.bind(this, selected_page_index) }">Edit</div>
-            <div class="ui button" onclick="{ close_view }">Close</div>
+            <div class="ui button primary" onclick="{ edit.bind(this, selected_page_index) }">编辑</div>
+            <div class="ui button" onclick="{ close_view }">关闭</div>
         </div>
     </div>
 
@@ -120,7 +119,7 @@
          Methods
         ---------------------------------------------------------------------*/
         self.add = function () {
-            // we're not editing any more, if we were
+            // 不再处于编辑状态（如果之前正在编辑）
             self.selected_page_index = undefined
 
             self.clear_form()
@@ -150,7 +149,7 @@
         }
 
         self.delete_page = function (page_index) {
-            if (confirm("Are you sure you want to delete '" + self.pages[page_index].title + "'?")) {
+            if (confirm("确定要删除 '" + self.pages[page_index].title + "' 吗？")) {
                 self.pages.splice(page_index, 1)
                 self.form_updated()
             }
@@ -162,13 +161,13 @@
             const rendered_content = renderMarkdownWithLatex(self.pages[page_index].content)
             self.refs.page_content.innerHTML = ""
             rendered_content.forEach(node => {
-                self.refs.page_content.appendChild(node.cloneNode(true)); // Append each node
+                self.refs.page_content.appendChild(node.cloneNode(true)); // 追加每个节点
             });
         }
 
         self.form_updated = function () {
             var is_valid = true
-            // Make sure we have at least 1 page and it has content
+            // 确保至少有1个页面并且页面内容不为空
             if (self.pages.length === 0) {
                 is_valid = false
             } else {
@@ -181,7 +180,7 @@
             CODALAB.events.trigger('competition_is_valid_update', 'pages', is_valid)
 
             if(is_valid) {
-                // Format data nicely, insert indexes so they can be saved
+                // 整理数据，插入索引以便保存
                 var indexed_pages = self.pages.map(function(page, index) {
                     page.index = index
                     return page
@@ -201,7 +200,7 @@
             }
 
             if(data.content === '') {
-                toastr.error("Cannot save, content is required for a page to save")
+                toastr.error("保存失败，页面内容为必填项")
                 return
             }
 

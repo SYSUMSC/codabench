@@ -4,12 +4,12 @@
             <strong>{field}:</strong>
 
             <span each="{error in error_object}">
-                <!-- Error is not an object, no need to go deeper -->
+                <!-- 错误不是对象，无需进一步处理 -->
                 <virtual if="{ error.constructor != Object }">
                     {error}
                 </virtual>
 
-                <!-- We have more errors to loop through recursively -->
+                <!-- 存在更多错误需要递归循环 -->
                 <virtual if="{ error.constructor == Object }">
                     <errors errors="{ error }"></errors>
                 </virtual>
@@ -26,7 +26,7 @@
 
                 <div class="ui message error" show="{ Object.keys(errors).length > 0 }">
                     <div class="header">
-                        Error(s) saving benchmark
+                        保存基准数据时发生错误
                     </div>
                     <errors errors="{errors}"></errors>
                 </div>
@@ -35,32 +35,32 @@
                     <a class="active item" data-tab="competition_details">
                         <i class="checkmark box icon green" show="{ valid_sections.details && !errors.details }"></i>
                         <i class="minus circle icon red" show="{ errors.details }"></i>
-                        Details
+                        详情
                     </a>
                     <a class="item" data-tab="participation">
                         <i class="checkmark box icon green" show="{ valid_sections.participation && !errors.participation }"></i>
                         <i class="minus circle icon red" show="{ errors.participation }"></i>
-                        Participation
+                        参与
                     </a>
                     <a class="item" data-tab="pages">
                         <i class="checkmark box icon green" show="{ valid_sections.pages && !errors.pages }"></i>
                         <i class="minus circle icon red" show="{ errors.pages }"></i>
-                        Pages
+                        页面
                     </a>
                     <a class="item" data-tab="phases">
                         <i class="checkmark box icon green" show="{ valid_sections.phases && !errors.phases }"></i>
                         <i class="minus circle icon red" show="{ errors.phases }"></i>
-                        Phases
+                        阶段
                     </a>
                     <a class="item" data-tab="leaderboard">
                         <i class="checkmark box icon green" show="{ valid_sections.leaderboards && !errors.leaderboards }"></i>
                         <i class="minus circle icon red" show="{ errors.leaderboards }"></i>
-                        Leaderboard
+                        排行榜
                     </a>
                     <a class="item" data-tab="collaborators">
                         <i class="checkmark box icon green" show="{ valid_sections.collaborators && !errors.collaborators }"></i>
                         <i class="minus circle icon red" show="{ errors.collaborators }"></i>
-                        Administrators
+                        管理员
                     </a>
                 </div>
                 <div class="ui active tab" data-tab="competition_details">
@@ -88,15 +88,15 @@
             <div class="column">
                 <div class="ui checkbox publish-checkbox">
                     <input type="checkbox" ref="publish">
-                    <label>Publish</label>
+                    <label>发布</label>
                 </div>
                 <button selenium="save4" class="ui primary button { disabled: !are_all_sections_valid() }" onclick="{ save }">
-                    Save
+                    保存
                 </button>
                 <button class="ui basic red button discard" onclick="{ discard }">
-                    Discard Changes
+                    放弃更改
                 </button>
-                <a class="ui secondary basic button" href="{URLS.COMPETITION_DETAIL(opts.competition_id)}">Back To Competition</a>
+                <a class="ui secondary basic button" href="{URLS.COMPETITION_DETAIL(opts.competition_id)}">返回比赛</a>
                 <help_button href="https://github.com/codalab/competitions-v2/wiki/Competition-Creation:-Form"></help_button>
             </div>
         </div>
@@ -105,7 +105,7 @@
     <script>
         var self = this
         /*---------------------------------------------------------------------
-         Init
+         初始化
         ---------------------------------------------------------------------*/
         self.competition = {}
         self.valid_sections = {
@@ -125,7 +125,7 @@
         self.errors = {}
 
         self.one("mount", function () {
-            // tabs
+            // 标签切换
             $('.menu .item', self.root).tab({
                 history: true,
                 historyType: 'hash',
@@ -141,7 +141,7 @@
         })
 
         /*---------------------------------------------------------------------
-         Methods
+         方法
         ---------------------------------------------------------------------*/
         self.update_competition_data = (id) => {
             CODALAB.api.get_competition(id)
@@ -162,7 +162,7 @@
                     self.update()
                 })
                 .fail(function (response) {
-                    toastr.error("Could not find competition");
+                    toastr.error("无法找到比赛");
                 });
             self.update()
         }
@@ -172,7 +172,7 @@
         }
 
         self.discard = function () {
-            if (confirm('Are you sure you want to discard your changes?')) {
+            if (confirm('确定要放弃更改吗？')) {
                 window.location.href = window.URLS.COMPETITION_MANAGEMENT
             }
         }
@@ -204,21 +204,21 @@
                 }
             }
 
-            // convert serializer task data to just keys if we didn't edit phases
-            // also add phase statuses based on above calculated indexes
+            // 如果未编辑阶段，将任务数据从序列化转换为键值
+            // 还要基于上面计算的索引添加阶段状态
             self.competition.phases = _.map(self.competition.phases, phase => {
                 if (phase.task_instances && _.some(phase.task_instances, Object)) {
                     phase.task_instances.task = _.map(phase.task_instances.task, task => task.key || task.value)
                 }
                 switch (phase.index) {
                     case current_index:
-                        phase.status = 'Current'
+                        phase.status = '当前阶段'
                         break
                     case previous_index:
-                        phase.status = 'Previous'
+                        phase.status = '上一阶段'
                         break
                     case next_index:
-                        phase.status = 'Next'
+                        phase.status = '下一阶段'
                         break
                     default:
                         phase.status = null
@@ -238,31 +238,30 @@
                 delete phase.task_instances
             }
 
-            // Send competition_id for either create or update, won't hurt anything but is
-            // useless for creation
+            // 创建或更新比赛时都发送 competition_id，不会影响功能
             api_endpoint(self.competition_return, self.opts.competition_id)
                 .done(function (response) {
                     self.errors = {}
                     self.update()
-                    toastr.success("Competition saved!")
+                    toastr.success("比赛保存成功！")
                     window.location.href = window.URLS.COMPETITION_DETAIL(response.id)
                 })
                 .fail(function (response) {
                     if (response) {
                         var errors = JSON.parse(response.responseText);
 
-                        // to make errors clearer, move errors for "detail" page into the errors "details" key
+                        // 为了让错误更清晰，将“详情”页面的错误移至“details”键中
                         var details_section_fields = ['title', 'logo']
                         details_section_fields.forEach(function (field) {
                             if (errors[field]) {
-                                // initialize section, if not already
+                                // 如果尚未初始化该部分，则初始化
                                 errors.details = errors.details || []
 
-                                // make temp dict containing key: value
+                                // 创建包含键值的新错误字典
                                 var new_error_dict = {}
                                 new_error_dict[field] = errors[field]
 
-                                // push it and delete the original
+                                // 添加错误并删除原有的
                                 errors.details.push(new_error_dict)
                                 delete errors[field]
                             }
@@ -271,15 +270,15 @@
                         self.update({errors: errors})
                     }
                     if(self.opts.competition_id){
-                        toastr.error("Creation failed, error occurred")
+                        toastr.error("创建失败，发生错误")
                     }else{
-                        toastr.error("Updation failed, error occurred")
+                        toastr.error("更新失败，发生错误")
                     }
                 })
 
         }
         /*---------------------------------------------------------------------
-         Events
+         事件
         ---------------------------------------------------------------------*/
         CODALAB.events.on('competition_data_update', function (data) {
             Object.assign(self.competition, data)

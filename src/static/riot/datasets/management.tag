@@ -1,43 +1,43 @@
 <data-management>
-    <!-- Search and filter bits -->
+    <!-- 搜索和筛选部分 -->
       
     <div class="ui icon input">
-        <input type="text" placeholder="Search..." ref="search" onkeyup="{ filter.bind(this, undefined) }">
+        <input type="text" placeholder="搜索..." ref="search" onkeyup="{ filter.bind(this, undefined) }">
         <i class="search icon"></i>
     </div>
     <select class="ui dropdown" ref="type_filter" onchange="{ filter.bind(this, undefined) }">
-        <option value="">Filter By Type</option>
+        <option value="">按类型过滤</option>
         <option value="-">----</option>
         <option each="{type in types}" value="{type}">{_.startCase(type)}</option>
     </select>
     <div class="ui checkbox" onclick="{ filter.bind(this, undefined) }">
-        <label>Show Auto Created</label>
+        <label>显示自动创建</label>
         <input type="checkbox" ref="auto_created">
     </div>
     <div class="ui checkbox inline-div" onclick="{ filter.bind(this, undefined) }">
-        <label>Show Public</label>
+        <label>显示公开</label>
         <input type="checkbox" ref="show_public">
     </div>
     <button class="ui green right floated labeled icon button" onclick="{show_creation_modal}">
         <i selenium="add-dataset" class="plus icon"></i>
-        Add Dataset/Program
+        添加数据集/程序
     </button>
     <button class="ui red right floated labeled icon button {disabled: marked_datasets.length === 0}" onclick="{delete_datasets}">
         <i class="icon delete"></i>
-        Delete Selected
+        删除选中项
     </button>
 
-    <!-- Data Table -->
+    <!-- 数据表 -->
     <table id="datasetsTable" class="ui {selectable: datasets.length > 0} celled compact sortable table">
         <thead>
         <tr>
-            <th>File Name</th>
-            <th width="175px">Type</th>
-            <th width="175px">Size</th>
-            <th width="125px">Uploaded</th>
-            <th width="60px" class="no-sort">In Use</th>
-            <th width="60px" class="no-sort">Public</th>
-            <th width="50px" class="no-sort">Delete?</th>
+            <th>文件名</th>
+            <th width="175px">类型</th>
+            <th width="175px">大小</th>
+            <th width="125px">上传时间</th>
+            <th width="60px" class="no-sort">正在使用</th>
+            <th width="60px" class="no-sort">公开</th>
+            <th width="50px" class="no-sort">删除？</th>
             <th width="25px" class="no-sort"></th>
         </tr>
         </thead>
@@ -48,7 +48,7 @@
             <td>{ dataset.name }</td>
             <td>{ dataset.type }</td>
             <td>{ format_file_size(dataset.file_size) }</td>
-            <td>{ timeSince(Date.parse(dataset.created_when)) } ago</td>
+            <td>{ timeSince(Date.parse(dataset.created_when)) } 之前</td>
             <td class="center aligned">
                 <i class="checkmark box icon green" show="{ dataset.in_use.length > 0 }"></i>
             </td>
@@ -70,13 +70,13 @@
 
         <tr if="{datasets.length === 0}">
             <td class="center aligned" colspan="6">
-                <em>No Datasets Yet!</em>
+                <em>暂无数据集！</em>
             </td>
         </tr>
         </tbody>
         <tfoot>
 
-        <!-- Pagination -->
+        <!-- 分页 -->
         <tr>
             <th colspan="8" if="{datasets.length > 0}">
                 <div class="ui right floated pagination menu" if="{datasets.length > 0}">
@@ -95,22 +95,22 @@
         </tfoot>
     </table>
 
-    <!--  Dataset Detail Model  -->
+    <!-- 数据集详情模态框 -->
     <div ref="info_modal" class="ui modal">
         <div class="header">
             {selected_row.name}
         </div>
         <div class="content">
-            <h3>Details</h3>
+            <h3>详细信息</h3>
 
             <table class="ui basic table">
                 <thead>
                 <tr>
-                    <th>Key</th>
-                    <th>Created By</th>
-                    <th>Created</th>
-                    <th>Type</th>
-                    <th>Public</th>
+                    <th>标识</th>
+                    <th>创建者</th>
+                    <th>创建时间</th>
+                    <th>类型</th>
+                    <th>公开</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -124,12 +124,12 @@
                 </tbody>
             </table>
             <virtual if="{!!selected_row.description}">
-                <div>Description:</div>
+                <div>描述：</div>
                 <div class="ui segment">
                     {selected_row.description}
                 </div>
             </virtual>
-            <div show="{!!_.get(selected_row.in_use, 'length')}"><strong>Used by:</strong>
+            <div show="{!!_.get(selected_row.in_use, 'length')}"><strong>使用于：</strong>
                 <div class="ui bulleted list">
                     <div class="item" each="{comp in selected_row.in_use}">
                         <a href="{URLS.COMPETITION_DETAIL(comp.pk)}" target="_blank">{comp.title}</a>
@@ -140,23 +140,23 @@
         <div class="actions">
             <button show="{selected_row.created_by === CODALAB.state.user.username}"
                 class="ui primary icon button" onclick="{toggle_is_public}">
-                <i class="share icon"></i> {selected_row.is_public ? "Make Private" : "Make Public"}
+                <i class="share icon"></i> {selected_row.is_public ? "设为私有" : "设为公开"}
             </button>
             <a href="{URLS.DATASET_DOWNLOAD(selected_row.key)}" class="ui green icon button">
-                <i class="download icon"></i>Download File
+                <i class="download icon"></i>下载文件
             </a>
-            <button class="ui cancel button">Close</button>
+            <button class="ui cancel button">关闭</button>
         </div>
     </div>
 
-    <!--  Add Dataset Model  -->
+    <!-- 添加数据集/程序模态框 -->
     <div ref="dataset_creation_modal" class="ui modal">
-        <div class="header">Add Dataset/Program Form</div>
+        <div class="header">添加数据集/程序表单</div>
 
         <div class="content">
             <div class="ui message error" show="{ Object.keys(errors).length > 0 }">
                 <div class="header">
-                    Error(s) creating dataset
+                    创建数据集时出错
                 </div>
                 <ul class="list">
                     <li each="{ error, field in errors }">
@@ -166,13 +166,13 @@
             </div>
 
             <form class="ui form coda-animated {error: errors}" ref="form">
-                <input-text selenium="scoring-name" name="name" ref="name" error="{errors.name}" placeholder="Name"></input-text>
+                <input-text selenium="scoring-name" name="name" ref="name" error="{errors.name}" placeholder="名称"></input-text>
                 <input-text selenium="scoring-desc" name="description" ref="description" error="{errors.description}"
-                            placeholder="Description"></input-text>
+                            placeholder="描述"></input-text>
 
                 <div class="field {error: errors.type}">
                     <select selenium="type" id="type_of_data" name="type" ref="type" class="ui dropdown">
-                        <option value="">Type</option>
+                        <option value="">类型</option>
                         <option value="-">----</option>
                         <option each="{type in types}" value="{type}">{_.startCase(type)}</option>
                     </select>
@@ -192,9 +192,9 @@
         <div class="actions">
             <button class="ui blue icon button" onclick="{check_form}">
                 <i selenium="upload" class="upload icon"></i>
-                Upload
+                上传
             </button>
-            <button class="ui basic red cancel button">Cancel</button>
+            <button class="ui basic red cancel button">取消</button>
         </div>
     </div>
 
@@ -203,7 +203,7 @@
         self.mixin(ProgressBarMixin)
 
         /*---------------------------------------------------------------------
-         Init
+         初始化
         ---------------------------------------------------------------------*/
         self.types = [
             "ingestion_program",
@@ -231,7 +231,7 @@
         })
 
         self.show_info_modal = function (row, e) {
-            // Return here so the info modal doesn't pop up when a checkbox is clicked
+            // 如果点击的是复选框，则不弹出详情模态框
             if (e.target.type === 'checkbox') {
                 return
             }
@@ -246,7 +246,7 @@
 
 
         /*---------------------------------------------------------------------
-         Methods
+         方法
         ---------------------------------------------------------------------*/
         self.pretty_date = date => luxon.DateTime.fromISO(date).toLocaleString(luxon.DateTime.DATE_FULL)
 
@@ -267,7 +267,7 @@
                 self.page += 1
                 self.filter({page: self.page})
             } else {
-                alert("No valid page to go to!")
+                alert("没有可前往的有效页码！")
             }
         }
         self.previous_page = function () {
@@ -275,7 +275,7 @@
                 self.page -= 1
                 self.filter({page: self.page})
             } else {
-                alert("No valid page to go to!")
+                alert("没有可前往的有效页码！")
             }
         }
 
@@ -295,16 +295,16 @@
                     self.update()
                 })
                 .fail(function (response) {
-                    toastr.error("Could not load datasets...")
+                    toastr.error("无法加载数据集...")
                 })
         }
 
         self.delete_dataset = function (dataset, e) {
-            if (confirm(`Are you sure you want to delete '${dataset.name}'?`)) {
+            if (confirm(`确定要删除 '${dataset.name}' 吗？`)) {
                 CODALAB.api.delete_dataset(dataset.id)
                     .done(function () {
                         self.update_datasets()
-                        toastr.success("Dataset deleted successfully!")
+                        toastr.success("数据集删除成功！")
                         CODALAB.events.trigger('reload_quota_cleanup')
                     })
                     .fail(function (response) {
@@ -315,11 +315,11 @@
         }
 
         self.delete_datasets = function () {
-            if (confirm(`Are you sure you want to delete multiple datasets?`)) {
+            if (confirm(`确定要删除多个数据集吗？`)) {
                 CODALAB.api.delete_datasets(self.marked_datasets)
                     .done(function () {
                         self.update_datasets()
-                        toastr.success("Dataset deleted successfully!")
+                        toastr.success("数据集删除成功！")
                         self.marked_datasets = []
                         CODALAB.events.trigger('reload_quota_cleanup')
                     })
@@ -333,7 +333,7 @@
         }
 
         self.clear_form = function () {
-            // Clear form
+            // 清空表单
             $(':input', self.refs.form)
                 .not(':button, :submit, :reset, :hidden')
                 .val('')
@@ -351,40 +351,37 @@
                 event.preventDefault()
             }
 
-            // Reset upload progress, in case we're trying to re-upload or had errors -- this is the
-            // best place to do it -- also resets animations
+            // 重置上传进度，以防重新上传或之前出错——这是最合适的位置，同时重置动画
             self.file_upload_progress_handler(undefined)
 
-            // Let's do some quick validation
+            // 快速验证
             self.errors = {}
             var validate_data = get_form_data(self.refs.form)
 
             var required_fields = ['name', 'type', 'data_file']
             required_fields.forEach(field => {
                 if (validate_data[field] === '') {
-                    self.errors[field] = "This field is required"
+                    self.errors[field] = "此字段为必填项"
                 }
             })
 
             if (Object.keys(self.errors).length > 0) {
-                // display errors and drop out
+                // 显示错误信息并退出
                 self.update()
                 return
             }
 
-            // Call the progress bar wrapper and do the upload -- we want to check and display errors
-            // first before doing the actual upload
+            // 调用进度条包装函数并执行上传——我们希望先检查并显示错误，再进行实际上传
             self.prepare_upload(self.upload)()
         }
 
         self.upload = function () {
-            // Have to get the "FormData" to get the file in a special way
-            // jquery likes to work with
+            // 获取 "FormData" 以特殊方式获取文件（jQuery 处理文件时会用到）
             var metadata = get_form_data(self.refs.form)
-            delete metadata.data_file  // dont send this with metadata
+            delete metadata.data_file  // 不要将文件与其他数据一起发送
 
             if (metadata.is_public === 'on') {
-                var public_confirm = confirm("Creating a public dataset means this will be sent to Chahub and publicly available on the internet. Are you sure you wish to continue?")
+                var public_confirm = confirm("创建公开数据集意味着这将被发送到 Chahub 并在互联网上公开。您确定要继续吗？")
                 if (!public_confirm) {
                     return
                 }
@@ -394,7 +391,7 @@
 
             CODALAB.api.create_dataset(metadata, data_file, self.file_upload_progress_handler)
                 .done(function (data) {
-                    toastr.success("Dataset successfully uploaded!")
+                    toastr.success("数据集上传成功！")
                     self.update_datasets()
                     self.clear_form()
                     $(self.refs.dataset_creation_modal).modal('hide')
@@ -405,7 +402,7 @@
                         try {
                             var errors = JSON.parse(response.responseText)
 
-                            // Clean up errors to not be arrays but plain text
+                            // 将错误数组转换为纯文本
                             Object.keys(errors).map(function (key, index) {
                                 errors[key] = errors[key].join('; ')
                             })
@@ -415,7 +412,7 @@
 
                         }
                     }
-                    toastr.error("Creation failed, error occurred")
+                    toastr.error("创建失败，发生错误")
                 })
                 .always(function () {
                     self.hide_progress_bar()
@@ -424,12 +421,12 @@
 
         self.toggle_is_public = () => {
             let message = self.selected_row.is_public
-                ? 'Are you sure you want to make this dataset private? It will no longer be available to other users.'
-                : 'Are you sure you want to make this dataset public? It will become visible to everyone'
+                ? '您确定要将此数据集设为私有吗？设为私有后将不再对其他用户可见。'
+                : '您确定要将此数据集设为公开吗？设为公开后将对所有人可见'
             if (confirm(message)) {
                 CODALAB.api.update_dataset(self.selected_row.id, {id: self.selected_row.id, is_public: !self.selected_row.is_public})
                     .done(data => {
-                        toastr.success('Dataset updated')
+                        toastr.success('数据集已更新')
                         $(self.refs.info_modal).modal('hide')
                         self.filter()
                     })
@@ -449,34 +446,32 @@
         }
 
 
-        // Function to format file size 
+        // 格式化文件大小函数
         self.format_file_size = function(file_size) {
-            // parse file size from string to float
+            // 将文件大小从字符串解析为浮点数
             try {
                 n = parseFloat(file_size)
             }
             catch(err) {
-                // return empty string if parsing fails
+                // 解析失败则返回空字符串
                 return ""
             }
-            // a file_size of -1 indicated an error
+            // 文件大小为 -1 表示错误
             if(n < 0) {
                 return ""
             }
-            // constant units to show with files size
-            // file size is in KB, converting it to MB and GB 
+            // 定义单位（文件大小以 KB 为单位，转换为 MB 和 GB）
             const units = ['KB', 'MB', 'GB']
-            // loop incrementer for selecting desired unit
+            // 循环直到 n 小于 1000，并选择合适的单位
             let i = 0
-            // loop over n until it is greater than 1000
             while(n >= 1000 && ++i){
                 n = n/1000;
             }
-            // restrict file size to 1 decimal number concatinated with unit
+            // 保留一位小数并加上单位
             return(n.toFixed(1) + ' ' + units[i]);
         }
 
-        // Update datasets on unused datasets delete
+        // 删除未使用数据集时更新数据集列表
         CODALAB.events.on('reload_datasets', self.update_datasets)
 
     </script>

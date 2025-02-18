@@ -2,9 +2,7 @@
     <div class="ui relaxed grid">
         <div class="row">
             <div class="three wide column">
-                <img class="ui medium circular image competition-image"
-                     alt="Competition Logo"
-                     src="{ competition.logo }">
+                <img class="ui medium circular image competition-image" alt="竞赛 Logo" src="{ competition.logo }">
             </div>
             <div class="ten wide column">
                 <div class="ui grid">
@@ -22,57 +20,61 @@
                         </div>
                     </div>
                     <div if="{competition.admin}">
-                        <a href="{URLS.COMPETITION_EDIT(competition.id)}" class="ui button">Edit</a>
+                        <a href="{URLS.COMPETITION_EDIT(competition.id)}" class="ui button">编辑</a>
                         <button class="ui small button" onclick="{show_modal.bind(this, '.manage-participants.modal')}">
-                            Participants
+                            参与者
                         </button>
                         <button class="ui small button" onclick="{show_modal.bind(this, '.manage-submissions.modal')}">
-                            Submissions
+                            提交
                         </button>
                         <button class="ui small button" onclick="{show_modal.bind(this, '.manage-competition.modal')}">
-                            Dumps
+                            数据包
                         </button>
                         <button class="ui small button" onclick="{show_modal.bind(this, '.migration.modal')}">
-                            Migrate
+                            迁移
                         </button>
                     </div>
                     <div class="row">
                         <div class="column">
-                            <!-- Main information -->
+                            <!-- 主信息 -->
                             <div>
-                                <span class="detail-label">Organized by:</span>
-                                <span class="detail-item"><a href="/profiles/user/{competition.created_by}" target="_BLANK">{competition.owner_display_name}</a></span>
-                                <span if="{competition.contact_email}">(<span class="contact-email">{competition.contact_email}</span>)</span>
+                                <span class="detail-label">组织者：</span>
+                                <span class="detail-item"><a href="/profiles/user/{competition.created_by}"
+                                        target="_BLANK">{competition.owner_display_name}</a></span>
+                                <span if="{competition.contact_email}">(<span
+                                        class="contact-email">{competition.contact_email}</span>)</span>
                             </div>
                             <div>
-                                <span class="detail-label">{has_current_phase(competition) ? 'Current Phase Ends' : 'Current Active Phase'}:</span>
+                                <span class="detail-label">{has_current_phase(competition) ? '当前阶段结束' :
+                                    '当前有效阶段'}:</span>
                                 <span class="detail-item">{get_end_date(competition)}</span>
                             </div>
                             <div>
-                                <span class="detail-label">Current server time:</span>
+                                <span class="detail-label">当前服务器时间：</span>
                                 <span class="detail-item" id="server_time">{pretty_date(CURRENT_DATE_TIME)}</span>
                             </div>
-                            <!-- Docker image -->
+                            <!-- Docker 镜像 -->
                             <div class="competition-secret-key">
-                                <span class="docker-label">Docker image:</span>
+                                <span class="docker-label">Docker 镜像：</span>
                                 <span id="docker-image">{ competition.docker_image }</span>
-                                <span onclick="{copy_docker_url}" class="ui send-pop-docker" data-content="Copied!">
+                                <span onclick="{copy_docker_url}" class="ui send-pop-docker" data-content="已复制！">
                                     <i class="ui copy icon"></i>
                                 </span>
                             </div>
-                            <!-- Secret URL -->
+                            <!-- 密钥 URL -->
                             <div class="competition-secret-key" if="{ competition.admin }">
-                                <span class="secret-label">Secret url:</span>
-                                <span id="secret-url">https://{ URLS.SECRET_KEY_URL(competition.id, competition.secret_key) }</span>
-                                <span onclick="{copy_secret_url}" class="ui send-pop-secret" data-content="Copied!">
+                                <span class="secret-label">密钥 URL：</span>
+                                <span id="secret-url">https://{ URLS.SECRET_KEY_URL(competition.id,
+                                    competition.secret_key) }</span>
+                                <span onclick="{copy_secret_url}" class="ui send-pop-secret" data-content="已复制！">
                                     <i class="ui copy icon"></i>
                                 </span>
                             </div>
-                            <!-- Competition Report -->
+                            <!-- 竞赛报告 -->
                             <div class="competition-secret-key" if="{competition.report}">
-                                <span class="report-label">Competition Report:</span>
+                                <span class="report-label">竞赛报告：</span>
                                 <span id="report-url">{ competition.report }</span>
-                                <span onclick="{copy_report_url}" class="ui send-pop-report" data-content="Copied!">
+                                <span onclick="{copy_report_url}" class="ui send-pop-report" data-content="已复制！">
                                     <i class="ui copy icon"></i>
                                 </span>
 
@@ -83,117 +85,113 @@
             </div>
             <div class="three wide column">
                 <div class="stat-buttons">
-                    <!--todo: turn cursor: pointer and hover off on these buttons since they are not clickable-->
+                    <!-- todo: 关闭这些按钮的鼠标点击和悬停效果，因为它们不可点击 -->
                     <div class="ui tiny left labeled fluid button">
                         <a class="ui tiny basic red label">{competition.participants_count}</a>
-                        <div class="ui tiny red button">Participants</div>
+                        <div class="ui tiny red button">参与者</div>
                     </div>
                     <div class="ui tiny left labeled fluid button">
                         <a class="ui tiny basic teal label">{competition.submissions_count}</a>
-                        <div class="ui tiny teal button">Submissions</div>
+                        <div class="ui tiny teal button">提交</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Manage Competition Modal -->
+    <!-- 管理竞赛模态框 -->
     <div class="ui manage-competition modal" ref="files_modal">
         <div class="content">
             <div class="ui dropdown button">
                 <i class="download icon"></i>
-                <div class="text">Create Competition Dump</div>
+                <div class="text">创建竞赛数据包</div>
                 <div class="menu">
-                    <div class="parent-modal item"
-                        onclick="{create_dump.bind(this, true)}"> 
-                        <!--  true for keys  -->
-                        Dump with keys
+                    <div class="parent-modal item" onclick="{create_dump.bind(this, true)}">
+                        <!-- true表示包含密钥 -->
+                        包含密钥的数据包
                     </div>
-                    <div class="parent-modal item"
-                    
-                        onclick="{create_dump.bind(this, false)}">
-                        <!--  false for files  -->
-                        Dump with files
+                    <div class="parent-modal item" onclick="{create_dump.bind(this, false)}">
+                        <!-- false表示包含文件 -->
+                        包含文件的数据包
                     </div>
                 </div>
             </div>
 
             <!--  <button class="ui icon button" onclick="{create_dump}">
-                <i class="download icon"></i> Create Competition Dump
+                <i class="download icon"></i> 创建竞赛数据包
             </button>  -->
             <button class="ui icon button" onclick="{update_files}">
-                <i class="sync alternate icon"></i> Refresh Table
+                <i class="sync alternate icon"></i> 刷新表格
             </button>
             <table class="ui table">
                 <thead>
-                <tr>
-                    <th>Files</th>
-                </tr>
+                    <tr>
+                        <th>文件</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr show="{files.bundle}">
-                    <td class="selectable">
-                        <a href="{files.bundle ? files.bundle.url : ''}">
-                            <i class="file archive outline icon"></i>
-                            Bundle: {files.bundle ? files.bundle.name : ''}
-                        </a>
-                    </td>
-                </tr>
-                <tr each="{file in files.dumps}" show="{files.dumps}">
-                    <td class="selectable">
-                        <a href="{file.url}">
-                            <i class="file archive outline icon"></i>
-                            Dump: {file.name}
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td show="{!files.dumps && !files.bundle}">
-                        <em>No Files Yet</em>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="center aligned" if="{tr_show}">Generating Dump, Please Refresh</td>
-                </tr>
+                    <tr show="{files.bundle}">
+                        <td class="selectable">
+                            <a href="{files.bundle ? files.bundle.url : ''}">
+                                <i class="file archive outline icon"></i>
+                                数据包: {files.bundle ? files.bundle.name : ''}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr each="{file in files.dumps}" show="{files.dumps}">
+                        <td class="selectable">
+                            <a href="{file.url}">
+                                <i class="file archive outline icon"></i>
+                                数据包: {file.name}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td show="{!files.dumps && !files.bundle}">
+                            <em>暂无文件</em>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="center aligned" if="{tr_show}">正在生成数据包，请刷新</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <!-- Manage Submissions Modal -->
+    <!-- 管理提交模态框 -->
     <div class="ui manage-submissions large modal" ref="sub_modal">
         <div class="content">
             <submission-manager admin="{competition.admin}" competition="{ competition }"></submission-manager>
         </div>
     </div>
 
-    <!-- Manage Participants Modal -->
+    <!-- 管理参与者模态框 -->
     <div class="ui manage-participants modal" ref="participant_modal">
         <div class="content">
             <participant-manager></participant-manager>
         </div>
     </div>
 
-    <!-- Manual Migration Modal -->
+    <!-- 手动迁移模态框 -->
     <div class="ui migration modal" ref="migration_modal">
         <div class="content">
             <table class="ui table">
                 <thead>
-                <tr>
-                    <th colspan="100%">
-                        Please Choose a phase to migrate
-                    </th>
-                </tr>
+                    <tr>
+                        <th colspan="100%">
+                            请选择一个阶段进行迁移
+                        </th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr each="{phase, index in competition.phases}">
-                    <td>{phase.name}</td>
-                    <td class="collapsing">
-                        <button if="{index !== competition.phases.length - 1}"
-                                class="ui button"
+                    <tr each="{phase, index in competition.phases}">
+                        <td>{phase.name}</td>
+                        <td class="collapsing">
+                            <button if="{index !== competition.phases.length - 1}" class="ui button"
                                 onclick="{migrate_phase.bind(this, phase.id)}">
-                            Migrate
-                        </button>
-                    </td>
-                </tr>
+                                迁移
+                            </button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -223,11 +221,11 @@
             CODALAB.api.create_competition_dump(self.competition.id, keys_instead_of_files)
                 .done(data => {
                     self.tr_show = true
-                    toastr.success("Success! Your competition dump is being created.")
+                    toastr.success("成功！您的竞赛数据包正在创建中。")
                     self.update()
                 })
                 .fail(response => {
-                    toastr.error("Error trying to create competition dump.")
+                    toastr.error("创建竞赛数据包时发生错误。")
                 })
         }
 
@@ -239,7 +237,7 @@
                     self.update()
                 })
                 .fail(response => {
-                    toastr.error('Error Retrieving Competition Files')
+                    toastr.error('获取竞赛文件时发生错误')
                 })
         }
 
@@ -247,56 +245,56 @@
         self.copy_secret_url = function () {
             let range = document.createRange();
             range.selectNode(document.getElementById("secret-url"));
-            window.getSelection().removeAllRanges(); // clear current selection
-            window.getSelection().addRange(range); // to select text
+            window.getSelection().removeAllRanges(); // 清除当前选择
+            window.getSelection().addRange(range); // 选择文本
             document.execCommand("copy");
-            window.getSelection().removeAllRanges();// to deselect
+            window.getSelection().removeAllRanges(); // 取消选择
             $('.send-pop-secret').popup('toggle')
         }
 
         self.copy_docker_url = function () {
             let range = document.createRange();
             range.selectNode(document.getElementById("docker-image"));
-            window.getSelection().removeAllRanges(); // clear current selection
-            window.getSelection().addRange(range); // to select text
+            window.getSelection().removeAllRanges(); // 清除当前选择
+            window.getSelection().addRange(range); // 选择文本
             document.execCommand("copy");
-            window.getSelection().removeAllRanges();// to deselect
+            window.getSelection().removeAllRanges(); // 取消选择
             $('.send-pop-docker').popup('toggle')
         }
 
         self.copy_report_url = function () {
             let range = document.createRange();
             range.selectNode(document.getElementById("report-url"));
-            window.getSelection().removeAllRanges(); // clear current selection
-            window.getSelection().addRange(range); // to select text
+            window.getSelection().removeAllRanges(); // 清除当前选择
+            window.getSelection().addRange(range); // 选择文本
             document.execCommand("copy");
-            window.getSelection().removeAllRanges();// to deselect
+            window.getSelection().removeAllRanges(); // 取消选择
             $('.send-pop-report').popup('toggle')
         }
 
         self.has_current_phase = function (competition) {
-            let current_phase = _.find(competition.phases, {status: 'Current'})
+            let current_phase = _.find(competition.phases, { status: 'Current' })
             return current_phase ? true : false
         }
 
         self.get_end_date = function (competition) {
-            if(self.has_current_phase(competition)){
-                let end_date = _.get(_.find(competition.phases, {status: 'Current'}), 'end')
-                return end_date ? pretty_date(end_date) : 'Never'
-            }else{
-                return 'None'
+            if (self.has_current_phase(competition)) {
+                let end_date = _.get(_.find(competition.phases, { status: 'Current' }), 'end')
+                return end_date ? pretty_date(end_date) : '从未'
+            } else {
+                return '无'
             }
-            
+
         }
 
         self.migrate_phase = function (phase_id) {
             CODALAB.api.manual_migration(phase_id)
                 .done(data => {
-                    toastr.success("Migration of this phase to the next should begin soon.")
+                    toastr.success("该阶段的迁移将很快开始。")
                     self.close_modal(self.refs.migration_modal)
                 })
                 .fail(error => {
-                    toastr.error('Something went wrong trying to migrate this phase.')
+                    toastr.error('迁移此阶段时出现问题。')
                 })
         }
 

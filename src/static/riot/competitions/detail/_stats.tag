@@ -5,11 +5,11 @@
                 <div class="ui forced-full-height">
                     <div class="ui compact menu">
                         <a class="item">
-                            <i class="icon users"></i> Teams
+                            <i class="icon users"></i> 队伍
                             <div class="floating ui red label">10</div>
                         </a>
                         <a class="item">
-                            <i class="icon user"></i> Participants
+                            <i class="icon user"></i> 参与者
                             <div class="floating ui teal label">63</div>
                         </a>
                     </div>
@@ -18,7 +18,7 @@
             <div class="twelve wide column">
                 <div class="ui forced-full-height">
                     <h4>
-                        Points and Tiers?
+                        积分和等级？
                     </h4>
                     <p>
                         Vestibulum in ultricies sapien, eu lacinia ante. Orci varius natoque
