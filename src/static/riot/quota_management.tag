@@ -2,55 +2,55 @@
    
     <div class="ui segment p-4">
         <div class="ui" style="display: flex; flex-direction: row; align-items: center;">
-            <!--  Title  -->
-            <h2 style="margin-bottom: 0;">Quota and Cleanup</h2>
+            <!--  标题  -->
+            <h2 style="margin-bottom: 0;">配额和清理</h2>
 
-            <!--  Quota  -->
+            <!--  配额  -->
             <div style="flex: 0 0 auto; margin-left: auto;">
-                Quota: {formatSize(storage_used)} / {formatSize(quota)}
+                配额： {formatSize(storage_used)} / {formatSize(quota)}
             </div>
         </div>
 
-        <!--  Table  -->
+        <!--  表格  -->
         <table class="ui celled compact table">
             <tbody>
-                <!--  Orphan Tasks  -->
+                <!--  未使用任务  -->
                 <tr>
-                    <td>Unused Tasks <span show="{unused_tasks > 0}">(<b>{unused_tasks}</b>)</span></td>
+                    <td>未使用任务 <span show="{unused_tasks > 0}">(<b>{unused_tasks}</b>)</span></td>
                     <td>
                     <button class="ui red right floated labeled icon button {disabled: unused_tasks === 0}" onclick="{delete_unused_tasks}">
                         <i class="icon trash"></i>
-                        Delete unused tasks
+                        删除未使用任务
                     </button>
                     </td>
                 </tr>
-                <!--  Orphan Datasets  -->
+                <!--  未使用数据集和程序  -->
                 <tr>
-                    <td>Unused Datasets and Programs <span show="{unused_datasets_programs > 0}">(<b>{unused_datasets_programs}</b>)</span></td>
+                    <td>未使用数据集和程序 <span show="{unused_datasets_programs > 0}">(<b>{unused_datasets_programs}</b>)</span></td>
                     <td>
                     <button class="ui red right floated labeled icon button {disabled: unused_datasets_programs === 0}" onclick="{delete_unused_datasets}">
                         <i class="icon trash"></i>
-                        Delete unused datasets/programs
+                        删除未使用数据集/程序
                     </button>
                     </td>
                 </tr>
-                <!--  Orphan Submissions  -->
+                <!--  未使用提交  -->
                 <tr>
-                    <td>Unused Submissions <span show="{unused_submissions > 0}">(<b>{unused_submissions}</b>)</span></td>
+                    <td>未使用提交 <span show="{unused_submissions > 0}">(<b>{unused_submissions}</b>)</span></td>
                     <td>
                         <button class="ui red right floated labeled icon button {disabled: unused_submissions === 0}" onclick="{delete_unused_submissions}">
                         <i class="icon trash"></i>
-                        Delete unused submissions
+                        删除未使用提交
                     </button>
                     </td>
                 </tr>
-                <!--  Failed Submissions  -->
+                <!--  失败的提交  -->
                 <tr>
-                    <td>Failed Submissions <span show="{failed_submissions > 0}">(<b>{failed_submissions}</b>)</span></td>
+                    <td>失败的提交 <span show="{failed_submissions > 0}">(<b>{failed_submissions}</b>)</span></td>
                     <td>
                         <button class="ui red right floated labeled icon button {disabled: failed_submissions === 0}" onclick="{delete_failed_submissions}">
                         <i class="icon trash"></i>
-                        Delete failed submissions
+                        删除失败的提交
                     </button>
                     </td>
                 </tr>
@@ -60,7 +60,7 @@
     </div>
 
     <script>
-        // Initialize variables
+        // 初始化变量
         let self = this
         self.unused_tasks = 0
         self.unused_datasets_programs = 0
@@ -69,14 +69,13 @@
         self.quota = 0
         self.storage_used = 0
 
-        // get cleanup details on mount
+        // 页面加载时获取清理数据和配额
         self.on('mount', () => {
             self.update()
             self.get_cleanup()
             self.get_quota()
         })
 
-        
         self.get_cleanup = function () {
             CODALAB.api.get_user_quota_cleanup()
                 .done(function (data) {
@@ -87,7 +86,7 @@
                     self.update()
                 })
                 .fail(function (response) {
-                    toastr.error("Could not load cleanup data")
+                    toastr.error("无法加载清理数据")
                 })
         }
 
@@ -99,17 +98,17 @@
                     self.update()
                 })
                 .fail(function (response) {
-                    toastr.error("Could not load quota")
+                    toastr.error("无法加载配额")
                 })
         }
 
         /*
-        Delete Functions
+        删除操作函数
         */
 
-        // Delete unused tasks
+        // 删除未使用任务
         self.delete_unused_tasks = function(){
-            if (confirm(`Are you sure you want to permanently delete all unused tasks?`)) {
+            if (confirm(`您确定要永久删除所有未使用的任务吗？`)) {
 
                 CODALAB.api.delete_unused_tasks()
                     .done(function (data) {
@@ -125,14 +124,14 @@
                         }
                     })
                     .fail(function (response) {
-                        toastr.error("Unsed tasks deletion failed!")
+                        toastr.error("未使用任务删除失败！")
                     })
             }
         }
 
-        // Delete unused datasets
+        // 删除未使用数据集和程序
         self.delete_unused_datasets = function(){
-            if (confirm(`Are you sure you want to permanently delete all unused datasets and programs?`)) {
+            if (confirm(`您确定要永久删除所有未使用的数据集和程序吗？`)) {
 
                 CODALAB.api.delete_unused_datasets()
                     .done(function (data) {
@@ -146,14 +145,14 @@
                         }
                     })
                     .fail(function (response) {
-                        toastr.error("Unused datasets and programs deletion failed!")
+                        toastr.error("未使用数据集和程序删除失败！")
                     })
             }
         }
 
-        // Delete unused submissions
+        // 删除未使用提交
         self.delete_unused_submissions = function(){
-            if (confirm(`Are you sure you want to permanently delete all unused submissions?`)) {
+            if (confirm(`您确定要永久删除所有未使用的提交吗？`)) {
 
                 CODALAB.api.delete_unused_submissions()
                     .done(function (data) {
@@ -167,14 +166,14 @@
                         }
                     })
                     .fail(function (response) {
-                        toastr.error("Unused submissions deletion failed!")
+                        toastr.error("未使用提交删除失败！")
                     })
             }
         }
 
-        // Delete failed submissions
+        // 删除失败的提交
         self.delete_failed_submissions = function(){
-            if (confirm(`Are you sure you want to permanently delete all failed submissions?`)) {
+            if (confirm(`您确定要永久删除所有失败的提交吗？`)) {
 
                 CODALAB.api.delete_failed_submissions()
                     .done(function (data) {
@@ -188,12 +187,12 @@
                         }
                     })
                     .fail(function (response) {
-                        toastr.error("Failed submissions deletion failed!")
+                        toastr.error("失败的提交删除失败！")
                     })
             }
         }
 
-        // Utils
+        // 工具函数
         self.formatSize = function(size) {
             return pretty_bytes(size);
         }
