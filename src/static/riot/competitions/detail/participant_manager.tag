@@ -1,30 +1,30 @@
 <participant-manager>
     <div show="{participants}">
         <div class="ui icon input">
-            <input type="text" placeholder="Search..." ref="participant_search" onkeyup="{ search_participants }">
+            <input type="text" placeholder="搜索..." ref="participant_search" onkeyup="{ search_participants }">
             <i class="search icon"></i>
         </div>
         <select ref="participant_status" class="ui dropdown" onchange="{ update_participants.bind(this, undefined) }">
-            <option value="">Status</option>
+            <option value="">状态</option>
             <option value="-">----</option>
-            <option value="approved">Approved</option>
-            <option value="pending">Pending</option>
-            <option value="denied">Denied</option>
-            <option value="unknown">Unknown</option>
+            <option value="approved">已批准</option>
+            <option value="pending">待处理</option>
+            <option value="denied">已拒绝</option>
+            <option value="unknown">未知</option>
         </select>
         <div class="ui checkbox">
             <input type="checkbox" ref="participant_show_deleted" onchange="{ update_participants.bind(this, undefined) }">
-            <label>Show deleted accounts</label>
+            <label>显示已删除账户</label>
         </div>
-        <div class="ui blue icon button" onclick="{show_email_modal.bind(this, undefined)}"><i class="envelope icon"></i> Email all participants</div>
+        <div class="ui blue icon button" onclick="{show_email_modal.bind(this, undefined)}"><i class="envelope icon"></i> 向所有参与者发送邮件</div>
         <table class="ui celled striped table">
             <thead>
             <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Is Bot?</th>
-                <th>Status</th>
-                <th class="center aligned">Actions</th>
+                <th>用户名</th>
+                <th>邮箱</th>
+                <th>是机器人吗？</th>
+                <th>状态</th>
+                <th class="center aligned">操作</th>
             </tr>
             </thead>
             <tbody>
@@ -32,12 +32,12 @@
                 <td><a href="/profiles/user/{username}" target="_BLANK">{username}</a></td>
                 <td>{email}</td>
                 <td>{is_bot}</td>
-                <td>{is_deleted ? "account deleted" : _.startCase(status)}</td>
+                <td>{is_deleted ? "账户已删除" : _.startCase(status)}</td>
                 <td class="right aligned">
                     <button class="mini ui red button icon"
                             show="{status !== 'denied'}"
                             onclick="{ revoke_permission.bind(this, id) }"
-                            data-tooltip="Revoke"
+                            data-tooltip="撤销"
                             data-inverted=""
                             data-position="bottom center"
                             disabled="{is_deleted}">
@@ -46,7 +46,7 @@
                     <button class="mini ui green button icon"
                             show="{status !== 'approved'}"
                             onclick="{ approve_permission.bind(this, id) }"
-                            data-tooltip="Approve"
+                            data-tooltip="批准"
                             data-inverted=""
                             data-position="bottom center"
                             disabled="{is_deleted}"
@@ -54,7 +54,7 @@
                             <i class="checkmark icon"></i>
                     </button>
                     <button class="mini ui blue button icon"
-                            data-tooltip="Send Message"
+                            data-tooltip="发送消息"
                             data-inverted=""
                             data-position="bottom center"
                             onclick="{show_email_modal.bind(this, id)}"
@@ -70,16 +70,16 @@
 
     <div class="ui modal" ref="email_modal">
         <div class="header">
-            Send Email
+            发送邮件
         </div>
         <div class="content">
             <div class="ui form">
                 <div class="field">
-                    <label>Subject</label>
-                    <input type="text" value="A message from the admins of {competition_title}" disabled>
+                    <label>主题</label>
+                    <input type="text" value="来自{competition_title}管理员的消息" disabled>
                 </div>
                 <div class="field">
-                    <label>Content</label>
+                    <label>内容</label>
                     <textarea class="markdown-editor" ref="email_content" name="content"></textarea>
                 </div>
             </div>
@@ -125,11 +125,11 @@
                 : _.partial(CODALAB.api.email_all_participants, self.competition_id)
             func(content)
                 .done(() => {
-                    toastr.success('Sent')
+                    toastr.success('发送成功')
                     self.close_email_modal()
                 })
                 .fail((resp) => {
-                    toastr.error('Error sending email')
+                    toastr.error('发送邮件时出错')
                 })
         }
 
@@ -155,7 +155,7 @@
                     self.update()
                 })
                 .fail(() => {
-                    toastr.error('Error returning competition participants')
+                    toastr.error('返回比赛参与者时出错')
                 })
         }
 
@@ -163,16 +163,16 @@
             CODALAB.api.update_participant_status(id, {status: status})
                 .done(() => {
                     if(status === 'denied'){
-                        toastr.success('Revoked successfully')
+                        toastr.success('撤销成功')
                     }else{
-                        toastr.success('Approved successfully')
+                        toastr.success('批准成功')
                     }
                     self.update_participants()
                 })
         }
 
         self.revoke_permission = id => {
-            if (confirm("Are you sure you want to revoke this user's permissions?")) {
+            if (confirm("您确定要撤销该用户的权限吗？")) {
                 self._update_status(id, 'denied')
             }
         }
