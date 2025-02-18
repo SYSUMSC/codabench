@@ -2,10 +2,10 @@
     <!--Todo: ultimately decide whether this belongs on tasks:management or dataset:management
             Is currently at both locations-->
     <div class="ui top attached tabular menu">
-        <div class="active item" data-tab="submissions">Submissions</div>
-        <div class="item" data-tab="datasets">Datasets and programs</div>
-        <div class="item" data-tab="tasks">Tasks</div>
-        <div class="item" data-tab="bundles">Competition Bundles</div>
+        <div class="active item" data-tab="submissions">提交</div>
+        <div class="item" data-tab="datasets">数据集和程序</div>
+        <div class="item" data-tab="tasks">任务</div>
+        <div class="item" data-tab="bundles">竞赛包</div>
         <div class="right menu">
             <div class="item">
                 <help_button href="https://github.com/codalab/competitions-v2/wiki/Task-&-Dataset-Management"
