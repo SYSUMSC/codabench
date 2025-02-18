@@ -2,12 +2,12 @@
     <div class="ui sixteen wide column submission-container">
 
         <div class="submission-form">
-            <h1>Submission upload</h1>
-            <div if="{_.get(selected_phase, 'status') === 'Previous'}" class="ui red message">This phase has ended and no longer accepts submissions!</div>
-            <div if="{_.get(selected_phase, 'status') === 'Next'}" class="ui yellow message">This phase hasn't started yet!</div>
+            <h1>提交上传</h1>
+            <div if="{_.get(selected_phase, 'status') === 'Previous'}" class="ui red message">该阶段已结束,不再接受提交!</div>
+            <div if="{_.get(selected_phase, 'status') === 'Next'}" class="ui yellow message">该阶段尚未开始!</div>
             <form class="ui form coda-animated {error: errors}" ref="form" enctype="multipart/form-data">
                 <div class="submission-form" ref="fact_sheet_form" if="{ opts.fact_sheet !== null}">
-                    <h2>Metadata or Fact Sheet</h2>
+                    <h2>元数据或说明表</h2>
                     <div class="submission-form-question" each="{ question in opts.fact_sheet }">
                         <span if="{ question.type === 'text' }">
                             <label if="{question.is_required == 'true'}" class="required-answer" for="{ question.key }">{ question.title }:</label>
@@ -32,7 +32,7 @@
                     <div class="item">
                         <a class="title">
                             <i class="dropdown icon"></i>
-                            Selected Tasks
+                            已选任务
                         </a>
                         <div class="content">
                             <div class="ui form">
@@ -50,20 +50,20 @@
                 </div>
 
                 <div class="ui six wide field">
-                    <label>Submit as:
+                    <label>提交者:
                     <span class="ui mini circular icon button"
-                        data-tooltip="You can either submit as yourself or as an organization"
+                        data-tooltip="你可以以个人名义或组织名义提交"
                         data-position="top center">
                         <i class="question icon"></i>
                     </span>
                     </label>
-                    
+
                     <select name="organizations" id="organization_dropdown" class="ui dropdown">
-                        <option value="None">Yourself</option>
+                        <option value="None">个人</option>
                         <option each="{org in organizations}" value="{org.id}">{org.name}</option>
-                        <option if="{_.size(organizations) === 0}" value="add_organization">+ Add New Organization</option>
-                    </select> 
-                    
+                        <option if="{_.size(organizations) === 0}" value="add_organization">+ 添加新组织</option>
+                    </select>
+
                 </div>
 
                 <input-file name="data_file" ref="data_file" error="{errors.data_file}" accept=".zip"></input-file>
@@ -80,12 +80,12 @@
              ref="accordion">
             <div class="title">
                 <i class="dropdown icon"></i>
-                Running {selected_submission.filename} (ID = {selected_submission.id})
+                正在运行 {selected_submission.filename} (ID = {selected_submission.id})
             </div>
             <div class="ui basic segment">
                 <div class="content">
                     <div id="submission-output" class="ui" ref="submission-output">
-                        <div class="header">Output</div>
+                        <div class="header">输出</div>
                         <div class="content">
                             <div if="{!ingestion_during_scoring}">
                                 <div if="{_.isEmpty(children)}">
@@ -96,7 +96,7 @@
                                                 show_graph="{opts.competition.enable_detailed_results}"></log_window>
                                     <div class="ui checkbox" ref="autoscroll_checkbox">
                                         <input type="checkbox" checked/>
-                                        <label>Autoscroll Output</label>
+                                        <label>自动滚动输出</label>
                                     </div>
                                 </div>
                                 <div if="{children}">
@@ -188,8 +188,8 @@
             $(self.refs.data_file.refs.file_input).on('change', self.check_can_upload)
             self.setup_autoscroll()
             self.setup_websocket()
-        }) 
-        
+        })
+
         // Function to capture change of `submit as` dropdown
         // Redirect to Add organization if selected option is Add Organizaiton
         $(document).on('change','#organization_dropdown',function(){
@@ -370,7 +370,7 @@
         }
 
         self.check_can_upload = function () {
-            
+
             // Check if selected phase accepts submissions (within the deadline of the phase)
             if(self.selected_phase.status === "Current"){
 
@@ -389,7 +389,7 @@
                 // Error when phase is not accepting submissions
                 if(self.selected_phase.status === "Next"){
                     toastr.error('This phase has not started yet. Please check the phase start date!')
-                   
+
                 }
                 if(self.selected_phase.status === "Previous"){
                     toastr.error('This phase has ended and no longer accepts submissions!')
@@ -498,7 +498,7 @@
                     } else {
                         toastr.error("Something went wrong, please try again later")
                     }
-                    
+
                 })
                 .always(function () {
                     setTimeout(self.hide_progress_bar, 500)
