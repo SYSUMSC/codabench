@@ -15,11 +15,11 @@
 
 {% block content %}
 
-    <!-- Annoucement  -->
+    <!-- 公告  -->
     {% if announcement %}
     <div style="margin:auto;" class="segment-container ui segment full-width">
         <div class="ui header">
-            <p>Announcement</p>
+            <p>公告</p>
         </div>
         <div class="container-content">
             <div class="center aligned column">
@@ -32,37 +32,37 @@
     <div class="home-wrap">
         <front-page-competitions></front-page-competitions>
 
-        <!-- Action Section -->
+        <!-- 行动部分 -->
         <div id="action-container" class="segment-container ui segment full-width">
             <div class="ui header">
-                Get Started
+                开始
             </div>
             <div class="container-content">
                 <div class="center aligned column">
                     <h3 class="ui icon header">
                         <i class="trophy icon"></i>
-                        Participate
+                        参与
                     </h3>
                     <div>
-                        <p>Find benchmarks that pique your interest! A benchmark allows you to test new algorithms against reference datasets OR (inverted benchmark) submit challenging data to reference algorithms.</p>
+                        <p>找到让你感兴趣的基准测试！基准测试允许你将新算法与参考数据集进行测试，或者（反向基准）向参考算法提交具有挑战性的数据。</p>
                     </div>
                 </div>
                 <div class="center aligned column">
                     <h3 class="ui icon header">
                         <i class="users icon"></i>
-                        Organize
+                        组织
                     </h3>
                     <div>
-                        <p>Organize a benchmark on Codabench. Start with our <a href="https://github.com/codalab/codabench/wiki/Getting-started-with-Codabench">tutorial</a>.</p>
+                        <p>在 Codabench 上组织基准测试。首先查看我们的 <a href="https://github.com/codalab/codabench/wiki/Getting-started-with-Codabench">教程</a>。</p>
                     </div>
                 </div>
                 <div class="center aligned column">
                     <h3 class="ui icon header">
                         <i class="code icon"></i>
-                        Contribute
+                        贡献
                     </h3>
                     <div>
-                        <p>Interested in joining the development team? Join us on <a href="https://github.com/codalab/codabench">Github</a> or <a href="mailto:info@codalab.org">contact us</a> directly.</p>
+                        <p>有兴趣加入开发团队吗？请在 <a href="https://github.com/codalab/codabench">Github</a> 上与我们联系，或直接 <a href="mailto:info@codalab.org">联系我们</a>。</p>
                     </div>
                 </div>
             </div>
@@ -74,111 +74,67 @@
             <div class="column">
                 <div class="ui statistic">
                     <div class="value">{{ HOME_PAGE_COUNTERS_INFO.public_competitions }}</div>
-                    <div class="label">Public Competitions</div>
+                    <div class="label">公开题目</div>
                 </div>
             </div>
             <!-- Users -->
             <div class="column">
                 <div class="ui statistic">
                     <div class="value">{{ HOME_PAGE_COUNTERS_INFO.users }}</div>
-                    <div class="label">Users</div>
+                    <div class="label">用户</div>
                 </div>
             </div>
             <!-- Submissions -->
             <div class="column">
                 <div class="ui statistic">
                     <div class="value">{{ HOME_PAGE_COUNTERS_INFO.submissions }}</div>
-                    <div class="label">Submissions</div>
+                    <div class="label">提交</div>
                 </div>
             </div>
         </div>
 
-        <!-- About Section -->
+        <!-- 关于 Codabench -->
         <div id="about-container" class="segment-container ui segment full-width">
             <div class="ui header">
-                About Codabench
+                关于 Codabench
             </div>
             <div class="container-content">
                 <div class="ui middle stackable grid container">
                     <div class="eight wide left aligned column">
                         <div class="row column-bottom-padding">
-                            <h3 class="ui color-header header">What is Codabench?</h3>
+                            <h3 class="ui color-header header">什么是 Codabench？</h3>
                             <div class="ui divider"></div>
-                            <p>Codabench is an <a href="https://github.com/codalab/codabench">open source</a> platform allowing you to organize AI benchmarks. It is flexible and powerful, yet easy to use. You define tasks (e.g. datasets and metrics of success), then interface for submissions of code (algorithms), add some documentation pages,
-                                make an upload and that's it! Your benchmark is created, ready to accept submissions of new algorithms. Everything can be fully customized, including the code of the scoring program. Organizers can even hook up their own compute workers to their benchmarks, enabling unlimited computing power.
-                               Participants can try out their methods, get real-time feedback and results on a competitive leaderboard, detailed plots and more.</p>
-                            <p>In a unique twist, Codabench also allows you to create inverted benchmarks. Here, the roles of datasets and algorithms are interchanged. In this scenario, you set the reference algorithms and the participants contribute datasets.</p>
+                            <p>Codabench 是一个 <a href="https://github.com/codalab/codabench">开源</a> 平台，允许你组织 AI 基准测试。它灵活且强大，但易于使用。你定义任务（例如数据集和成功指标），然后接口用于提交代码（算法），添加一些文档页面，进行上传，完成！你的基准测试就创建好了，准备接受新算法的提交。所有内容都可以完全自定义，包括评分程序的代码。组织者甚至可以将自己的计算工作者连接到他们的基准测试，从而实现无限的计算能力。参与者可以尝试他们的方法，获得实时反馈和竞争排行榜上的结果、详细图表等。</p>
+                            <p>在一个独特的转折中，Codabench 还允许你创建反向基准测试。在这种情况下，数据集和算法的角色被互换。在这种情况下，你设置参考算法，参与者贡献数据集。</p>
                         </div>
 
                         <div class="row column-bottom-padding">
-                            <h3 class="ui color-header header">What is CodaLab?</h3>
+                            <h3 class="ui color-header header">什么是 CodaLab？</h3>
                             <div class="ui divider"></div>
-                            <p>CodaLab Competitions is a powerful <a href="https://github.com/codalab/codalab-competitions">open source</a> framework for running competitions using result or code submissions.
-                                You can participate in an existing competition or host your own competition for free.</p>
-                            <p>Most competitions hosted on CodaLab are machine learning (data science) competitions, but it is NOT limited to this application domain.
-                                It can accommodate any problem for which a solution can be provided in the form of a zip archive containing a
-                                number of files to be evaluated quantitatively by a scoring program (provided by the organizers).
-                                The scoring program must return a numeric score, which is displayed on a leaderboard where
-                                the performances of participants are compared.</p>
+                            <p>CodaLab Competitions 是一个强大的 <a href="https://github.com/codalab/codalab-competitions">开源</a> 框架，用于运行使用结果或代码提交的竞赛。你可以参与现有的竞赛或免费举办自己的竞赛。</p>
+                            <p>大多数在 CodaLab 上举办的竞赛都是机器学习（数据科学）竞赛，但并不限于此应用领域。它可以容纳任何可以以包含多个文件的 zip 压缩包形式提供解决方案的问题，这些文件将由组织者提供的评分程序进行定量评估。评分程序必须返回一个数字分数，该分数显示在排行榜上，参与者的表现进行比较。</p>
                         </div>
 
                         <div class="row column-bottom-padding">
-                            <h3 class="ui color-header header">History of CodaLab</h3>
+                            <h3 class="ui color-header header">CodaLab 的历史</h3>
                             <div class="ui divider"></div>
-                            <p>CodaLab was created in 2013 as a joint venture between Microsoft and Stanford University.
-                                Originally the vision was to create an ecosystem for conducting computational research
-                                in a more efficient, reproducible, and collaborative manner, combining worksheets and
-                                competitions. Worksheets capture complex research pipelines in a reproducible way and create "executable
-                                papers". Codabench is the continuity of CodaLab, a version 2 in which users can organize benchmarks.</p>
-                            <p>Some competitions have been organized using worksheets, but the competition platform
-                                and the worksheet platform have both a large user base and can be used independently. In
-                                2014,
-                                <a class="large_links" href="http://www.chalearn.org/">ChaLearn</a> joined to co-develop
-                                CodaLab competitions. Since 2015, University Paris-Saclay is
-                                community lead of CodaLab competitions, under the direction of Isabelle Guyon, professor
-                                of big data. CodaLab and Codabench are administered by the <a class="large_links" href="https://www.lisn.upsaclay.fr/">LISN staff.</a>
-                            </p>
+                            <p>CodaLab 于 2013 年由微软和斯坦福大学共同创建。最初的愿景是创建一个生态系统，以更高效、可重复和协作的方式进行计算研究，结合工作表和竞赛。工作表以可重复的方式捕获复杂的研究流程，并创建"可执行论文"。Codabench 是 CodaLab 的延续，是一个版本 2，用户可以组织基准测试。</p>
+                            <p>一些竞赛已经使用工作表组织，但竞赛平台和工作表平台都有庞大的用户基础，可以独立使用。2014 年，<a class="large_links" href="http://www.chalearn.org/">ChaLearn</a> 加入共同开发 CodaLab 竞赛。自 2015 年以来，巴黎萨克雷大学是 CodaLab 竞赛的社区负责人，由大数据教授 Isabelle Guyon 领导。CodaLab 和 Codabench 由 <a class="large_links" href="https://www.lisn.upsaclay.fr/">LISN 团队</a> 管理。</p>
                         </div>
 
                         <div class="row column-bottom-padding">
-                            <h3 class="ui color-header header">CodaLab in Research</h3>
+                            <h3 class="ui color-header header">CodaLab 在研究中的应用</h3>
                             <div class="ui divider"></div>
-                            <p>CodaLab is used actively in research. In
-                                2019/2020, 400 new challenges were launched. Recent
-                                popular challenges organized with CodaLab include the
-                                <a href="https://competitions.codalab.org/competitions/25276">COVID-19
-                                  retweet prediction challenge,</a>&nbsp; the <a
-                                  href="https://competitions.codalab.org/competitions/24184">ECCV
-                                  2020 ChaLearn LAP Fair face recognition challenge</a>,
-                                the 2020 <a href="https://competitions.codalab.org/competitions/21639">DriveML
-                                  Huawei Autonomous Vehicle Challenge</a>, and high
-                                profile challenges include the <a class="large_links" href="https://web.see4c.eu/">2
-                                million Euro prize of the EU, organized by the See.4C consortium</a>, the <a class="large_links"
-                                href="https://competitions.codalab.org/competitions/16652">CIKM
-                                AnalytiCup 2017</a>, which attracted 493 participants,
-                              <a class="large_links"
-                                href="https://competitions.codalab.org/competitions/3221">MSCOCO</a>
-                              (633 participants) and the <a class="large_links"
-                                href="https://competitions.codalab.org/competitions/2321">ChaLearn
-                                AutoML challenge 2017</a> (687 participants).</p>
-                            <p>Since 2016, CodaLab offers the possibility of organizing machine learning challenges with
-                                code submission. The simplest machine learning challenges require only the submission of
-                                results, which are compared to a solution (or key) by a scoring program. Result submission
-                                challenges are less computationally expensive than code submission challenges. However, they offer less
-                                possibilities. In particular, code submission allows conducting fair benchmarks by
-                                executing submitted code in the same condition for all participants.</p>
-                            <p>CodaLab has been providing free resources for challenge organizers who want to run high
-                                impact events, within a pre-approved agreed upon budget. New since version 1.5: organizers can
-                                hook up their own compute workers to the backend of CodaLab to redirect the code submissions,
-                                enabling growth to big data competitions running at the expense of the organizers. For very
-                                special dedicated projects, CodaLab can be customized since it is an open source project.</p>
+                            <p>CodaLab 在研究中被积极使用。在 2019/2020 年，推出了 400 个新挑战。最近使用 CodaLab 组织的热门挑战包括 <a href="https://competitions.codalab.org/competitions/25276">COVID-19 转发预测挑战</a>、<a href="https://competitions.codalab.org/competitions/24184">ECCV 2020 ChaLearn LAP 公平人脸识别挑战</a>、2020 年的 <a href="https://competitions.codalab.org/competitions/21639">DriveML 华为自动驾驶汽车挑战</a>，以及高知名度的挑战，包括 <a class="large_links" href="https://web.see4c.eu/">200 万欧元的欧盟奖金，由 See.4C 联盟组织</a>、<a class="large_links" href="https://competitions.codalab.org/competitions/16652">CIKM AnalytiCup 2017</a>，吸引了 493 名参与者，<a class="large_links" href="https://competitions.codalab.org/competitions/3221">MSCOCO</a>（633 名参与者）和 <a class="large_links" href="https://competitions.codalab.org/competitions/2321">ChaLearn AutoML 挑战 2017</a>（687 名参与者）。</p>
+                            <p>自 2016 年以来，CodaLab 提供了组织机器学习挑战的可能性，允许代码提交。最简单的机器学习挑战只需要提交结果，这些结果由评分程序与解决方案（或关键）进行比较。结果提交挑战的计算成本低于代码提交挑战。然而，它们提供的可能性较少。特别是，代码提交允许在所有参与者的相同条件下执行提交的代码，从而进行公平的基准测试。</p>
+                            <p>CodaLab 一直为希望举办高影响力活动的挑战组织者提供免费资源，预算在预先批准的协议范围内。自 1.5 版以来：组织者可以将自己的计算工作者连接到 CodaLab 的后端，以重定向代码提交，从而实现大数据竞赛的增长，费用由组织者承担。对于非常特殊的专用项目，CodaLab 可以进行定制，因为它是一个开源项目。</p>
                         </div>
 
                     </div>
-                    <!-- News Section -->
+                    <!-- 新闻部分 -->
                     <div class="eight wide center aligned column">
                         <div class="row news-column-bottom-padding">
-                            <h1 class="ui color-header header">News</h1>
+                            <h1 class="ui color-header header">新闻</h1>
                         </div>
                         {% for post in news_posts %}
                         <div class="row news-column-bottom-padding news">
@@ -200,15 +156,15 @@
             </div>
         </div>
 
-        <!-- Citation Section -->
+        <!-- 引用部分 -->
         <div id="cite-container" class="segment-container ui segment full-width">
             <div class="ui header">
-                Cite Codabench in your research
+                在你的研究中引用 Codabench
             </div>
             <div class="row container-content">
                 <pre>
 @article{codabench,
-    title = {Codabench: Flexible, easy-to-use, and reproducible meta-benchmark platform},
+    title = {Codabench: 灵活、易用且可重复的元基准平台},
     author = {Zhen Xu and Sergio Escalera and Adrien Pavão and Magali Richard and
                 Wei-Wei Tu and Quanming Yao and Huan Zhao and Isabelle Guyon},
     journal = {Patterns},
@@ -223,10 +179,10 @@
             </div>
         </div>
 
-        <!-- Partners Section -->
+        <!-- 合作伙伴部分 -->
         <!--
         <div class="segment-container ui segment full-width">
-            <div class="ui header">Partners</div>
+            <div class="ui header">合作伙伴</div>
             <div class="container-content" id="partners-row1">
                 <a href="https://www.universite-paris-saclay.fr/" target="_blank">
                     <img class="partner-img" src="{% static 'img/partners/paris-saclay.png' %}">
@@ -282,7 +238,7 @@
 
 {% block extra_body %}
     <script>
-        // Prevent buttons from stacking in mobile view
+        // 防止按钮在移动视图中堆叠
         $(window).resize(function () {
             if ($(window).width() < 390) {
                 return $('.pages')

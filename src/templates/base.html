@@ -1,7 +1,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -9,7 +9,7 @@
     <title>Codabench</title>
     <link rel="icon" type="image/ico" href="{% static 'img/favicon.ico' %}"/>
 
-    <!-- Vendor -->
+    <!-- 第三方库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
     <link rel="stylesheet" href="{% static "css/calendar.min.css" %}">
@@ -20,7 +20,7 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <!-- Ours -->
+    <!-- 自定义样式 -->
     <link rel="stylesheet" href="{% static "generated/output.css" %}">
 
     <!-- Latex -->
@@ -61,10 +61,10 @@
     {% endfor %}
 {% endif %}
 
-<!-- Sidebar Menu -->
+<!-- 侧边栏菜单 -->
 <div class="ui thin sidebar left inverted vertical overlay menu">
     <div class="ui container">
-        <a href="{% url "pages:home" %}" class="item">Competitions</a>
+        <a href="{% url "pages:home" %}" class="item">比赛</a>
         <a class="item">Chahub</a>
         <a href="https://chagrade.lri.fr/" class="item">Chagrade</a>
     </div>
@@ -76,7 +76,7 @@
             <i class="bars icon"></i>
         </div>
     </div>
-    <!-- Page Contents -->
+    <!-- 页面内容 -->
     <div id="header" class="ui inverted vertical center aligned segment masthead
         {% block top_div_extra_class %}{% endblock %}">
         <div id="bg"></div>
@@ -88,7 +88,7 @@
                     </a>
                     <div class="ui search" id="site-wide-competition-search">
                         <div class="ui left icon input search-width">
-                            <input id="competition-search" class="prompt" type="text" placeholder="Search Competitions">
+                            <input id="competition-search" class="prompt" type="text" placeholder="搜索比赛">
                             <i class="search icon"></i>
                         </div>
                         <div class="results search-width scrollable-height-limit"></div>
@@ -136,12 +136,12 @@
 
                                     <div class="header">管理员菜单</div>
 {#                                    <a class="item" href="#">Customize Codalab</a>#}
-                                    <a class="item" href="{% url "pages:server_status" %}">Server Status</a>
+                                    <a class="item" href="{% url "pages:server_status" %}">服务器状态</a>
                                 {% if request.user.is_staff %}
-                                    <a class="item" href="{% url "pages:monitor_queues" %}">Monitor Queues</a>
-                                    <a class="item" href="{% url "admin:index" %}">Django Admin</a>
-                                    <a class="item" href="{% url "su_login" %}">Change User</a>
-                                    <a class="item" href="{% url "analytics:analytics" %}">Analytics</a>
+                                    <a class="item" href="{% url "pages:monitor_queues" %}">监控队列</a>
+                                    <a class="item" href="{% url "admin:index" %}">Django 管理后台</a>
+                                    <a class="item" href="{% url "su_login" %}">切换用户</a>
+                                    <a class="item" href="{% url "analytics:analytics" %}">分析统计</a>
 {#                                    <a class="item" href="#">Health</a>#}
 {#                                    <a class="item" href="#">Users</a>#}
 {#                                    <a class="item" href="#">Submissions</a>#}
@@ -149,7 +149,7 @@
 {#                                        User</a>#}
                                 {% endif %}
                                 <div class="ui divider"></div>
-                                <div class="header">Account</div>
+                                <div class="header">账户</div>
                                 <a class="item" href="{% url 'profiles:user_profile' username=user.username %}">
                                     <i class="icon user"></i>
                                     查看个人信息
@@ -217,27 +217,27 @@
             <div class="three wide column">
                 <h4 class="ui inverted header">Chasuite</h4>
                 <div class="ui inverted link list">
-                    <a href="https://codalab.lisn.fr/" class="item">Competitions v1.6</a>
+                    <a href="https://codalab.lisn.fr/" class="item">比赛 v1.6</a>
                     <a href="http://chahub.org/" class="item">Chahub</a>
                     <a href="https://chagrade.lri.fr/" class="item">Chagrade</a>
                 </div>
             </div>
             <div class="three wide column">
-                <h4 class="ui inverted header">About</h4>
+                <h4 class="ui inverted header">关于</h4>
                 <div class="ui inverted link list">
-                    <a href="https://github.com/codalab/codalab-competitions/wiki/Project_About_CodaLab" class="item">About</a>
+                    <a href="https://github.com/codalab/codalab-competitions/wiki/Project_About_CodaLab" class="item">关于</a>
                     <a href="https://github.com/codalab/codabench" class="item">Github</a>
-                    <a href="https://github.com/codalab/codalab-competitions/wiki/Privacy" class="item">Privacy and Terms</a>
-                    <a href="{% url 'schema-swagger-ui' %}" class="item">API Docs</a>
+                    <a href="https://github.com/codalab/codalab-competitions/wiki/Privacy" class="item">隐私和条款</a>
+                    <a href="{% url 'schema-swagger-ui' %}" class="item">API 文档</a>
                 </div>
             </div>
             <div class="three wide column">
-                {# Empty for now, can add a list of links here if needed! #}
+                {# 暂时为空，如有需要可添加链接列表 #}
             </div>
             <div class="seven wide column">
                 <h4 class="ui inverted header">CodaBench</h4>
-                <p>Join us on <a href="https://github.com/codalab/codabench" target="_blank">Github</a> for contact &amp; bug reports</p>
-                <p>Questions about the platform? See our <a href="https://github.com/codalab/codabench/wiki" target="_blank">Wiki</a> for more information.</p>
+                <p>加入我们的 <a href="https://github.com/codalab/codabench" target="_blank">Github</a> 获取联系方式及报告错误</p>
+                <p>对平台有疑问？请参阅我们的 <a href="https://github.com/codalab/codabench/wiki" target="_blank">Wiki</a> 了解更多信息。</p>
             </div>
         </div>
     </div>
@@ -247,10 +247,10 @@
         </div>
     {% endif %}
 </div>
-    {# Admin only user switching #}
+    {# 仅限管理员的用户切换 #}
     <user_switch></user_switch>
 
-    <!-- Vendor -->
+    <!-- 第三方库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"
             integrity="sha256-7/yoZS3548fXSRXqc/xYzjsmuW3sFKzuvOCHd06Pmps=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -270,12 +270,10 @@
     <script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
     <!-- Latex -->
     <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-    <!-- Ours -->
-
-
+    <!-- 自定义脚本 -->
 
     <script>
-        {# From `common_settings` context processor #}
+        // 从 `common_settings` 上下文处理器获取数据
         STORAGE_TYPE = "{{ STORAGE_TYPE }}"
         MAX_EXECUTION_TIME_LIMIT = "{{ MAX_EXECUTION_TIME_LIMIT }}"
         CURRENT_DATE_TIME = "{% now "c" %}"
@@ -288,7 +286,7 @@
             }
         }
 
-        {# Doing this here to append functionality to user data #}
+        // 为用户数据追加功能
         CODALAB.state.user.has_competition_admin_privileges = competition => {
             let user = CODALAB.state.user
             if (user.is_superuser || user.is_staff) {
@@ -298,7 +296,7 @@
             return user.username === competition.created_by || collabs.includes(user.username)
         }
 
-        // Load in URLs or other django generated goodies
+        // 加载 Django 生成的 URL 及其他信息
         URLS = {
             assets: {
                 header_particles: "{% static "particles/header.json" %}"
@@ -310,12 +308,12 @@
             // Websockets
             //WS_SUBMISSION_LISTEN: ""
 
-            // Analytics
+            // 分析统计
             ANALYTICS_API: function (query_parameters) {
                 return "{% url "analytics_api" %}" + `?${$.param(query_parameters)}`
             },
 
-            // Competitions
+            // 比赛相关
             COMPETITION_MANAGEMENT: "{% url "competitions:management" %}",
             COMPETITION_UPLOAD: "{% url "competitions:upload" %}",
             COMPETITION_ADD: "{% url "competitions:create" %}",
@@ -347,16 +345,16 @@
                 let urlParam = "?phase=" + phase_id
                 return urlBase.slice(0, -1) + ".json" + urlParam
             },
-            // Forums
+            // 论坛
             FORUM: function (pk) {
                return "{% url "forums:forum_detail" forum_pk=0 %}".replace(0, pk)
             },
-            // Datasets
+            // 数据集
             DATASET_MANAGEMENT: "{% url "datasets:management" %}",
             DATASET_DOWNLOAD: function (key) {
                 return "{% url "datasets:download" key=0 %}".replace(0, key)
             },
-            // Tasks
+            // 任务
             TASK_MANAGEMENT: "{% url "tasks:task_management" %}",
             TASK_DETAIL: function (pk) {
                 return "{% url "tasks:detail" pk=0 %}".replace(0, pk)
@@ -364,7 +362,7 @@
             LOGIN: "{% url 'accounts:login' %}",
             SIGNUP: "{% url 'accounts:signup' %}",
         }
-        // Django returns <input type="hidden" value="csrf-token-secret"> so we just grab the `value` attribute from this
+        // Django 返回 <input type="hidden" value="csrf-token-secret">，故直接获取该元素的 `value` 属性
         CSRF_TOKEN = $('{% csrf_token %}').attr('value')
 
         $(document).ready( function () {
