@@ -23,7 +23,7 @@
             </table>
         </div>
         <button class="ui blue button" onclick="{ update_scores }">
-            Submit
+            提交
         </button>
     </form>
 

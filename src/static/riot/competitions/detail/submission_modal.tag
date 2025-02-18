@@ -1,10 +1,10 @@
 <submission-modal>
     <div class="ui large green pointing menu">
-        <div class="active submission-modal item" data-tab="{admin_: submission.admin}downloads">DOWNLOADS</div>
-        <div class="submission-modal item" data-tab="{admin_: submission.admin}logs" show="{!opts.hide_output}">LOGS</div>
-        <div class="submission-modal item" data-tab="{admin_: submission.admin}graph" show="{!opts.hide_output && opts.show_visualization}">VISUALIZATION</div>
-        <div class="submission-modal item" data-tab="admin" if="{submission.admin}">ADMIN</div>
-        <div class="submission-modal item" data-tab="{admin_: submission.admin}fact_sheet">FACT SHEET ANSWERS</div>
+        <div class="active submission-modal item" data-tab="{admin_: submission.admin}downloads">下载</div>
+        <div class="submission-modal item" data-tab="{admin_: submission.admin}logs" show="{!opts.hide_output}">日志</div>
+        <div class="submission-modal item" data-tab="{admin_: submission.admin}graph" show="{!opts.hide_output && opts.show_visualization}">可视化</div>
+        <div class="submission-modal item" data-tab="admin" if="{submission.admin}">管理员</div>
+        <div class="submission-modal item" data-tab="{admin_: submission.admin}fact_sheet">事实表答案</div>
     </div>
     <div class="ui tab active modal-tab" data-tab="{admin_: submission.admin}downloads">
         <div class="ui relaxed centered grid">
@@ -12,23 +12,23 @@
                 <table class="ui table" id="downloads">
                     <thead>
                         <tr>
-                            <th><i class="download icon"></i> Files</th>
+                            <th><i class="download icon"></i> 文件</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td class="selectable file-download">
-                                <a href="{ data_file }"><i class="file archive outline icon"></i> Submission File</a>
+                                <a href="{ data_file }"><i class="file archive outline icon"></i> 提交文件</a>
                             </td>
                         </tr>
                         <tr>
                             <td class="selectable file-download {disabled: !prediction_result}">
-                                <a href="{ prediction_result }"><i class="file outline icon"></i>Output from prediction step</a>
+                                <a href="{ prediction_result }"><i class="file outline icon"></i>预测步骤的输出</a>
                             </td>
                         </tr>
                         <tr>
                             <td class="selectable file-download {disabled: !scoring_result}">
-                                <a href="{ scoring_result }"><i class="file outline icon"></i>Output from scoring step</a>
+                                <a href="{ scoring_result }"><i class="file outline icon"></i>评分步骤的输出</a>
                             </td>
                         </tr>
                     </tbody>
@@ -41,10 +41,10 @@
             <div class="three wide column">
                 <div class="ui fluid vertical secondary menu">
                     <div class="active submission-modal item" data-tab="{admin_: submission.admin}prediction">
-                        Prediction Logs
+                        预测日志
                     </div>
                     <div class="submission-modal item" data-tab="{admin_: submission.admin}scoring">
-                        Scoring Logs
+                        评分日志
                     </div>
                 </div>
             </div>
@@ -58,20 +58,15 @@
                             stderr
                         </div>
                         <div class="submission-modal item" data-tab="{admin_: submission.admin}p_ingest_stdout">
-                            Ingestion stdout
+                            采集 stdout
                         </div>
                         <div class="submission-modal item" data-tab="{admin_: submission.admin}p_ingest_stderr">
-                            Ingestion stderr
+                            采集 stderr
                         </div>
                     </div>
 
                     <div class="ui active bottom attached inverted segment tab log"
                          data-tab="{admin_: submission.admin}p_stdout">
-                        <!--
-                        todo: something like:
-                            <pre>{ logs.prediction_stdout ? logs.prediction_stdout : "Empty Logs"}</pre>
-                            so log files don't look empty
-                        -->
                         <pre>{ logs.prediction_stdout }</pre>
                     </div>
 
@@ -99,10 +94,10 @@
                             stderr
                         </div>
                         <div class="submission-modal item" data-tab="{admin_: submission.admin}s_ingest_stdout">
-                            Ingestion stdout
+                            采集 stdout
                         </div>
                         <div class="submission-modal item" data-tab="{admin_: submission.admin}s_ingest_stderr">
-                            Ingestion stderr
+                            采集 stderr
                         </div>
                     </div>
 
@@ -133,7 +128,7 @@
         <div class="ui inverted segment log">
             <textarea name="fact-sheet" id="fact_sheet" ref="fact_sheet_text_area">{ JSON.stringify(fact_sheet_answers, null, 2) }</textarea>
         </div>
-        <div class="ui button green" onclick="{update_fact_sheet.bind(this)}">Save</div>
+        <div class="ui button green" onclick="{update_fact_sheet.bind(this)}">保存</div>
     </div>
     <div class="ui tab modal-tab" data-tab="{admin_: submission.admin}graph" show="{opts.show_visualization && (!opts.hide_output || submission.admin)}">
         <iframe src="{detailed_result}" class="graph-frame" show="{detailed_result}"></iframe>
@@ -195,13 +190,13 @@
                 fact_sheet = JSON.parse(fact_sheet)
             }
             catch (err) {
-                toastr.error("Invalid JSON")
+                toastr.error("无效的 JSON")
                 return false
             }
             self.fact_sheet_answers = fact_sheet
             CODALAB.api.update_submission_fact_sheet(self.submission.id, self.fact_sheet_answers)
                 .done((data) => {
-                    toastr.success('Fact Sheet Answers updated')
+                    toastr.success('事实表答案已更新')
                     setTimeout(function () {
                         location.reload()
                     }, 1000)
