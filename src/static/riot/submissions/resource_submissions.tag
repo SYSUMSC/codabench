@@ -1,33 +1,33 @@
 <submission-management>
 
-    <!--  Search -->
+    <!-- 搜索 -->
     <div class="ui icon input">
-        <input type="text" placeholder="Search..." ref="search" onkeyup="{ filter.bind(this, undefined) }">
+        <input type="text" placeholder="搜索..." ref="search" onkeyup="{ filter.bind(this, undefined) }">
         <i class="search icon"></i>
     </div>
     <div class="ui checkbox inline-div" onclick="{ filter.bind(this, undefined) }">
-        <label>Show Public</label>
+        <label>显示公开</label>
         <input type="checkbox" ref="show_public">
     </div>
     <button class="ui green right floated labeled icon button" onclick="{show_creation_modal}">
         <i class="plus icon"></i>
-        Add Submission
+        添加提交
     </button>
     <button class="ui red right floated labeled icon button {disabled: marked_submissions.length === 0}" onclick="{delete_submissions}">
         <i class="icon delete"></i>
-        Delete Selected Submissions
+        删除选中提交
     </button>
 
-    <!-- Data Table -->
+    <!-- 数据表 -->
     <table id="submissionsTable" class="ui {selectable: submissions.length > 0} celled compact sortable table">
         <thead>
         <tr>
-            <th>File Name</th>
-            <th>Competition in</th>
-            <th width="175px">Size</th>
-            <th width="125px">Uploaded</th>
-            <th width="60px" class="no-sort">Public</th>
-            <th width="50px" class="no-sort">Delete?</th>
+            <th>文件名</th>
+            <th>所属竞赛</th>
+            <th width="175px">大小</th>
+            <th width="125px">上传时间</th>
+            <th width="60px" class="no-sort">公开</th>
+            <th width="50px" class="no-sort">删除？</th>
             <th width="25px" class="no-sort"></th>
         </tr>
         </thead>
@@ -35,14 +35,14 @@
         <tr each="{ submission, index in submissions }"
             class="submission-row"
             onclick="{show_info_modal.bind(this, submission)}">
-            <!--  show file name if exists otherwise show name(for old submissions)  -->
+            <!-- 如果存在文件名则显示，否则显示名称（适用于旧提交） -->
             <td>{ submission.file_name || submission.name }</td>
-            <!--  show compeition name as link if competition is available -->
+            <!-- 如果存在竞赛，则以链接形式显示竞赛名称 -->
             <td if="{submission.competition}"><a class="link-no-deco" target="_blank" href="../competitions/{ submission.competition.id }">{ submission.competition.title }</a></td>
-            <!--  show empty td if competition is not available  -->
+            <!-- 如果没有竞赛，则显示空单元格 -->
             <td if="{!submission.competition}"></td>
             <td>{ format_file_size(submission.file_size) }</td>
-            <td>{ timeSince(Date.parse(submission.created_when)) } ago</td>
+            <td>{ timeSince(Date.parse(submission.created_when)) } 之前</td>
             <td class="center aligned">
                 <i class="checkmark box icon green" show="{ submission.is_public }"></i>
             </td>
@@ -61,13 +61,13 @@
 
         <tr if="{submissions.length === 0}">
             <td class="center aligned" colspan="6">
-                <em>No Submissions Yet!</em>
+                <em>暂无提交！</em>
             </td>
         </tr>
         </tbody>
         <tfoot>
 
-        <!-- Pagination -->
+        <!-- 分页 -->
         <tr>
             <th colspan="8" if="{submissions.length > 0}">
                 <div class="ui right floated pagination menu" if="{submissions.length > 0}">
@@ -86,31 +86,31 @@
         </tfoot>
     </table>
 
-    <!--  Submission Detail Model  -->
+    <!-- 提交详情模态框 -->
     <div ref="info_modal" class="ui modal">
         <div class="header">
             {selected_row.file_name || selected_row.name}
         </div>
         <div class="content">
-            <h3>Details</h3>
+            <h3>详细信息</h3>
 
             <table class="ui basic table">
                 <thead>
                 <tr>
-                    <th>Key</th>
-                    <th>Competition in</th>
-                    <th>Created By</th>
-                    <th>Created</th>
-                    <th>Type</th>
-                    <th>Public</th>
+                    <th>标识</th>
+                    <th>所属竞赛</th>
+                    <th>创建者</th>
+                    <th>创建时间</th>
+                    <th>类型</th>
+                    <th>公开</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td>{selected_row.key}</td>
-                    <!--  show compeition name as link if competition is available -->
+                    <!-- 如果存在竞赛，则以链接形式显示竞赛名称 -->
                     <td if="{selected_row.competition}"><a class="link-no-deco" target="_blank" href="../competitions/{ selected_row.competition.id }">{ selected_row.competition.title }</a></td>
-                    <!--  show empty td if competition is not available  -->
+                    <!-- 如果没有竞赛，则显示空单元格 -->
                     <td if="{!selected_row.competition}"></td>
                     <td><a href="/profiles/user/{selected_row.created_by}/" target=_blank>{selected_row.owner_display_name}</a></td>
                     <td>{pretty_date(selected_row.created_when)}</td>
@@ -120,7 +120,7 @@
                 </tbody>
             </table>
             <virtual if="{!!selected_row.description}">
-                <div>Description:</div>
+                <div>描述：</div>
                 <div class="ui segment">
                     {selected_row.description}
                 </div>
@@ -129,23 +129,23 @@
         <div class="actions">
             <button show="{selected_row.created_by === CODALAB.state.user.username}"
                 class="ui primary icon button" onclick="{toggle_is_public}">
-                <i class="share icon"></i> {selected_row.is_public ? "Make Private" : "Make Public"}
+                <i class="share icon"></i> {selected_row.is_public ? "设为私有" : "设为公开"}
             </button>
             <a href="{URLS.DATASET_DOWNLOAD(selected_row.key)}" class="ui green icon button">
-                <i class="download icon"></i>Download File
+                <i class="download icon"></i>下载文件
             </a>
-            <button class="ui cancel button">Close</button>
+            <button class="ui cancel button">关闭</button>
         </div>
     </div>
 
-    <!--  Add Submission Model  -->
+    <!-- 添加提交模态框 -->
     <div ref="submission_creation_modal" class="ui modal">
-        <div class="header">Add Submission Form</div>
+        <div class="header">添加提交表单</div>
 
         <div class="content">
             <div class="ui message error" show="{ Object.keys(errors).length > 0 }">
                 <div class="header">
-                    Error(s) creating submission
+                    创建提交时出错
                 </div>
                 <ul class="list">
                     <li each="{ error, field in errors }">
@@ -155,9 +155,9 @@
             </div>
 
             <form class="ui form coda-animated {error: errors}" ref="form">
-                <input-text name="name" ref="name" error="{errors.name}" placeholder="Name"></input-text>
+                <input-text name="name" ref="name" error="{errors.name}" placeholder="名称"></input-text>
                 <input-text name="description" ref="description" error="{errors.description}"
-                            placeholder="Description"></input-text>
+                            placeholder="描述"></input-text>
 
                 <input type=hidden name="type" ref="type" value="submission">
                 
@@ -175,9 +175,9 @@
         <div class="actions">
             <button class="ui blue icon button" onclick="{check_form}">
                 <i class="upload icon"></i>
-                Upload
+                上传
             </button>
-            <button class="ui basic red cancel button">Cancel</button>
+            <button class="ui basic red cancel button">取消</button>
         </div>
     </div>
 
@@ -186,7 +186,7 @@
         self.mixin(ProgressBarMixin)
 
         /*---------------------------------------------------------------------
-         Init
+         初始化
         ---------------------------------------------------------------------*/
         self.errors = []
         self.submissions = []
@@ -205,7 +205,7 @@
         })
 
         self.show_info_modal = function (row, e) {
-            // Return here so the info modal doesn't pop up when a checkbox is clicked
+            // 如果点击的是复选框，则不弹出详情模态框
             if (e.target.type === 'checkbox') {
                 return
             }
@@ -218,9 +218,8 @@
             $(self.refs.submission_creation_modal).modal('show')
         }
 
-
         /*---------------------------------------------------------------------
-         Methods
+         方法
         ---------------------------------------------------------------------*/
         self.pretty_date = date => luxon.DateTime.fromISO(date).toLocaleString(luxon.DateTime.DATE_FULL)
 
@@ -239,7 +238,7 @@
                 self.page += 1
                 self.filter({page: self.page})
             } else {
-                alert("No valid page to go to!")
+                alert("没有可前往的有效页码！")
             }
         }
         self.previous_page = function () {
@@ -247,7 +246,7 @@
                 self.page -= 1
                 self.filter({page: self.page})
             } else {
-                alert("No valid page to go to!")
+                alert("没有可前往的有效页码！")
             }
         }
 
@@ -266,17 +265,17 @@
                     self.update()
                 })
                 .fail(function (response) {
-                    toastr.error("Could not load submissions...")
+                    toastr.error("无法加载提交...")
                 })
         }
 
         self.delete_submission = function (submission, e) {
             name = submission.file_name || submission.name
-            if (confirm(`Are you sure you want to delete '${name}'?`)) {
+            if (confirm(`确定要删除 '${name}' 吗？`)) {
                 CODALAB.api.delete_dataset(submission.id)
                     .done(function () {
                         self.update_submissions()
-                        toastr.success("Submission deleted successfully!")
+                        toastr.success("提交删除成功！")
                         CODALAB.events.trigger('reload_quota_cleanup')
                     })
                     .fail(function (response) {
@@ -287,11 +286,11 @@
         }
 
         self.delete_submissions = function () {
-            if (confirm(`Are you sure you want to delete multiple submissions?`)) {
+            if (confirm(`确定要删除多个提交吗？`)) {
                 CODALAB.api.delete_datasets(self.marked_submissions)
                     .done(function () {
                         self.update_submissions()
-                        toastr.success("Submission deleted successfully!")
+                        toastr.success("提交删除成功！")
                         self.marked_submissions = []
                         CODALAB.events.trigger('reload_quota_cleanup')
                     })
@@ -305,14 +304,13 @@
         }
 
         self.clear_form = function () {
-            // Clear form
+            // 清空表单
             $(':input', self.refs.form)
                 .not(':button, :submit, :reset, :hidden')
                 .val('')
                 .removeAttr('checked')
                 .removeAttr('selected');
 
-            
             self.errors = {}
             self.update()
         }
@@ -322,41 +320,37 @@
                 event.preventDefault()
             }
 
-            // Reset upload progress, in case we're trying to re-upload or had errors -- this is the
-            // best place to do it -- also resets animations
+            // 重置上传进度，以防重新上传或之前出错——这是最合适的位置，同时重置动画
             self.file_upload_progress_handler(undefined)
 
-            // Let's do some quick validation
+            // 快速验证
             self.errors = {}
             var validate_data = get_form_data(self.refs.form)
 
             var required_fields = ['name', 'type', 'data_file']
             required_fields.forEach(field => {
                 if (validate_data[field] === '') {
-                    self.errors[field] = "This field is required"
+                    self.errors[field] = "此字段为必填项"
                 }
             })
 
             if (Object.keys(self.errors).length > 0) {
-                // display errors and drop out
+                // 显示错误信息并退出
                 self.update()
                 return
             }
 
-            // Call the progress bar wrapper and do the upload -- we want to check and display errors
-            // first before doing the actual upload
+            // 调用进度条包装函数并执行上传——我们希望先检查并显示错误，再进行实际上传
             self.prepare_upload(self.upload)()
-
         }
 
         self.upload = function () {
-            // Have to get the "FormData" to get the file in a special way
-            // jquery likes to work with
+            // 获取 "FormData" 以特殊方式获取文件（jQuery 会处理）
             var metadata = get_form_data(self.refs.form)
-            delete metadata.data_file  // dont send this with metadata
+            delete metadata.data_file  // 不要将文件随其他数据发送
 
             if (metadata.is_public === 'on') {
-                var public_confirm = confirm("Creating a public submission means this will be sent to Chahub and publicly available on the internet. Are you sure you wish to continue?")
+                var public_confirm = confirm("创建公开提交意味着这将被发送到 Chahub 并在互联网上公开可用。您确定要继续吗？")
                 if (!public_confirm) {
                     return
                 }
@@ -366,7 +360,7 @@
 
             CODALAB.api.create_dataset(metadata, data_file, self.file_upload_progress_handler)
                 .done(function (data) {
-                    toastr.success("Submission successfully uploaded!")
+                    toastr.success("提交上传成功！")
                     self.update_submissions()
                     self.clear_form()
                     $(self.refs.submission_creation_modal).modal('hide')
@@ -377,7 +371,7 @@
                         try {
                             var errors = JSON.parse(response.responseText)
 
-                            // Clean up errors to not be arrays but plain text
+                            // 将错误数组转换为纯文本
                             Object.keys(errors).map(function (key, index) {
                                 errors[key] = errors[key].join('; ')
                             })
@@ -387,7 +381,7 @@
 
                         }
                     }
-                    toastr.error("Creation failed, error occurred")
+                    toastr.error("创建失败，发生错误")
                 })
                 .always(function () {
                     self.hide_progress_bar()
@@ -396,12 +390,12 @@
 
         self.toggle_is_public = () => {
             let message = self.selected_row.is_public
-                ? 'Are you sure you want to make this submission private? It will no longer be available to other users.'
-                : 'Are you sure you want to make this submission public? It will become visible to everyone'
+                ? '您确定要将此提交设为私有吗？设为私有后将不再对其他用户可见。'
+                : '您确定要将此提交设为公开吗？设为公开后将对所有人可见？'
             if (confirm(message)) {
                 CODALAB.api.update_dataset(self.selected_row.id, {id: self.selected_row.id, is_public: !self.selected_row.is_public})
                     .done(data => {
-                        toastr.success('Submission updated')
+                        toastr.success('提交已更新')
                         $(self.refs.info_modal).modal('hide')
                         self.filter()
                     })
@@ -420,34 +414,30 @@
             }
         }
 
-        // Function to format file size 
+        // 格式化文件大小函数
         self.format_file_size = function(file_size) {
-            // parse file size from string to float
+            // 将文件大小从字符串解析为浮点数
             try {
                 n = parseFloat(file_size)
             }
             catch(err) {
-                // return empty string if parsing fails
+                // 解析失败则返回空字符串
                 return ""
             }
-            // a file_size of -1 indicated an error
+            // 文件大小为 -1 表示错误
             if(n < 0) {
                 return ""
             }
-            // constant units to show with files size
-            // file size is in KB, converting it to MB and GB 
+            // 定义文件大小单位（文件大小以 KB 为单位，转换为 MB 和 GB）
             const units = ['KB', 'MB', 'GB']
-            // loop incrementer for selecting desired unit
             let i = 0
-            // loop over n until it is greater than 1000
             while(n >= 1000 && ++i){
                 n = n/1000;
             }
-            // restrict file size to 1 decimal number concatinated with unit
             return(n.toFixed(1) + ' ' + units[i]);
         }
 
-        // Update submissions on unused/failed submissions delete
+        // 在删除未使用/失败的提交时更新提交列表
         CODALAB.events.on('reload_submissions', self.update_submissions)
 
     </script>
