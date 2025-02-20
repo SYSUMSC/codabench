@@ -1,6 +1,6 @@
 <organization-user-management>
     <div class="ui raised segment">
-        <h1 class="ui dividing header">User Management:</h1>
+        <h1 class="ui dividing header">用户管理：</h1>
         <div class="ui right floated small green button" id="invite-user-button" onclick="{invite_users.bind(this)}">
             邀请用户
             <i class="user plus icon right"></i>
@@ -8,11 +8,11 @@
         <table class="ui striped table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>E-mail</th>
-                    <th>Date Joined</th>
-                    <th>Group</th>
-                    <th>Remove</th>
+                    <th>姓名</th>
+                    <th>电子邮箱</th>
+                    <th>加入时间</th>
+                    <th>用户组</th>
+                    <th>移除</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,10 +27,10 @@
                                 </div>
                                 <i class="dropdown icon"></i>
                                 <div class="menu">
-                                    <div class="header">Adjust Member Permissions</div>
-                                    <div class="item" data-member="{user.id}" data-value="MANAGER">Manager</div>
-                                    <div class="item" data-member="{user.id}" data-value="PARTICIPANT">Participant</div>
-                                    <div class="item" data-member="{user.id}" data-value="MEMBER">Member</div>
+                                    <div class="header">调整成员权限</div>
+                                    <div class="item" data-member="{user.id}" data-value="MANAGER">管理员</div>
+                                    <div class="item" data-member="{user.id}" data-value="PARTICIPANT">参与者</div>
+                                    <div class="item" data-member="{user.id}" data-value="MEMBER">成员</div>
                                 </div>
                             </div>
                             <div class="ui tiny inline loader"></div>
@@ -48,13 +48,13 @@
             </tbody>
         </table>
         <div class="ui mini modal" ref="confirm_delete">
-            <div class="header">Please Confirm</div>
+            <div class="header">请确认</div>
             <div class="content">
-                Are you want to remove <strong>{pending_member_name}</strong> from <strong>{organization_name}</strong>?
+                确定要将 <strong>{pending_member_name}</strong> 从 <strong>{organization_name}</strong> 中移除吗？
             </div>
             <div class="actions">
-                <div class="ui negative button">Remove Member</div>
-                <div class="ui ok button">Cancel</div>
+                <div class="ui negative button">移除成员</div>
+                <div class="ui ok button">取消</div>
             </div>
         </div>
         <div class="ui modal" ref="invite_users">
@@ -62,14 +62,14 @@
             <div class="content">
                 <select class="ui fluid search multiple selection dropdown" multiple id="user_search">
                     <i class="dropdown icon"></i>
-                    <div class="default text">Select Collaborator</div>
+                    <div class="default text">选择协作者</div>
                     <div class="menu">
                     </div>
                 </select>
             </div>
             <div class="actions">
                 <div class="ui positive button">邀请用户</div>
-                <div class="ui cancel button">Cancel</div>
+                <div class="ui cancel button">取消</div>
             </div>
         </div>
     </div>
@@ -143,7 +143,7 @@
                             location.reload()
                         })
                         .fail((response) => {
-                            let errorMessage = "An error has occurred"; // 默认错误信息
+                            let errorMessage = "发生错误"; // 默认错误信息
                             if (response.responseJSON && response.responseJSON.message) {
                                 errorMessage = response.responseJSON.message; // 解析后端返回的 message
                             }

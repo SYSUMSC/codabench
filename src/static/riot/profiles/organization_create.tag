@@ -3,7 +3,7 @@
         <h1 class="ui dividing header">创建组织:</h1>
         <form class="ui form" id="organization-form">
             <div class="field">
-                <label>个人资料照片</label>
+                <label>组织照片</label>
                 <div class="ui left action file input">
                     <button class="ui icon button" type="button"
                         onclick="document.getElementById('profile_phtoto').click()">
@@ -50,14 +50,13 @@
                     <input type="text" name="twitter_url" placeholder="https://twitter.com/organization">
                 </div>
                 <div class="field" id="github_url">
-                    <label>Github 网址</label>
+                    <label>GitHub 网址</label>
                     <input type="text" name="github_url" placeholder="https://github.com/organization">
                 </div>
             </div>
             <div class="ui error message"></div>
             <button type="button" class="ui primary button" onclick="{save.bind(this)}" ref="submit_button">提交</button>
         </form>
-    </div>
     </div>
 
     <script>
@@ -76,7 +75,8 @@
                         identifier: 'name',
                         optional: false,
                         rules: [{
-                            type: 'empty'
+                            type: 'empty',
+                            prompt: '请输入组织名称'
                         }]
                     },
                     email: {
@@ -84,7 +84,7 @@
                         optional: false,
                         rules: [{
                             type: 'email',
-                            prompt: 'Please enter a valid {name}'
+                            prompt: '请输入有效的{name}'
                         }]
                     },
                     website_url: {
@@ -93,11 +93,11 @@
                         rules: [
                             {
                                 type: 'url',
-                                prompt: 'Please enter a valid {name}. Example: https://organization.com'
+                                prompt: '请输入有效的{name}。示例: https://organization.com'
                             },
                             {
                                 type: 'test_http',
-                                prompt: '{name} must start with "http://" or "https://"'
+                                prompt: '{name}必须以"http://"或"https://"开头'
                             }
                         ]
                     },
@@ -107,11 +107,11 @@
                         rules: [
                             {
                                 type: 'url',
-                                prompt: 'Please enter a valid {name}. Example: https://organization.com'
+                                prompt: '请输入有效的{name}。示例: https://twitter.com/organization'
                             },
                             {
                                 type: 'test_http',
-                                prompt: '{name} must start with "http://" or "https://"'
+                                prompt: '{name}必须以"http://"或"https://"开头'
                             }
                         ]
                     },
@@ -121,11 +121,11 @@
                         rules: [
                             {
                                 type: 'url',
-                                prompt: 'Please enter a valid {name}. Example: https://www.linkedin.com/company/organization'
+                                prompt: '请输入有效的{name}。示例: https://www.linkedin.com/company/organization'
                             },
                             {
                                 type: 'test_http',
-                                prompt: '{name} must start with "http://" or "https://"'
+                                prompt: '{name}必须以"http://"或"https://"开头'
                             }
                         ]
                     },
@@ -135,11 +135,11 @@
                         rules: [
                             {
                                 type: 'url',
-                                prompt: 'Please enter a valid {name}. Example: https://github.com/organization'
+                                prompt: '请输入有效的{name}。示例: https://github.com/organization'
                             },
                             {
                                 type: 'test_http',
-                                prompt: '{name} must start with "http://" or "https://"'
+                                prompt: '{name}必须以"http://"或"https://"开头'
                             }
                         ]
                     },
@@ -149,7 +149,7 @@
                     data.photo = self.org_photo
                     CODALAB.api.create_organization(data)
                         .done(data => {
-                            toastr.success("Organization Created")
+                            toastr.success("组织创建成功")
                             window.location.href = data.url
                         })
                         .fail(data => {
