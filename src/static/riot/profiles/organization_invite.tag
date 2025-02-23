@@ -1,6 +1,6 @@
 <organization-invite>
     <div class="ui raised segment">
-        <h1 class="ui dividing header">组织邀请</h1>
+        <h1 class="ui dividing header">队伍邀请</h1>
         <div if="{state === 'loading'}" class="ui placeholder">
             <div class="paragraph">
                 <div class="line"></div>
@@ -53,7 +53,7 @@
                         <div class="description">
                             <h3 class="header">此邀请不是发给当前登录用户的。</h3>
                             <div class="text">
-                                请确保您登录了正确的账号，或请组织管理员重新发送邀请。
+                                请确保您登录了正确的账号，或请队伍管理员重新发送邀请。
                             </div>
                         </div>
                         <div class="extra">

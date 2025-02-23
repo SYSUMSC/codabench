@@ -85,7 +85,7 @@
         </tr>
         </tfoot>
     </table>
-    
+
     <!-- 任务详情模态框 -->
     <div class="ui modal" ref="detail_modal">
         <div class="header">
@@ -181,7 +181,7 @@
                 <p>
                 在此上传任务的 zip 文件以创建新任务。有关帮助，请参阅文档 <a href="https://github.com/codalab/codabench/wiki/Resource-Management#upload-a-task" target="_blank">这里</a>。
                 </p>
-                
+
                 <input-file name="data_file" ref="data_file"
                             accept=".zip"></input-file>
             </form>
@@ -357,7 +357,7 @@
         <!-- 警告信息 -->
         <div class="content">
             <div class="ui yellow message">
-                注意：如果需要，组织者有责任重新运行更新后的任务的提交。
+                注意：如果需要，队伍者有责任重新运行更新后的任务的提交。
             </div>
         </div>
         <div class="actions">
@@ -468,7 +468,7 @@
         /*---------------------------------------------------------------------
          模态框方法
         ---------------------------------------------------------------------*/
-        
+
         self.show_upload_task_modal = () => {
             self.reset_upload_task_input()
             $(self.refs.upload_task_modal).modal('show')
@@ -509,7 +509,7 @@
         self.check_upload_task_form = () => {
 
             var data_file = self.refs.data_file.refs.file_input.value
-            
+
             if(data_file === undefined || !data_file.endsWith('.zip')) {
                 toastr.warning("请选择一个 .zip 文件进行上传")
                 self.reset_upload_task_input()
@@ -543,7 +543,7 @@
                         self.close_upload_task_modal()
                         self.update_tasks()
                     }, 500)
-                    
+
                 })
                 .catch(function (error) {
                     toastr.error("任务上传失败：" + error.responseJSON.error)
@@ -669,25 +669,25 @@
                 toastr.error('任务必须包含评分程序！')
                 return
             }
-            
+
             // 替换数据对象中的属性名称
             data.name = data.edit_name;
             data.description = data.edit_description;
 
             // 如果未移除导入程序，则添加表单中的新导入程序
             if(data.edit_ingestion_program != ""){
-                data.ingestion_program = self.form_datasets.ingestion_program 
+                data.ingestion_program = self.form_datasets.ingestion_program
             }
             // 如果未移除输入数据，则添加表单中的新输入数据
             if(data.edit_input_data != ""){
-                data.input_data = self.form_datasets.input_data 
+                data.input_data = self.form_datasets.input_data
             }
             // 如果未移除参考数据，则添加表单中的新参考数据
             if(data.edit_reference_data != ""){
-                data.reference_data = self.form_datasets.reference_data 
+                data.reference_data = self.form_datasets.reference_data
             }
             // 添加表单中的评分程序到数据
-            data.scoring_program = self.form_datasets.scoring_program 
+            data.scoring_program = self.form_datasets.scoring_program
 
             // 删除旧的属性名称
             delete data.edit_name
@@ -696,7 +696,7 @@
             delete data.edit_scoring_program
             delete data.edit_input_data
             delete data.edit_reference_data
-            
+
             task_id = self.selected_task.id
             CODALAB.api.update_task(task_id, data)
                 .done((response) => {

@@ -5,14 +5,14 @@
 {% block content %}
     {% if is_editor %}
         <div class="ui container" style="margin-bottom: 1em">
-            <a href="{{ organization.url }}edit/"><button type="button" class="ui left floated button">编辑组织</button></a>
-            
+            <a href="{{ organization.url }}edit/"><button type="button" class="ui left floated button">编辑队伍</button></a>
+
             <button class="ui red right floated button" onclick="self.delete_organization({{ organization.id }})" >
-                删除组织
+                删除队伍
             </button>
-            
-            
-            
+
+
+
         </div>
     {% endif %}
     <div class="ui container">
@@ -84,7 +84,7 @@
                         {% if is_editor or is_member %}
                             <th>电子邮箱</th>
                         {% endif %}
-                        
+
                     </tr>
                     </thead>
                     <tbody>
@@ -95,7 +95,7 @@
                             {% if is_editor or is_member %}
                                 <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
                             {% endif %}
-                            
+
                         </tr>
                         {% endif %}
                     {% endfor %}
@@ -108,9 +108,9 @@
 
 {% block extra_js %}
     <script>
-    
+
         self.delete_organization = (organization_id) => {
-            if (confirm(`确定要永久删除该组织吗?`)) {
+            if (confirm(`确定要永久删除该队伍吗?`)) {
                 CODALAB.api.delete_organization(organization_id)
                     .done((resp) => {
                         if(resp.success){

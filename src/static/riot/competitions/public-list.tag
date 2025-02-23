@@ -24,7 +24,7 @@
                             { pretty_description(competition.description)}
                         </p>
                         <p class="organizer">
-                            <em>组织者: <strong>{competition.created_by}</strong></em>
+                            <em>队伍者: <strong>{competition.created_by}</strong></em>
                         </p>
                     </div>
                 </a>

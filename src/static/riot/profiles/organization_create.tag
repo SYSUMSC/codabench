@@ -1,9 +1,9 @@
 <organization-create>
     <div class="ui raised segment">
-        <h1 class="ui dividing header">创建组织:</h1>
+        <h1 class="ui dividing header">创建队伍:</h1>
         <form class="ui form" id="organization-form">
             <div class="field">
-                <label>组织照片</label>
+                <label>队伍照片</label>
                 <div class="ui left action file input">
                     <button class="ui icon button" type="button"
                         onclick="document.getElementById('profile_phtoto').click()">
@@ -18,11 +18,11 @@
             </div>
             <div class="two fields">
                 <div class="field" id="name">
-                    <label>组织名称</label>
+                    <label>队伍名称</label>
                     <input type="text" name="name" placeholder="名称">
                 </div>
                 <div class="field" id="email">
-                    <label>组织邮箱</label>
+                    <label>队伍邮箱</label>
                     <input type="text" name="email" placeholder="email@organization.com">
                 </div>
             </div>
@@ -36,7 +36,7 @@
             </div>
             <div class="two fields">
                 <div class="field" id="website_url">
-                    <label>组织网址</label>
+                    <label>队伍网址</label>
                     <input type="text" name="website_url" placeholder="https://organization.com">
                 </div>
                 <div class="field" id="linkedin_url">
@@ -76,7 +76,7 @@
                         optional: false,
                         rules: [{
                             type: 'empty',
-                            prompt: '请输入组织名称'
+                            prompt: '请输入队伍名称'
                         }]
                     },
                     email: {
@@ -149,7 +149,7 @@
                     data.photo = self.org_photo
                     CODALAB.api.create_organization(data)
                         .done(data => {
-                            toastr.success("组织创建成功")
+                            toastr.success("队伍创建成功")
                             window.location.href = data.url
                         })
                         .fail(data => {

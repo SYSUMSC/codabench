@@ -73,7 +73,7 @@
     {% if auth_organizations %}
     <div class="sixteen wide mobile six wide computer centered column">
         <!-- @todo 原：Organization Login存疑 -->
-        <h3 class="ui centered header">作为组织登录</h3>
+        <h3 class="ui centered header">作为队伍登录</h3>
         <form method="POST" action="{% url 'oidc_configurations:organization_oidc_login' %}">
             {% csrf_token %}
             <div>

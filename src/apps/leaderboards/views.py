@@ -5,20 +5,20 @@ from django.apps import apps
 
 def overall_leaderboard(request):
     """
-    统计所有排行榜中各组织获得的积分，并按总积分排名。
+    统计所有排行榜中各队伍获得的积分，并按总积分排名。
     假设：
       - 只统计提交状态为 Finished 且已上榜（leaderboard 非空）的提交
-      - 每个排行榜内，按组织取最佳提交得分进行排名
+      - 每个排行榜内，按队伍取最佳提交得分进行排名
       - 每个排行榜总积分为 100，按照等差数列分配
     """
-    # 筛选出满足条件的提交，且要求提交所属组织不为空
+    # 筛选出满足条件的提交，且要求提交所属队伍不为空
     submissions = Submission.objects.filter(
         leaderboard__isnull=False,
         status='Finished',
         organization__isnull=False
     ).distinct()
 
-    # 按排行榜和组织分组，取出每个组织在每个排行榜的最高得分
+    # 按排行榜和队伍分组，取出每个队伍在每个排行榜的最高得分
     # 结构：{ leaderboard_id: { organization_id: best_score, ... }, ... }
     leaderboard_org_scores = {}
     for sub in submissions:
@@ -28,12 +28,12 @@ def overall_leaderboard(request):
         score = sub.scores.aggregate(total=Sum('score'))['total'] or 0
         if lb_id not in leaderboard_org_scores:
             leaderboard_org_scores[lb_id] = {}
-        # 如果当前组织已经存在，则保留更高的得分
+        # 如果当前队伍已经存在，则保留更高的得分
         if org_id not in leaderboard_org_scores[lb_id] or score > leaderboard_org_scores[lb_id][org_id]:
             leaderboard_org_scores[lb_id][org_id] = score
 
-    # 根据每个排行榜内组织的得分进行排名，并分配积分（总积分 100）
-    # 最后将各排行榜中的积分累计到各组织上
+    # 根据每个排行榜内队伍的得分进行排名，并分配积分（总积分 100）
+    # 最后将各排行榜中的积分累计到各队伍上
     org_total_points = {}  # { organization_id: total_points }
     for lb_id, org_scores in leaderboard_org_scores.items():
         # 按得分降序排序，得分高者排名靠前
@@ -46,7 +46,7 @@ def overall_leaderboard(request):
             points = (n - rank + 1) / total_factor * 100
             org_total_points[org_id] = org_total_points.get(org_id, 0) + points
 
-    # 获取组织对象。这里假设组织模型为 Organization，且在 app "profiles" 下
+    # 获取队伍对象。这里假设队伍模型为 Organization，且在 app "profiles" 下
     Organization = apps.get_model('profiles', 'Organization')
     overall_leaderboard_list = []
     for org_id, points in org_total_points.items():

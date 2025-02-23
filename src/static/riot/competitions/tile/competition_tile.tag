@@ -13,7 +13,7 @@
                     {pretty_description(description)}
                 </p>
                 <p class="organizer">
-                    <em>组织者: <strong>{created_by}</strong></em>
+                    <em>队伍者: <strong>{created_by}</strong></em>
                 </p>
             </div>
             </a>

@@ -7,7 +7,7 @@
                 <div if="{selected_user.photo}"><img id="avatar" class="ui centered small rounded image" src="{selected_user.photo}"></div>
 
                 <!-- Competition Divider -->
-                <div class="ui horizontal divider">组织</div>
+                <div class="ui horizontal divider">队伍</div>
 
                 <!-- Competition Cards -->
                 <div each="{org in selected_user.organizations}" class="ui fluid card">
@@ -26,7 +26,7 @@
                     </div>
                     <div class="right aligned extra content">
                         <a class="status" href="/profiles/organization/{org.id}/">
-                            查看组织
+                            查看队伍
                             <i class="angle right icon"></i>
                         </a>
                     </div>

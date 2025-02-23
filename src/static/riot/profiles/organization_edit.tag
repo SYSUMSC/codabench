@@ -1,9 +1,9 @@
 <organization-edit>
     <div class="ui raised segment">
-    <h1 class="ui dividing header">编辑组织：</h1>
+    <h1 class="ui dividing header">编辑队伍：</h1>
     <form class="ui form" id="organization-form">
         <div class="field">
-            <label>组织照片</label>
+            <label>队伍照片</label>
             <label show="{ original_org_photo }">
                 已上传照片: <a href="{ original_org_photo }" target="_blank">{ original_org_photo_name }</a>
             </label>
@@ -19,11 +19,11 @@
         </div>
         <div class="two fields">
             <div class="required field" id="name">
-                <label>组织名称</label>
+                <label>队伍名称</label>
                 <input type="text" name="name" placeholder="名称">
             </div>
             <div class="required field" id="email">
-                <label>组织邮箱</label>
+                <label>队伍邮箱</label>
                 <input type="text" name="email" placeholder="email@organization.com">
             </div>
         </div>
@@ -37,7 +37,7 @@
         </div>
         <div class="two fields">
             <div class="field" id="website_url">
-                <label>组织网址</label>
+                <label>队伍网址</label>
                 <input type="text" name="website_url" placeholder="https://organization.com">
             </div>
             <div class="field" id="linkedin_url">
@@ -58,7 +58,7 @@
         <div class="ui error message"></div>
         <div class="ui primary button" onclick="{save.bind(this)}" id="submit_button">提交</div>
         <a href="{self.organization.url}">
-            <button type="button" class="ui button">返回组织页面</button>
+            <button type="button" class="ui button">返回队伍页面</button>
         </a>
     </form>
     </div>
@@ -167,7 +167,7 @@
                     data.photo = self.org_photo
                     CODALAB.api.update_organization(data, self.organization.id)
                         .done(data => {
-                            toastr.success("组织信息已保存")
+                            toastr.success("队伍信息已保存")
                             self.submit_button.prop('disabled', false)
                         })
                         .fail(data => {

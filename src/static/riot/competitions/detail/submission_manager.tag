@@ -95,7 +95,7 @@
                     <sup data-tooltip="{submission.status_details}">
                         <i if="{submission.status === 'Failed'}" class="failed question circle icon"></i>
                     </sup>
-                    <sup data-tooltip="组织者将很快运行您的提交">
+                    <sup data-tooltip="队伍者将很快运行您的提交">
                         <i if="{submission.status === 'Submitting' && !submission.auto_run}"
                             class="question circle icon"></i>
                     </sup>

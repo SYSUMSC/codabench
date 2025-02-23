@@ -130,7 +130,7 @@ class OrganizationViewSet(mixins.CreateModelMixin,
     def create(self, request, *args, **kwargs):
         #改为在membership_set查找该用户是否存在
         if request.user.membership_set.exists():
-            return Response({"error": "你已经加入了一个组织!"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "你已经加入了一个队伍!"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.perform_create(serializer)
@@ -170,11 +170,11 @@ class OrganizationViewSet(mixins.CreateModelMixin,
         org = self.get_object()
         user_ids = request.data.get('users', [])
 
-        # 筛选出尚未加入任何组织的用户
+        # 筛选出尚未加入任何队伍的用户
         users = User.objects.filter(id__in=user_ids).exclude(membership__isnull=False)
 
         if not users:
-            return Response({"message": "邀请的某些用户已经在其他组织了"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "邀请的某些用户已经在其他队伍了"}, status=status.HTTP_400_BAD_REQUEST)
 
         org.users.add(*users)
 

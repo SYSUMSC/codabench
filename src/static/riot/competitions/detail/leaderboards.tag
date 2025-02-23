@@ -52,7 +52,7 @@
         <tbody if="{participant_status === 'pending'}">
             <tr class="center aligned ui yellow message">
                 <td colspan="100%">
-                    <em>您的参赛请求正在等待比赛组织者的审批。</em>
+                    <em>您的参赛请求正在等待比赛队伍者的审批。</em>
                 </td>
             </tr>
         </tbody>
@@ -60,7 +60,7 @@
         <tbody if="{participant_status === 'denied'}">
             <tr class="center aligned ui red message">
                 <td colspan="100%">
-                    <em>您的参赛请求被拒绝，请联系比赛组织者了解详细信息。</em>
+                    <em>您的参赛请求被拒绝，请联系比赛队伍者了解详细信息。</em>
                 </td>
             </tr>
         </tbody>

@@ -38,7 +38,7 @@
                         <div class="column">
                             <!-- 主信息 -->
                             <div>
-                                <span class="detail-label">组织者：</span>
+                                <span class="detail-label">队伍者：</span>
                                 <span class="detail-item"><a href="/profiles/user/{competition.created_by}"
                                         target="_BLANK">{competition.owner_display_name}</a></span>
                                 <span if="{competition.contact_email}">(<span
