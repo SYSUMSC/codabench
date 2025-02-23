@@ -8,7 +8,7 @@
             <div class="ui checkbox">
                 <input selenium="auto-approve" type="checkbox" name="registration_auto_approve" ref="registration_auto_approve" onchange="{form_updated}">
                 <label>自动批准注册请求
-                    <span data-tooltip="如果未勾选，则注册请求必须由基准创建者或协作者手动批准"
+                    <span data-tooltip="如果未勾选，则注册请求必须由赛题创建者或协作者手动批准"
                           data-inverted=""
                           data-position="bottom center">
                     <i class="help icon circle"></i></span>
@@ -19,7 +19,7 @@
             <div class="ui checkbox">
                 <input type="checkbox" name="allow_robot_submissions" ref="allow_robot_submissions" onchange="{form_updated}">
                 <label>允许机器人提交
-                    <span data-tooltip="如果未勾选，机器人用户必须由基准创建者或协作者手动批准。这可以在以后更改。"
+                    <span data-tooltip="如果未勾选，机器人用户必须由赛题创建者或协作者手动批准。这可以在以后更改。"
                           data-inverted=""
                           data-position="bottom center">
                     <i class="help icon circle"></i></span>

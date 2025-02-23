@@ -2,7 +2,7 @@
     <div class="ui two column grid">
         <div class="eight wide column">
             <div class="ui large header">
-                热门基准
+                热门赛题
             </div>
             <div class="loader-container popular">
                 <div class="lds-ring">
@@ -18,7 +18,7 @@
 
         <div class="eight wide column">
             <div class="ui large header">
-                精选基准
+                精选赛题
             </div>
             <div class="loader-container popular">
                 <div class="lds-ring">

@@ -26,7 +26,7 @@
 
                 <div class="ui message error" show="{ Object.keys(errors).length > 0 }">
                     <div class="header">
-                        保存基准数据时发生错误
+                        保存赛题数据时发生错误
                     </div>
                     <errors errors="{errors}"></errors>
                 </div>
