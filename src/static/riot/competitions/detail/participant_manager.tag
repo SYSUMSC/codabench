@@ -155,7 +155,7 @@
                     self.update()
                 })
                 .fail(() => {
-                    toastr.error('返回比赛参与者时出错')
+                    toastr.error('返回赛题参与者时出错')
                 })
         }
 

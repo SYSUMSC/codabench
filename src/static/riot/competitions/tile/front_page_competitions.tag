@@ -44,7 +44,7 @@
         self.get_frontpage_competitions = function (data) {
             return CODALAB.api.get_front_page_competitions(data)
                 .fail(function (response) {
-                    toastr.error("无法加载比赛列表")
+                    toastr.error("无法加载赛题列表")
                 })
                 .done(function (data) {
                     self.featured_competitions = data["featured_comps"]

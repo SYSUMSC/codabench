@@ -91,15 +91,15 @@
             self.get_running_competitions()
         }
 
-        // 封装获取比赛数据的方法
+        // 封装获取赛题数据的方法
         self.get_competitions_wrapper = function (query_params) {
             return CODALAB.api.get_competitions(query_params)
                 .fail(function (response) {
-                    toastr.error("无法加载比赛列表")
+                    toastr.error("无法加载赛题列表")
                 })
         }
 
-        // 获取用户参与的比赛
+        // 获取用户参与的赛题
         self.get_participating_in_competitions = function () {
             self.get_competitions_wrapper({participating_in: true})
                 .done(function (data) {
@@ -108,7 +108,7 @@
                 })
         }
 
-        // 获取用户运行的比赛
+        // 获取用户运行的赛题
         self.get_running_competitions = function () {
             self.get_competitions_wrapper({
                 mine: true,
@@ -120,26 +120,26 @@
                 })
         }
 
-        // 删除比赛
+        // 删除赛题
         self.delete_competition = function (competition) {
             if (confirm("你确定要删除 '" + competition.title + "' 吗？")) {
                 CODALAB.api.delete_competition(competition.id)
                     .done(function () {
                         self.update_competitions()
-                        toastr.success("比赛删除成功")
+                        toastr.success("赛题删除成功")
                     })
                     .fail(function () {
-                        toastr.error("比赛删除失败")
+                        toastr.error("赛题删除失败")
                     })
             }
         }
 
-        // 切换比赛的发布状态
+        // 切换赛题的发布状态
         self.toggle_competition_publish = function (competition) {
             CODALAB.api.toggle_competition_publish(competition.id)
                 .done(function (data) {
                     var published_state = data.published ? "已发布" : "未发布"
-                    toastr.success(`比赛已成功${published_state}`)
+                    toastr.success(`赛题已成功${published_state}`)
                     self.get_running_competitions()
                 })
         }

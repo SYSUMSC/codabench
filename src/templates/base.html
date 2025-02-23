@@ -64,7 +64,7 @@
 <!-- 侧边栏菜单 -->
 <div class="ui thin sidebar left inverted vertical overlay menu">
     <div class="ui container">
-        <a href="{% url "pages:home" %}" class="item">比赛</a>
+        <a href="{% url "pages:home" %}" class="item">赛题</a>
         <a class="item">Chahub</a>
         <a href="https://chagrade.lri.fr/" class="item">Chagrade</a>
     </div>
@@ -88,7 +88,7 @@
                     </a>
                     <div class="ui search" id="site-wide-competition-search">
                         <div class="ui left icon input search-width">
-                            <input id="competition-search" class="prompt" type="text" placeholder="搜索比赛">
+                            <input id="competition-search" class="prompt" type="text" placeholder="搜索赛题">
                             <i class="search icon"></i>
                         </div>
                         <div class="results search-width scrollable-height-limit"></div>
@@ -103,8 +103,8 @@
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             <div class="header"></div>
-                            <a class="item" href="{% url "competitions:management" %}">比赛管理</a>
-                            <a class="item" href="{% url "competitions:public" %}">公共比赛列表</a>
+                            <a class="item" href="{% url "competitions:management" %}">赛题管理</a>
+                            <a class="item" href="{% url "competitions:public" %}">公共赛题列表</a>
                         </div>
                     </div>
                     <a class="item" href="{% url "tasks:task_management" %}">
@@ -223,7 +223,7 @@
             <div class="three wide column">
                 <h4 class="ui inverted header">Chasuite</h4>
                 <div class="ui inverted link list">
-                    <a href="https://codalab.lisn.fr/" class="item">比赛 v1.6</a>
+                    <a href="https://codalab.lisn.fr/" class="item">赛题 v1.6</a>
                     <a href="http://chahub.org/" class="item">Chahub</a>
                     <a href="https://chagrade.lri.fr/" class="item">Chagrade</a>
                 </div>
@@ -320,7 +320,7 @@
                 return "{% url "analytics_api" %}" + `?${$.param(query_parameters)}`
             },
 
-            // 比赛相关
+            // 赛题相关
             COMPETITION_MANAGEMENT: "{% url "competitions:management" %}",
             COMPETITION_UPLOAD: "{% url "competitions:upload" %}",
             COMPETITION_ADD: "{% url "competitions:create" %}",

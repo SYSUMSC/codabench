@@ -91,7 +91,7 @@
 
     <!--  Server status page button  -->
     <a href="/server_status" target="_blank">
-         <div class="ui blue right floated button">打开比赛状况界面</div>
+         <div class="ui blue right floated button">打开赛题状况界面</div>
     </a>
 
     <div class="ui modal" ref="modal">
@@ -140,7 +140,7 @@
             <span>{selected_queue.vhost}</span>
 
             <!--  Competitions using this queue  -->
-            <h4 if="{ _.get(selected_queue, 'competitions.length', 0) }">正在使用该队列的比赛:</h4>
+            <h4 if="{ _.get(selected_queue, 'competitions.length', 0) }">正在使用该队列的赛题:</h4>
             <ul if="{ _.get(selected_queue, 'competitions.length', 0) }">
                 <li each="{ comp in selected_queue.competitions }">
 

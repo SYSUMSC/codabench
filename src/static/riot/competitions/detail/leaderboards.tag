@@ -40,11 +40,11 @@
             <th each="{ column in filtered_columns }" colspan="1">{column.title}</th>
         </tr>
         </thead>
-        <!--  显示当用户未注册比赛  -->
+        <!--  显示当用户未注册赛题  -->
         <tbody if="{participant_status === null}">
             <tr class="center aligned ui yellow message">
                 <td colspan="100%">
-                    <em>您尚未注册此比赛，请前往“我的提交”选项卡进行注册，以查看排行榜。</em>
+                    <em>您尚未注册此赛题，请前往“我的提交”选项卡进行注册，以查看排行榜。</em>
                 </td>
             </tr>
         </tbody>
@@ -52,7 +52,7 @@
         <tbody if="{participant_status === 'pending'}">
             <tr class="center aligned ui yellow message">
                 <td colspan="100%">
-                    <em>您的参赛请求正在等待比赛队伍者的审批。</em>
+                    <em>您的参赛请求正在等待赛题队伍者的审批。</em>
                 </td>
             </tr>
         </tbody>
@@ -60,7 +60,7 @@
         <tbody if="{participant_status === 'denied'}">
             <tr class="center aligned ui red message">
                 <td colspan="100%">
-                    <em>您的参赛请求被拒绝，请联系比赛队伍者了解详细信息。</em>
+                    <em>您的参赛请求被拒绝，请联系赛题队伍者了解详细信息。</em>
                 </td>
             </tr>
         </tbody>
