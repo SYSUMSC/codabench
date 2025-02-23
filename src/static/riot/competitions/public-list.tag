@@ -1,5 +1,5 @@
 <public-list>
-    <h1>公开基准测试和竞赛</h1>
+    <h1>公开题目和竞赛</h1>
     <div class="pagination-nav">
         <button show="{competitions.previous}" onclick="{handle_ajax_pages.bind(this, -1)}" class="float-left ui inline button active">上一页</button>
         <button hide="{competitions.previous}" disabled="disabled" class="float-left ui inline button disabled">上一页</button>

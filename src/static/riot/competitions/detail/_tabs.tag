@@ -201,7 +201,7 @@
                 </div>
                 <!-- 如果没有排行榜，显示此消息 -->
                 <div show="{_.isEmpty(competition.leaderboards)}">
-                    <div class="center aligned"><h2>此基准测试无可见排行榜</h2></div>
+                    <div class="center aligned"><h2>此题目无可见排行榜</h2></div>
                 </div>
                 <!-- 否则，显示排行榜 -->
                 <div show="{!_.isEmpty(competition.leaderboards)}">

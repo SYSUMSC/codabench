@@ -3,7 +3,7 @@
         <div class="eight wide column centered form-empty">
             <div class="ui segment">
                 <div class="flex-header">
-                    <h1 class="ui header">上传基准测试</h1>
+                    <h1 class="ui header">上传题目</h1>
                     <help_button href="https://github.com/codalab/competitions-v2/wiki/Competition-Creation:-Bundle"
                                  tooltip="了解更多关于竞赛包创建的信息">
                     </help_button>

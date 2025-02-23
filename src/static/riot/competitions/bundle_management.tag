@@ -14,7 +14,7 @@
         <thead>
             <tr>
                 <th>文件名称</th>
-                <th>基准测试</th>
+                <th>题目</th>
                 <th width="175px">大小</th>
                 <th width="125px">上传时间</th>
                 <th width="50px" class="no-sort">删除？</th>

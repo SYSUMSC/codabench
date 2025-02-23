@@ -4,8 +4,8 @@
             <div class="row">
                 <div class="fourteen wide column">
                     <div class="ui fluid secondary pointing tabular menu">
-                        <a class="active item" data-tab="participating">我参与的基准测试</a>
-                        <a class="item" data-tab="running">我正在运行的基准测试</a>
+                        <a class="active item" data-tab="participating">我参与的题目</a>
+                        <a class="item" data-tab="running">我正在运行的题目</a>
                         <div class="right menu">
                             <div class="item">
                                 <help_button href="https://github.com/codalab/competitions-v2/wiki/Competition-Management-&-List"></help_button>
