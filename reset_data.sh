@@ -6,7 +6,7 @@ if [[ $confirm != "y" && $confirm != "Y" ]]; then
   echo "操作已取消。"
   exit 0
 fi
-
+docker compose down
 # 定义所有挂载目录
 mount_points=(
   "./var/postgres"
