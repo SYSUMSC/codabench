@@ -1,4 +1,5 @@
 import json
+import traceback
 import django
 
 from django.conf import settings
@@ -106,13 +107,16 @@ def activateEmail(request, user, to_email):
         'protocol': 'https' if request.is_secure() else 'http'
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
-    if email.send():
-        # @todo 存疑 'Dear {user.username}, please go to you email {to_email} inbox and click on received activation link to confirm and complete the registration. *Note: Check your spam folder.'
-        messages.success(request, f'{user.username}你好，请检查你的邮箱 {to_email} 并点击\
-            收到的激活链接来确认并完成注册。 注意：如果没有收到邮件，请检查垃圾邮件。')
-    else:
-        # Problem sending confirmation email to {to_email}, check if you typed it correctly.
-        messages.error(request, f'无法向 {to_email}发送邮件，请确认你的输入是否正确')
+    try:
+        if email.send():
+            # @todo 存疑 'Dear {user.username}, please go to you email {to_email} inbox and click on received activation link to confirm and complete the registration. *Note: Check your spam folder.'
+            messages.success(request, f'{user.username}你好，请检查你的邮箱 {to_email} 并点击\
+                收到的激活链接来确认并完成注册。 注意：如果没有收到邮件，请检查垃圾邮件。')
+        else:
+            # Problem sending confirmation email to {to_email}, check if you typed it correctly.
+            messages.error(request, f'无法向 {to_email}发送邮件，请确认你的输入是否正确')
+    except Exception as e:
+        print(f"发生错误: {e} \n{traceback.format_exc()}")
 
 
 def send_delete_account_confirmation_mail(request, user):
