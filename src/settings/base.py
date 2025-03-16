@@ -158,7 +158,7 @@ SOCIAL_AUTH_USER_MODEL = 'profiles.User'
 # =============================================================================
 # Debugging
 # =============================================================================
-DEBUG = os.environ.get("DEBUG", False)
+DEBUG = os.environ.get("DEBUG", True)
 
 # =============================================================================
 # Database
@@ -425,32 +425,32 @@ DEFAULT_USER_QUOTA = 15 * 1024 * 1024 * 1024  # 15GB
 # =============================================================================
 # Debug
 # =============================================================================
-if DEBUG:
-    INSTALLED_APPS += ('debug_toolbar',)
-    MIDDLEWARE = ('debug_toolbar.middleware.DebugToolbarMiddleware',
-                  'querycount.middleware.QueryCountMiddleware',
-                  ) + MIDDLEWARE  # we want Debug Middleware at the top
-    # tricks to have debug toolbar when developing with docker
+# if DEBUG:
+#     INSTALLED_APPS += ('debug_toolbar',)
+#     MIDDLEWARE = ('debug_toolbar.middleware.DebugToolbarMiddleware',
+#                   'querycount.middleware.QueryCountMiddleware',
+#                   ) + MIDDLEWARE  # we want Debug Middleware at the top
+#     # tricks to have debug toolbar when developing with docker
 
-    INTERNAL_IPS = ['127.0.0.1']
+#     INTERNAL_IPS = ['127.0.0.1']
 
-    import socket
+#     import socket
 
-    try:
-        INTERNAL_IPS.append(socket.gethostbyname(socket.gethostname())[:-1])
-    except socket.gaierror:
-        pass
+#     try:
+#         INTERNAL_IPS.append(socket.gethostbyname(socket.gethostname())[:-1])
+#     except socket.gaierror:
+#         pass
 
-    QUERYCOUNT = {
-        'IGNORE_REQUEST_PATTERNS': [
-            r'^/admin/',
-            r'^/static/',
-        ]
-    }
+#     QUERYCOUNT = {
+#         'IGNORE_REQUEST_PATTERNS': [
+#             r'^/admin/',
+#             r'^/static/',
+#         ]
+#     }
 
-    DEBUG_TOOLBAR_CONFIG = {
-        "SHOW_TOOLBAR_CALLBACK": lambda request: True
-    }
+#     DEBUG_TOOLBAR_CONFIG = {
+#         "SHOW_TOOLBAR_CALLBACK": lambda request: True
+#     }
 
 # =========================================================================
 # Email

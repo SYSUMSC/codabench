@@ -31,3 +31,5 @@ for dir in "${mount_points[@]}"; do
   fi
 done
 echo "数据清理完成。"
+
+docker compose up -d

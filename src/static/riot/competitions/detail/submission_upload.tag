@@ -52,14 +52,14 @@
                 <div class="ui six wide field">
                     <label>提交者:
                     <span class="ui mini circular icon button"
-                        data-tooltip="你可以以个人名义或队伍名义提交"
+                        data-tooltip="只能以队伍名义提交"
                         data-position="top center">
                         <i class="question icon"></i>
                     </span>
                     </label>
 
                     <select name="organizations" id="organization_dropdown" class="ui dropdown">
-                        <option value="None">个人</option>
+                        <!--option value="None">个人</option-->
                         <option each="{org in organizations}" value="{org.id}">{org.name}</option>
                         <option if="{_.size(organizations) === 0}" value="add_organization">+ 添加新队伍</option>
                     </select>

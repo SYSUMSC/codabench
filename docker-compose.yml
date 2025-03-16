@@ -1,4 +1,3 @@
-version: '3'
 services:
   #-----------------------------------------------
   #   Web Services
@@ -16,8 +15,8 @@ services:
       - ./var/log/caddy:/var/log/
     restart: unless-stopped
     ports:
-      - 80:80
-      - 443:443
+      - 180:80
+      - 1443:443
     depends_on:
       - django
 
@@ -47,7 +46,6 @@ services:
         max-size: "20m"
         max-file: "5"
 
-
   #-----------------------------------------------
   # Minio local storage helper
   #-----------------------------------------------
@@ -61,7 +59,7 @@ services:
       - $MINIO_PORT:9000
     env_file: .env
     healthcheck:
-      test: ["CMD", "nc", "-z", "minio", "9000"]
+      test: [ "CMD", "nc", "-z", "minio", "9000" ]
       interval: 5s
       retries: 5
   createbuckets:
@@ -74,20 +72,16 @@ services:
     #   This volume is shared with `minio`, so `z` to share it
     #   - ./var/minio:/export
     entrypoint: >
-      /bin/sh -c "
-      set -x;
-      if [ -n \"$MINIO_ACCESS_KEY\" ] && [ -n \"$MINIO_SECRET_KEY\" ] && [ -n \"$MINIO_PORT\" ]; then
-        until /usr/bin/mc config host add minio_docker http://minio:$MINIO_PORT $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && break; do 
-          echo '...waiting...' && sleep 5; 
+      /bin/sh -c " set -x; if [ -n \"$MINIO_ACCESS_KEY\" ] && [ -n \"$MINIO_SECRET_KEY\" ] && [ -n \"$MINIO_PORT\" ]; then
+        until /usr/bin/mc config host add minio_docker http://minio:$MINIO_PORT $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && break; do
+          echo '...waiting...' && sleep 5;
         done;
         /usr/bin/mc mb minio_docker/$AWS_STORAGE_BUCKET_NAME || echo 'Bucket $AWS_STORAGE_BUCKET_NAME already exists.';
         /usr/bin/mc mb minio_docker/$AWS_STORAGE_PRIVATE_BUCKET_NAME || echo 'Bucket $AWS_STORAGE_PRIVATE_BUCKET_NAME already exists.';
         /usr/bin/mc anonymous set download minio_docker/$AWS_STORAGE_BUCKET_NAME;
       else
         echo 'MINIO_ACCESS_KEY, MINIO_SECRET_KEY, or MINIO_PORT are not defined. Skipping buckets creation.';
-      fi;
-      exit 0;
-      "
+      fi; exit 0; "
 
   #-----------------------------------------------
   #   Local development helper, rebuilds RiotJS/Stylus on change
@@ -104,7 +98,6 @@ services:
         max-size: "20m"
         max-file: "5"
 
-
   #-----------------------------------------------
   #   Database Service
   #-----------------------------------------------
@@ -114,7 +107,7 @@ services:
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    command: [ "postgres", "-c", "log_statement=all", "-c", "log_destination=stderr" ]
     ports:
       - 5432:5432
     volumes:
@@ -168,9 +161,9 @@ services:
     depends_on:
       - rabbit
     logging:
-        options:
-            max-size: "20m"
-            max-file: "5"
+      options:
+        max-size: "20m"
+        max-file: "5"
 
   #-----------------------------------------------
   #   Redis
