@@ -211,6 +211,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.compute_worker
+      args:
+        HTTP_PROXY: http://127.0.0.1:20171
+        HTTPS_PROXY: http://127.0.0.1:20171
     depends_on:
       - django
       - rabbit
