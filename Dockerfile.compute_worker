@@ -5,7 +5,8 @@ ENV PYTHONUNBUFFERED 1
 
 # Install Docker
 RUN apt-get update
-RUN curl -fsSL https://get.docker.com | sh
+# RUN curl -fsSL https://get.docker.com | sh
+RUN apt install docker.io docker-compose -y
 
 
 RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.8.3
