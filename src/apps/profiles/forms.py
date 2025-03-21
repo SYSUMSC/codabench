@@ -9,6 +9,29 @@ class SignUpForm(UserCreationForm):
         max_length=254, help_text="Required. Inform a valid email address."
     )
 
+    phone_number = forms.CharField(
+        max_length=20, required=True, help_text="请输入您的电话号码"
+    )
+
+    student_id = forms.CharField(
+        max_length=20, required=True, help_text="请输入您的学号"
+    )
+
+    graduation_year = forms.IntegerField(
+        required=True, help_text="请输入您的毕业年份（如2023）"
+    )
+
+    education_level = forms.ChoiceField(
+        choices=[
+            ('bachelor', '本科'),
+            ('master', '硕士'),
+            ('phd', '博士'),
+            ('other', '其他')
+        ],
+        required=True,
+        help_text="请选择您的学历"
+    )
+
     def clean_username(self):
         data = self.cleaned_data["username"]
         if not data.islower():
@@ -26,7 +49,7 @@ class SignUpForm(UserCreationForm):
     class Meta:
 
         model = User
-        fields = ("username", "email", "password1", "password2")
+        fields = ("username", "email", "phone_number", "student_id", "graduation_year", "education_level", "password1", "password2")
 
 
 class LoginForm(forms.Form):
