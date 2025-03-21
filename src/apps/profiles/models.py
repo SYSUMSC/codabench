@@ -76,6 +76,7 @@ class User(ChaHubSaveMixin, AbstractBaseUser, PermissionsMixin):
                                          ('phd', '博士'),
                                          ('other', '其他')
                                      ])
+    real_name = models.CharField(max_length=50, null=True, blank=True, verbose_name="真实姓名")
     display_name = models.CharField(max_length=50, null=True, blank=True)
     first_name = models.CharField(max_length=200, unique=False, null=True, blank=True)
     last_name = models.CharField(max_length=200, unique=False, null=True, blank=True)

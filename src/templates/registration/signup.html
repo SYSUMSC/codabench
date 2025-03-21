@@ -89,6 +89,24 @@
 
             <div class="field">
                 <div class="ui left icon input">
+                    <i class="user icon"></i>
+                    <input type="text"
+                           name="real_name"
+                           placeholder="真实姓名"
+                           id="id_real_name"
+                           value="{{ form.real_name.value|default:''}}"
+                           maxlength="{{ form.real_name.field.max_length }}"
+                           required>
+                </div>
+            </div>
+            {% if form.real_name.errors %}
+            <div class="ui red message">
+                {{ form.real_name.errors }}
+            </div>
+            {% endif %}
+
+            <div class="field">
+                <div class="ui left icon input">
                     <i class="graduation cap icon"></i>
                     <input type="number"
                            name="graduation_year"

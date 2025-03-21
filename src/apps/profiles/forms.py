@@ -17,6 +17,10 @@ class SignUpForm(UserCreationForm):
         max_length=20, required=True, help_text="请输入您的学号"
     )
 
+    real_name = forms.CharField(
+        max_length=50, required=True, help_text="请输入您的真实姓名"
+    )
+
     graduation_year = forms.IntegerField(
         required=True, help_text="请输入您的毕业年份（如2023）"
     )
@@ -49,7 +53,7 @@ class SignUpForm(UserCreationForm):
     class Meta:
 
         model = User
-        fields = ("username", "email", "phone_number", "student_id", "graduation_year", "education_level", "password1", "password2")
+        fields = ("username", "email", "phone_number", "student_id", "real_name", "graduation_year", "education_level", "password1", "password2")
 
 
 class LoginForm(forms.Form):
