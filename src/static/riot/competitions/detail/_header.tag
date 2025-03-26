@@ -37,48 +37,68 @@
                     <div class="row">
                         <div class="column">
                             <!-- 主信息 -->
-                            <div>
-                                <span class="detail-label">组织者：</span>
-                                <span class="detail-item"><a href="/profiles/user/{competition.created_by}"
-                                        target="_BLANK">{competition.owner_display_name}</a></span>
-                                <span if="{competition.contact_email}">(<span
-                                        class="contact-email">{competition.contact_email}</span>)</span>
-                            </div>
-                            <div>
-                                <span class="detail-label">{has_current_phase(competition) ? '当前阶段结束' :
-                                    '当前有效阶段'}:</span>
-                                <span class="detail-item">{get_end_date(competition)}</span>
-                            </div>
-                            <div>
-                                <span class="detail-label">当前服务器时间：</span>
-                                <span class="detail-item" id="server_time">{pretty_date(CURRENT_DATE_TIME)}</span>
-                            </div>
-                            <!-- Docker 镜像 -->
-                            <div class="competition-secret-key">
-                                <span class="docker-label">Docker 镜像：</span>
-                                <span id="docker-image">{ competition.docker_image }</span>
-                                <span onclick="{copy_docker_url}" class="ui send-pop-docker" data-content="已复制！">
-                                    <i class="ui copy icon"></i>
-                                </span>
-                            </div>
-                            <!-- 密钥 URL -->
-                            <div class="competition-secret-key" if="{ competition.admin }">
-                                <span class="secret-label">密钥 URL：</span>
-                                <span id="secret-url">https://{ URLS.SECRET_KEY_URL(competition.id,
-                                    competition.secret_key) }</span>
-                                <span onclick="{copy_secret_url}" class="ui send-pop-secret" data-content="已复制！">
-                                    <i class="ui copy icon"></i>
-                                </span>
-                            </div>
+                            <div class="info-container">
+                                <!-- 出题人 -->
+                                <div class="info-card">
+                                    <span class="emoji-icon">👥</span>
+                                    <div class="detail-content">
+                                        <div class="detail-label">出题人：</div>
+                                        <span class="detail-item"><a href="/profiles/user/{competition.created_by}"
+                                                target="_BLANK">{competition.owner_display_name}</a></span>
+                                        <span if="{competition.contact_email}">(<span
+                                                class="contact-email">{competition.contact_email}</span>)</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 时间信息 -->
+                                <div class="info-card">
+                                    <span class="emoji-icon">⏰</span>
+                                    <div class="detail-content">
+                                        <div class="time-group">
+                                            <div class="detail-label">{has_current_phase(competition) ? '当前阶段结束' :
+                                                '当前有效阶段'}:</div>
+                                            <span class="detail-item">{get_end_date(competition)}</span>
+                                        </div>
+                                        <div class="time-group">
+                                            <div class="detail-label">服务器时间：</div>
+                                            <span class="detail-item" id="server_time">{pretty_date(CURRENT_DATE_TIME)}</span>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    <!-- Docker 镜像和密钥 URL -->
+                                    <div class="info-card">
+                                        <span class="emoji-icon">ℹ️</span>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Docker镜像</div>
+                                            <div class="detail-item">
+                                                <span id="docker-image">{ competition.docker_image }</span>
+                                            <span onclick="{copy_docker_url}" class="copy-trigger">
+                                                <i class="ui copy icon"></i>
+                                            </span>
+                                            </div>
+                                        <div class="detail-label" if="{ competition.admin }">竞赛密钥</div>
+                                        <div class="detail-item" if="{ competition.admin }">
+                                            <span id="secret-url">https://{ URLS.SECRET_KEY_URL(competition.id, competition.secret_key) }</span>
+                                            <div onclick="{copy_secret_url}" class="copy-trigger">
+                                                <i class="ui copy icon"></i>
+                                            </div>
+                                            </div>
+                                            </div>
+                                            </div>
                             <!-- 竞赛报告 -->
-                            <div class="competition-secret-key" if="{competition.report}">
-                                <span class="report-label">竞赛报告：</span>
-                                <span id="report-url">{ competition.report }</span>
-                                <span onclick="{copy_report_url}" class="ui send-pop-report" data-content="已复制！">
-                                    <i class="ui copy icon"></i>
-                                </span>
-
-                            </div>
+                                <div class="info-card" if="{competition.report}">
+                                    <span class="emoji-icon">📊</span>
+                                    <div class="detail-content">
+                                        <div class="detail-label">分析报告</div>
+                                        <div class="detail-item">
+                                            <span id="report-url">{ competition.report }</span>
+                                            <span onclick="{copy_report_url}" class="copy-trigger">
+                                                <i class="ui copy icon"></i>
+                                            </span>
+                                        </div>
+                                        </div>
+                                        </div>
                         </div>
                     </div>
                 </div>
@@ -301,22 +321,93 @@
     </script>
 
     <style type="text/stylus">
-        $blue = #2c3f4c
-        $teal = #00bbbb
-        $lightblue = #f2faff
-        $red = #DB2828
+        $primary = #2c3f4c
+        $accent = #008c8c
+        $secondary = #6c757d
+        $lightbg = #f8f9fa
+        $emoji-color = #4a90e2
 
-        .detail-label
-            font-size 1.25em
-            text-transform uppercase
-            color $teal
-            font-family 'Overpass Mono', monospace
+        .info-container
+            display flex
+            flex-wrap wrap
+            gap 1.5rem
+            margin 1.5rem 0
 
-        .detail-item
-            font-size 1.25em
-            color $blue
-            text-transform capitalize
-            font-family 'Overpass Mono', monospace
+        .info-card
+            flex 1 1 280px
+            min-width 280px
+            padding 1.2rem
+            background lighten($lightbg, 4%)
+            border-radius 15px
+            box-shadow 2px 2px 8px rgba(0,0,0,0.1)
+            display flex
+            align-items center
+            gap 1rem
+            transition all 0.3s ease
+            //margin-bottom 1rem
+
+            &:hover
+                transform translateY(-3px)
+                box-shadow 0 4px 12px rgba(0,0,0,0.15)
+
+            .emoji-icon
+                font-size 1.8rem
+                width 40px
+                height 40px
+                display flex
+                align-items center
+                justify-content center
+                color $emoji-color
+                filter drop-shadow(0 2px 4px rgba($emoji-color, 0.2))
+                transition all 0.3s ease
+
+            .detail-content
+                flex 1
+
+                .detail-label
+                    font-size 0.9em
+                    color $accent
+                    margin-top 0.6rem
+                    margin-bottom 0.3rem
+
+                .detail-item
+                    font-size 1.1em
+                    font-weight 500
+                    color $primary
+
+                .time-group
+                    margin-bottom 0.8rem
+                    &:last-child
+                        margin-bottom 0
+
+        .copy-trigger
+            display inline-block
+            cursor pointer
+            transition all 0.3s ease
+            margin-left 0.8rem
+            color lighten($primary, 30%)
+
+            &:hover
+                transform scale(1.1)
+                color $accent
+                filter drop-shadow(0 2px 4px rgba($accent, 0.2))
+            &:active
+                transform scale(0.9)
+
+
+        .competition-secret-key
+            display flex
+            align-items center
+            margin 1rem 0
+            padding 0.8rem
+            background $lightbg
+            border-radius 6px
+            font-size 0.95em
+
+            span[class$='-label']
+                color $accent
+                font-weight 500
+                min-width 90px
 
         .competition-secret-key
             font-size 13px
