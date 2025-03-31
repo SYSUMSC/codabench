@@ -18,6 +18,7 @@
                 <input value="{ logo_file_name }" readonly onclick="document.getElementById('profile_phtoto').click()">
             </div>
         </div>
+        <!--
         <div class="two fields">
             <div class="field" id="first_name">
                 <label>名字</label>
@@ -40,10 +41,12 @@
         <div class="field" id="location">
             <label>地理位置</label>
             <input type="text" name="location" placeholder="地理位置"></div>
+        -->
         <div class="field" id="email">
             <label>邮箱</label>
             <input disabled type="text" name="email" placeholder="邮箱">
         </div>
+        <!--
         <div class="two fields">
             <div class="field" id="personal_url">
                 <label>个人网站</label>
@@ -64,6 +67,7 @@
                 <input type="text" name="github_url" placeholder="Github地址">
             </div>
         </div>
+        -->
         <div class="field" id="biography">
             <label>简介</label>
             <textarea name="biography"></textarea>

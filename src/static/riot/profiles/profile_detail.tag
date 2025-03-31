@@ -47,6 +47,40 @@
                     </div>
                 </div>
 
+                <!-- Real Name -->
+                <div if="{ selected_user.real_name }" class="about-block">
+                    <div class="flex-container">
+                        <div class="label">真实姓名</div>
+                        <div class="value">{selected_user.real_name}</div>
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div if="{ selected_user.phone_number }" class="about-block">
+                    <div class="flex-container">
+                        <div class="label">电话号码</div>
+                        <div class="value">{selected_user.phone_number}</div>
+                    </div>
+                </div>
+
+                <!-- Student ID -->
+                <div if="{ selected_user.student_id }" class="about-block">
+                    <div class="flex-container">
+                        <div class="label">学号</div>
+                        <div class="value">{selected_user.student_id}</div>
+                    </div>
+                </div>
+
+                <!-- Education Level -->
+
+                <!-- Graduation Year -->
+                <div if="{ selected_user.graduation_year }" class="about-block">
+                    <div class="flex-container">
+                        <div class="label">毕业年份</div>
+                        <div class="value">{selected_user.graduation_year}</div>
+                    </div>
+                </div>
+
                 <!--  Do not show to other users  -->
                 <div if="{selected_user.id === CODALAB.state.user.id}">
                     <!-- Email -->
@@ -80,8 +114,7 @@
                 <!-- Location -->
                 <div if="{ selected_user.location }" class="about-block">
                     <div class="flex-container">
-                        <!-- @todo 原：Location -->
-                        <div class="label"></i>地理位置</div>
+                        <div class="label">地理位置</div>
                         <div class="value">{selected_user.location}</div>
                     </div>
                 </div>
