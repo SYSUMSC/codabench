@@ -3,9 +3,9 @@
         <button type="button" class="ui icon button" id="search-leaderboard-button">
             <i class="search icon"></i>
         </button>
-        <input ref="leaderboardFilter" type="text" placeholder="按列筛选排行榜">
+        <input ref="leaderboardFilter" type="text" placeholder="Filter Leaderboard by Columns">
     </div>
-    <a data-tooltip="开始输入以筛选‘元数据’或任务列。" data-position="right center">
+    <a data-tooltip="Start typing to filter columns under 'Meta-data' or Tasks." data-position="right center">
         <i class="grey question circle icon"></i>
     </a>
     <table id="leaderboardTable" class="ui celled selectable sortable table">
@@ -18,8 +18,8 @@
                         <div class="ui simple dropdown item" style="padding: 0px 5px">
                             <i class="download icon" style="font-size: 1.5em; margin: 0;"></i>
                             <div style="padding-top: 8px; right: 0; left: auto;" class="menu">
-                                <a href="{URLS.COMPETITION_GET_CSV(competition_id, selected_leaderboard.id)}" target="new" class="item">下载 CSV</a>
-                                <a href="{URLS.COMPETITION_GET_JSON_BY_ID(competition_id, selected_leaderboard.id)}" target="new" class="item">下载 JSON</a>
+                                <a href="{URLS.COMPETITION_GET_CSV(competition_id, selected_leaderboard.id)}" target="new" class="item">This CSV</a>
+                                <a href="{URLS.COMPETITION_GET_JSON_BY_ID(competition_id, selected_leaderboard.id)}" target="new" class="item">This JSON</a>
                             </div>
                         </div>
                     </div>
@@ -27,7 +27,7 @@
             </th>
         </tr>
         <tr class="task-row">
-            <th>任务：</th>
+            <th>Task:</th>
             <th colspan=4></th>
             <th each="{ task in filtered_tasks }" class="center aligned" colspan="{ task.colWidth }">{ task.name }</th>
         </tr>
@@ -38,37 +38,38 @@
             <th>日期</th>
             <th>ID</th>
             <th each="{ column in filtered_columns }" colspan="1">{column.title}</th>
+
         </tr>
         </thead>
-        <!--  显示当用户未注册赛题  -->
+        <!--  Show when particpant is not registered  -->
         <tbody if="{participant_status === null}">
             <tr class="center aligned ui yellow message">
                 <td colspan="100%">
-                    <em>您尚未注册此赛题，请前往“我的提交”选项卡进行注册，以查看排行榜。</em>
+                    <em>You are not a participant of this competition. Please register in My Submissions tab to view the leaderboard.</em>
                 </td>
             </tr>
         </tbody>
-        <!--  显示当用户注册等待审核  -->
+        <!--  Show when particpant registration is pending  -->
         <tbody if="{participant_status === 'pending'}">
             <tr class="center aligned ui yellow message">
                 <td colspan="100%">
-                    <em>您的参赛请求正在等待赛题队伍者的审批。</em>
+                    <em>Your request to participate in this competition is waiting for an approval from the competition organizer.</em>
                 </td>
             </tr>
         </tbody>
-        <!--  显示当用户注册被拒绝  -->
+        <!--  Show when particpant registration is denied  -->
         <tbody if="{participant_status === 'denied'}">
             <tr class="center aligned ui red message">
                 <td colspan="100%">
-                    <em>您的参赛请求被拒绝，请联系赛题队伍者了解详细信息。</em>
+                    <em>Your request to participate in this competition is denied. Please contact the competition organizer for more details.</em>
                 </td>
             </tr>
         </tbody>
-        <!--  显示当用户注册已通过  -->
+        <!--  Show when particpant registration is approved  -->
         <tbody if="{participant_status === 'approved'}">
         <tr if="{_.isEmpty(selected_leaderboard.submissions)}" class="center aligned">
             <td colspan="100%">
-                <em>排行榜暂无提交数据！</em>
+                <em>No submissions have been added to this leaderboard yet!</em>
             </td>
         </tr>
         <tr each="{ submission, index in selected_leaderboard.submissions}">
@@ -86,14 +87,15 @@
             <td>{ pretty_date(submission.created_when) }</td>
             <td>{submission.id}</td>
             <td each="{ column in filtered_columns }">
-                <a if="{column.title == '详细结果'}" href="detailed_results/{get_detailed_result_submisison_id(column, submission)}" target="_blank" class="eye-icon-link">
+                <a if="{column.title == 'Detailed Results'}" href="detailed_results/{get_detailed_result_submisison_id(column, submission)}" target="_blank" class="eye-icon-link">
                     <i class="icon grey eye eye-icon"></i>
                 </a>
-                <span if="{column.title != '详细结果'}" class="{bold_class(column, submission)}">{get_score(column, submission)}</span>
+                <span if="{column.title != 'Detailed Results'}" class="{bold_class(column, submission)}">{get_score(column, submission)}</span>
             </td>
         </tr>
         </tbody>
     </table>
+
 
     <script>
         let self = this
@@ -115,11 +117,14 @@
         }
 
         self.bold_class = function(column, submission){
-            let return_class = ''
-            if(column.task_id != -1){
-                if(submission.scores.length > 1){
+            // Return `text-bold` if submission has
+            // more than one scores and score index  == leaderbaord.primary_index
+            // otherwise return empty string
+            return_class = '' // default class value
+            if(column.task_id != -1){ // factsheet check
+                if(submission.scores.length > 1){ // score length check
                     let column_index = _.get(column, 'index')
-                    if(column_index === self.selected_leaderboard.primary_index){
+                    if(column_index === self.selected_leaderboard.primary_index){ // column index check
                         return_class = 'text-bold'
                     }
                 }
@@ -128,14 +133,14 @@
         }
         self.get_score = function(column, submission) {
             if(column.task_id === -1){
-                return _.get(submission, 'fact_sheet_answers[' + column.key + ']', '无数据')
+                return _.get(submission, 'fact_sheet_answers[' + column.key + ']', 'n/a')
             } else {
                 let score = _.get(_.find(submission.scores, {'task_id': column.task_id, 'column_key': column.key}), 'score')
                 if (score) {
                     return score
                 }
             }
-            return '无数据'
+            return 'n/a'
         }
 
         self.on("mount" , function () {
@@ -170,6 +175,73 @@
             }
             self.update()
         }
+
+        self.update_leaderboard = () => {
+            CODALAB.api.get_leaderboard_for_render(self.phase_id)
+                .done(responseData => {
+                    self.selected_leaderboard = responseData
+                    self.columns = []
+                    // Make fake task and columns for Metadata so it can be filtered like columns
+                    if(self.selected_leaderboard.fact_sheet_keys){
+                        let fake_metadata_task = {
+                            id: -1,
+                            colWidth: self.selected_leaderboard.fact_sheet_keys.length,
+                            columns: [],
+                            name: "Fact Sheet Answers"
+                        }
+                        for(question of self.selected_leaderboard.fact_sheet_keys){
+                            fake_metadata_task.columns.push({
+                                key: question[0],
+                                title: question[1],
+                            })
+                        }
+                        self.selected_leaderboard.tasks.unshift(fake_metadata_task)
+                    }
+                    for(task of self.selected_leaderboard.tasks){
+
+                        for(column of task.columns){
+                            column.task_id = task.id
+                            self.columns.push(column)
+                        }
+                        // -1 id is used for fact sheet answers
+                        if(self.enable_detailed_results & self.show_detailed_results_in_leaderboard & task.id != -1){
+                            self.columns.push({
+                              task_id: task.id,
+                              title: "Detailed Results"
+                            })
+                            task.colWidth += 1
+                        }
+                    }
+                    self.filter_columns()
+                    $('#leaderboardTable').tablesort()
+                    self.update()
+                })
+        }
+
+        self.get_detailed_result_submisison_id = function(column, submisison){
+            for (index in submisison.detailed_results) {
+                if(column.task_id == submisison.detailed_results[index].task){
+                    return submisison.detailed_results[index].id
+                }
+            }
+        }
+
+
+        CODALAB.events.on('phase_selected', data => {
+            self.phase_id = data.id
+            self.update_leaderboard()
+        })
+
+        CODALAB.events.on('competition_loaded', (competition) => {
+            self.competition_id = competition.id
+            self.participant_status = competition.participant_status
+            self.opts.is_admin ? self.show_download = "visible": self.show_download = "hidden"
+            self.enable_detailed_results = competition.enable_detailed_results
+            self.show_detailed_results_in_leaderboard = competition.show_detailed_results_in_leaderboard
+
+        })
+
+        CODALAB.events.on('submission_changed_on_leaderboard', self.update_leaderboard)
 
     </script>
     <style type="text/stylus">
