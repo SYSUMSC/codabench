@@ -1,24 +1,28 @@
+version: '3'
+
 services:
   #-----------------------------------------------
   #   Web Services
   #-----------------------------------------------
-  caddy:
-    image: caddy:2.8.4
-    env_file: .env
-    environment:
-      - ACME_AGREE=true
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./src/staticfiles:/var/www/django/static
-      - ./caddy_data:/data
-      - ./caddy_config:/config
-      - ./var/log/caddy:/var/log/
-    restart: unless-stopped
-    ports:
-      - 180:80
-      - 1443:443
-    depends_on:
-      - django
+  # caddy:
+  #   image: caddy:2.8.4
+  #   env_file: .env
+  #   environment:
+  #     - ACME_AGREE=true
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile
+  #     - ./src/staticfiles:/var/www/django/static
+  #     - ./caddy_data:/data
+  #     - ./caddy_config:/config
+  #     - ./var/log/caddy:/var/log/
+  #   restart: unless-stopped
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   depends_on:
+  #     - django
+  #   networks:
+  #     custom_network:
 
   django:
     build: .
@@ -45,6 +49,8 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
+    networks:
+      custom_network:
 
   #-----------------------------------------------
   # Minio local storage helper
@@ -62,15 +68,15 @@ services:
       test: [ "CMD", "nc", "-z", "minio", "9000" ]
       interval: 5s
       retries: 5
+    networks:
+      custom_network:
+
   createbuckets:
     image: minio/mc
     depends_on:
       minio:
         condition: service_healthy
     env_file: .env
-    # volumes:
-    #   This volume is shared with `minio`, so `z` to share it
-    #   - ./var/minio:/export
     entrypoint: >
       /bin/sh -c " set -x; if [ -n \"$MINIO_ACCESS_KEY\" ] && [ -n \"$MINIO_SECRET_KEY\" ] && [ -n \"$MINIO_PORT\" ]; then
         until /usr/bin/mc config host add minio_docker http://minio:$MINIO_PORT $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && break; do
@@ -82,6 +88,8 @@ services:
       else
         echo 'MINIO_ACCESS_KEY, MINIO_SECRET_KEY, or MINIO_PORT are not defined. Skipping buckets creation.';
       fi; exit 0; "
+    networks:
+      custom_network:
 
   #-----------------------------------------------
   #   Local development helper, rebuilds RiotJS/Stylus on change
@@ -97,6 +105,8 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
+    networks:
+      custom_network:
 
   #-----------------------------------------------
   #   Database Service
@@ -118,18 +128,14 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
+    networks:
+      custom_network:
 
   #-----------------------------------------------
   #   Rabbitmq & Flower monitoring tool
   #-----------------------------------------------
   rabbit:
-    build:
-      context: .
-      dockerfile: Dockerfile.rabbitmq
-      args:
-        - WORKER_CONNECTION_TIMEOUT=${WORKER_CONNECTION_TIMEOUT}
-    # setting hostname here makes data persist properly between
-    # containers being destroyed..!
+    image: rabbitmq:3.13.7-management
     hostname: rabbit
     env_file: .env
     environment:
@@ -146,9 +152,11 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
+          #privileged: true
+    networks:
+      custom_network:
 
   flower:
-    # image: mher/flower
     build:
       context: .
       dockerfile: Dockerfile.flower
@@ -164,6 +172,8 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
+    networks:
+      custom_network:
 
   #-----------------------------------------------
   #   Redis
@@ -177,12 +187,13 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
+    networks:
+      custom_network:
 
   #-----------------------------------------------
   #   Celery Service
   #-----------------------------------------------
   site_worker:
-    # This auto-reloads
     command: bash -c "watchmedo auto-restart -p '*.py' --recursive -- celery -A celery_config worker -B -Q site-worker -l info -n site-worker@%n --concurrency=2"
     working_dir: /app/src
     build:
@@ -201,33 +212,37 @@ services:
     deploy:
       resources:
         limits:
-          # Limit memory substantially here so we see any problems that may
-          # appear on Heroku ahead of time
           memory: 256M
+    networks:
+      custom_network:
 
   compute_worker:
     command: bash -c "watchmedo auto-restart -p '*.py' --recursive -- celery -A compute_worker worker -l info -Q compute-worker -n compute-worker@%n"
     working_dir: /app
     build:
       context: .
-      dockerfile: Dockerfile.compute_worker
-      # args:
-      #   HTTP_PROXY: http://127.0.0.1:20171
-      #   HTTPS_PROXY: http://127.0.0.1:20171
+      dockerfile: Dockerfile.compute_worker_gpu
     depends_on:
       - django
       - rabbit
     volumes:
       - ./compute_worker:/app
       - ${HOST_DIRECTORY:-/tmp/codabench}:/codabench
-      # Actual connection back to docker parent to run things
       - /var/run/docker.sock:/var/run/docker.sock
     env_file: .env
     environment:
       - BROKER_URL=pyamqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@${RABBITMQ_HOST}:${RABBITMQ_PORT}//
-      # Make the worker leave behind the submission so we can examine it
       - CODALAB_IGNORE_CLEANUP_STEP=1
     logging:
       options:
         max-size: "20m"
         max-file: "5"
+    networks:
+      custom_network:
+
+networks:
+  custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
