@@ -99,12 +99,20 @@ def activate(request, uidb64, token):
 def activateEmail(request, user, to_email):
     # Activate your user account.
     mail_subject = '激活你的账号'
+    # message = render_to_string('profiles/emails/template_activate_account.html', {
+    #     'user': user.username,
+    #     'domain': get_current_site(request).domain,
+    #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+    #     'token': account_activation_token.make_token(user),
+    #     'protocol': 'https' if request.is_secure() else 'http'
+    # })
+
     message = render_to_string('profiles/emails/template_activate_account.html', {
         'user': user.username,
-        'domain': get_current_site(request).domain,
+        'domain': "neuronspark.sysumsc.cn",
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': account_activation_token.make_token(user),
-        'protocol': 'https' if request.is_secure() else 'http'
+        'protocol': 'https'
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
     try:
