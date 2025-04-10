@@ -7,13 +7,6 @@
             <div class="item" data-tab="phases-tab">阶段</div>
             <div class="item" data-tab="participate-tab">我的提交</div>
             <div class="item" data-tab="results-tab">结果</div>
-            <!--<a class="item" href="{URLS.FORUM(competition.forum)}">论坛</a>-->
-            <div class="right menu">
-                <div class="item">
-                    <help_button href="https://github.com/codalab/competitions-v2/wiki/Competition-Detail-Page"
-                                 tooltip_position="left center">帮助</help_button>
-                </div>
-            </div>
         </div>
 
         <!-- 开始使用选项卡 -->
