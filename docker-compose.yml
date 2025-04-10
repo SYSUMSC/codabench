@@ -140,6 +140,8 @@ services:
       dockerfile: Dockerfile.rabbitmq
       args:
         - WORKER_CONNECTION_TIMEOUT=${WORKER_CONNECTION_TIMEOUT}
+    # setting hostname here makes data persist properly between
+    # containers being destroyed..!
     hostname: rabbit
     env_file: .env
     environment:
@@ -156,7 +158,6 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
-          #privileged: true
     networks:
       custom_network:
 
