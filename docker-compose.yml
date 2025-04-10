@@ -199,6 +199,7 @@ services:
   #   Celery Service
   #-----------------------------------------------
   site_worker:
+    # This auto-reloads
     command: bash -c "watchmedo auto-restart -p '*.py' --recursive -- celery -A celery_config worker -B -Q site-worker -l info -n site-worker@%n --concurrency=2"
     working_dir: /app/src
     build:
@@ -217,6 +218,8 @@ services:
     deploy:
       resources:
         limits:
+          # Limit memory substantially here so we see any problems that may
+          # appear on Heroku ahead of time
           memory: 256M
     networks:
       custom_network:
