@@ -135,7 +135,11 @@ services:
   #   Rabbitmq & Flower monitoring tool
   #-----------------------------------------------
   rabbit:
-    image: rabbitmq:3.13.7-management
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
+      args:
+        - WORKER_CONNECTION_TIMEOUT=${WORKER_CONNECTION_TIMEOUT}
     hostname: rabbit
     env_file: .env
     environment:
