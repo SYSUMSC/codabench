@@ -1,0 +1,74 @@
+:root
+    --color-primary: #E58A57;
+    --color-secondary: #EEC1A4;
+    --color-success: #28a745;
+    --color-danger: #dc3545;
+    --color-gray: #AAA;
+    --color-gray-light: #DDD;
+    --color-gray-dark: #555;
+
+.btn-scale
+    transition: transform 0.3s;
+    &:hover
+        transform: scale(1.2);
+    &:active
+        transform: scale(0.8);
+.btn-scale-sm
+    transition: transform 0.3s;
+    &:hover
+        transform: scale(1.1);
+    &:active
+        transform: scale(0.9);
+
+.btn-neon-primary
+    &:hover
+        box-shadow: 0 0 10px var(--color-primary) !important
+.btn-neon-secondary
+    &:hover
+        box-shadow: 0 0 10px var(--color-secondary)!important
+.btn-neon-success
+    &:hover
+        box-shadow: 0 0 10px var(--color-success)!important
+.btn-neon-danger
+    &:hover
+        box-shadow: 0 0 10px var(--color-danger)!important
+.btn-neon-gray
+    &:hover
+        box-shadow: 0 0 10px var(--color-gray)!important
+.btn-neon-gray-light
+    &:hover
+        box-shadow: 0 0 10px var(--color-gray-light)!important
+.btn-neon-gray-dark
+    &:hover
+        box-shadow: 0 0 10px var(--color-gray-dark)!important
+
+.bg-gray
+    background-color: var(--color-gray) !important
+.bg-gray-light
+    color: black !important
+    background-color: var(--color-gray-light) !important
+.bg-gray-dark
+    color: white!important
+    background-color: var(--color-gray-dark)!important
+.bg-success
+    background-color: var(--color-success)!important
+.bg-danger
+    background-color: var(--color-danger)!important
+.bg-primary
+    background-color: var(--color-primary) !important
+
+.round-md
+    border-radius: 1rem!important
+.round-lg
+    border-radius: 2rem!important
+.round-xl
+    border-radius: 3rem!important
+.round-sm
+    border-radius: 0.5rem!important
+.round-xs
+    border-radius: 0.2rem!important
+
+.bg-semi-transparent
+    background: rgba(255, 255, 255, 0.5)
+.bg-semi-transparent-plus
+    background: rgba(255, 255, 255, 0.8)

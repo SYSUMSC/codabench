@@ -1,3 +1,4 @@
+@import "src/static/stylus/components.styl"
 .ui.search .prompt
     // Value from semantic default input
     border-radius .28571429rem
@@ -17,14 +18,14 @@
     color white
     background rgba(255, 255, 255, 0.5)
     border 2px solid #DDD
-    border-radius: 50rem
+    border-radius: 1rem
     transition all 0.3s ease-in-out
     #competition-search
         width 10em
         height 100%
         padding 1rem
         border:  none
-        border-radius: 50rem
+        border-radius: 1rem
         outline none
         background: transparent
         transition width 0.3s ease-in-out
@@ -39,9 +40,47 @@
         #competition-search
             width 25em
     i
-        margin: 0 0.6rem 0 0.4rem
+        margin: 0 0.8rem 0 0.4rem
 // &:hover
 //     #competition-search
 //         width 25em
 //         background rgb(255, 255, 255)
+$header-height = calc(3rem + 22px + 18px)
+.header-content
+    height: $header-height
+    // padding: 0.5rem 0
+    position: fixed
+    top: 0
+    width: 100%
+    z-index: 1000
+    background: transparent
+    border-bottom: 1px solid #DDD
+    backdrop-filter: blur(10px)
+    -webkit-backdrop-filter: blur(10px)
+.header-placeholder
+    height: $header-height
+    pointer-events: none // 防止交互冲突
 
+.results
+    padding: 0 !important
+    border-radius: 2rem !important
+    background: rgba(255, 255, 255, 0.8)
+    backdrop-filter: blur(10px)
+
+.header-menu
+    >*
+        @extends .round-md
+        &:hover
+            transform: scale(1.1)
+        transition: all 0.3s ease-in-out !important
+    >a
+        @extends .bg-semi-transparent-plus
+        &:hover
+            @extends.btn-scale-sm
+    >div>div.menu
+        @extends.round-md
+        @extends.bg-semi-transparent-plus
+        >a
+            margin: 0.5rem 0
+            padding: 0 !important
+            transition: all 0.3s ease-in-out !important
