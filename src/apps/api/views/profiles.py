@@ -176,6 +176,11 @@ class OrganizationViewSet(mixins.CreateModelMixin,
         if not users:
             return Response({"message": "邀请的某些用户已经在其他队伍了"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # 检查是否超过队伍人数限制（最多3人）
+        current_member_count = org.membership_set.filter(group__in=Membership.ALL_GROUP).count()
+        if current_member_count + len(users) > 3:
+            return Response({"message": "队伍最多只能有3个人"}, status=status.HTTP_400_BAD_REQUEST)
+
         org.users.add(*users)
 
         # 获取 Membership 记录，方便后续处理
@@ -234,6 +239,11 @@ class OrganizationViewSet(mixins.CreateModelMixin,
             return Response('Deleted Invite', status=status.HTTP_200_OK)
 
         elif request.method == 'POST':
+            # 检查是否超过队伍人数限制（最多3人）
+            current_member_count = membership.organization.membership_set.filter(group__in=Membership.ALL_GROUP).count()
+            if current_member_count >= 3:
+                return Response({"message": "该队伍已达到3人上限，无法加入"}, status=status.HTTP_400_BAD_REQUEST)
+
             membership.group = Membership.MEMBER
             membership.save()
             membership.organization.user_record.add(request.user)
