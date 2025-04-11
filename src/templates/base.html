@@ -159,10 +159,14 @@
                         <i selenium="tasks" class="ui small file icon"></i>
                         资源
                     </a>
+                    {% if user.is_authenticated %}
+                    {% if request.user.is_staff %}
                     <a class="item" href="{% url "queues:management" %}">
                         <i class="ui small computer icon"></i>
                         队列管理
                     </a>
+                    {% endif %}
+                    {% endif %}
                     <a class="item" href="{% url 'leaderboards:overall_leaderboard' %}">
                         <i class="ui small chart bar icon"></i>
                         总排行榜
