@@ -8,7 +8,7 @@
             <div class="ui checkbox">
                 <input selenium="auto-approve" type="checkbox" name="registration_auto_approve" ref="registration_auto_approve" onchange="{form_updated}">
                 <label>自动批准注册请求
-                    <span data-tooltip="如果未勾选，则注册请求必须由基准创建者或协作者手动批准"
+                    <span data-tooltip="如果未勾选，则注册请求必须由赛题创建者或协作者手动批准"
                           data-inverted=""
                           data-position="bottom center">
                     <i class="help icon circle"></i></span>
@@ -19,7 +19,7 @@
             <div class="ui checkbox">
                 <input type="checkbox" name="allow_robot_submissions" ref="allow_robot_submissions" onchange="{form_updated}">
                 <label>允许机器人提交
-                    <span data-tooltip="如果未勾选，机器人用户必须由基准创建者或协作者手动批准。这可以在以后更改。"
+                    <span data-tooltip="如果未勾选，机器人用户必须由赛题创建者或协作者手动批准。这可以在以后更改。"
                           data-inverted=""
                           data-position="bottom center">
                     <i class="help icon circle"></i></span>
@@ -28,10 +28,10 @@
         </div>
 
         <!--  白名单邮箱列表  -->
-        <!--  不需要管理员批准即可参加比赛的用户邮箱  -->
+        <!--  不需要管理员批准即可参加赛题的用户邮箱  -->
         <div class="field">
             <label>白名单邮箱</label>
-            <p>用户无需比赛组织者批准即可参加此比赛的邮箱列表（每行一个邮箱）。</p>
+            <p>用户无需赛题队伍者批准即可参加此赛题的邮箱列表（每行一个邮箱）。</p>
             <div class="ui yellow message">
                 <span><b>注意：</b></span><br>
                 仅允许有效的邮箱<br>

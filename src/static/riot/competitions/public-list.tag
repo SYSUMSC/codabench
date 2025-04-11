@@ -1,5 +1,5 @@
 <public-list>
-    <h1>公开基准测试和竞赛</h1>
+    <h1>公开题目和竞赛</h1>
     <div class="pagination-nav">
         <button show="{competitions.previous}" onclick="{handle_ajax_pages.bind(this, -1)}" class="float-left ui inline button active">上一页</button>
         <button hide="{competitions.previous}" disabled="disabled" class="float-left ui inline button disabled">上一页</button>
@@ -24,7 +24,7 @@
                             { pretty_description(competition.description)}
                         </p>
                         <p class="organizer">
-                            <em>组织者: <strong>{competition.created_by}</strong></em>
+                            <em>队伍者: <strong>{competition.created_by}</strong></em>
                         </p>
                     </div>
                 </a>

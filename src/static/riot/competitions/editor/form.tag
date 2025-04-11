@@ -26,7 +26,7 @@
 
                 <div class="ui message error" show="{ Object.keys(errors).length > 0 }">
                     <div class="header">
-                        保存基准数据时发生错误
+                        保存赛题数据时发生错误
                     </div>
                     <errors errors="{errors}"></errors>
                 </div>
@@ -96,7 +96,7 @@
                 <button class="ui basic red button discard" onclick="{ discard }">
                     放弃更改
                 </button>
-                <a class="ui secondary basic button" href="{URLS.COMPETITION_DETAIL(opts.competition_id)}">返回比赛</a>
+                <a class="ui secondary basic button" href="{URLS.COMPETITION_DETAIL(opts.competition_id)}">返回赛题</a>
                 <help_button href="https://github.com/codalab/competitions-v2/wiki/Competition-Creation:-Form"></help_button>
             </div>
         </div>
@@ -162,7 +162,7 @@
                     self.update()
                 })
                 .fail(function (response) {
-                    toastr.error("无法找到比赛");
+                    toastr.error("无法找到赛题");
                 });
             self.update()
         }
@@ -238,12 +238,12 @@
                 delete phase.task_instances
             }
 
-            // 创建或更新比赛时都发送 competition_id，不会影响功能
+            // 创建或更新赛题时都发送 competition_id，不会影响功能
             api_endpoint(self.competition_return, self.opts.competition_id)
                 .done(function (response) {
                     self.errors = {}
                     self.update()
-                    toastr.success("比赛保存成功！")
+                    toastr.success("赛题保存成功！")
                     window.location.href = window.URLS.COMPETITION_DETAIL(response.id)
                 })
                 .fail(function (response) {

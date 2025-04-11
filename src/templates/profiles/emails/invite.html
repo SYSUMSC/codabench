@@ -1,7 +1,15 @@
 {% extends 'emails/base_email.html' %}
 
 {% block content %}
-    <p>You have been invited to join {{ organization }}.</p>
-    <p>Click this link to accept or reject your invite. <a href="http://{{ site.domain }}{{ invite_url }}">http://{{ site.domain }}{{ invite_url }}</a></p>
+    <p>您好！</p>
 
+    <p>您收到了来自 {{ organization.name }} 的邀请。</p>
+
+    <p>请点击以下链接接受邀请：</p>
+
+    <p><a href="{{ invite_url }}">{{ invite_url }}</a></p>
+
+    <p>如果您无法点击链接，请复制链接并在浏览器中打开。</p>
+
+    <p>祝好，<br>Codabench 团队</p>
 {% endblock %}

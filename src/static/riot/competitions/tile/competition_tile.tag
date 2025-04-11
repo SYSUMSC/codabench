@@ -1,5 +1,5 @@
 <competition-tile>
-    
+
         <div class="tile-wrapper">
             <div class="ui square tiny bordered image img-wrapper">
                 <img src="{logo_icon ? logo_icon : logo}">
@@ -13,7 +13,7 @@
                     {pretty_description(description)}
                 </p>
                 <p class="organizer">
-                    <em>Organized by: <strong>{created_by}</strong></em>
+                    <em>队伍者: <strong>{created_by}</strong></em>
                 </p>
             </div>
             </a>
@@ -24,7 +24,7 @@
                     <span if="{reward}"><img width="30" height="30" src="/static/img/trophy.png"></span>
                     <span if="{report}"><a href="{report}" target="_blank"><img width="30" height="30" src="/static/img/paper.png"></a></span>
                 </div>
-                <strong>{participants_count}</strong> Participants
+                <strong>{participants_count}</strong> 参与者
             </div>
         </div>
 
@@ -118,16 +118,16 @@
     <div class="content">
         <a class="header">{ title }</a>
         <div class="meta">
-            <span class="date">Joined in 2013</span>
+            <span class="date">2013年加入</span>
         </div>
         <div class="description">
-            Kristy is an art director living in New York.
+            Kristy是一位生活在纽约的艺术总监。
         </div>
     </div>
     <div class="extra content">
         <a>
             <i class="user icon"></i>
-            22 Friends
+            22个朋友
         </a>
     </div>
 

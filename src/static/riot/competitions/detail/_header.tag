@@ -37,6 +37,7 @@
                     <div class="row">
                         <div class="column">
                             <!-- 主信息 -->
+
                             <div class="info-container">
                                 <!-- 出题人 -->
                                 <div class="info-card">
@@ -86,6 +87,7 @@
                                             </div>
                                             </div>
                                             </div>
+
                             <!-- 竞赛报告 -->
                                 <div class="info-card" if="{competition.report}">
                                     <span class="emoji-icon">📊</span>

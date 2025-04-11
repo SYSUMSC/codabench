@@ -1,4 +1,5 @@
 import json
+import traceback
 import django
 
 from django.conf import settings
@@ -98,21 +99,32 @@ def activate(request, uidb64, token):
 def activateEmail(request, user, to_email):
     # Activate your user account.
     mail_subject = '激活你的账号'
+    # message = render_to_string('profiles/emails/template_activate_account.html', {
+    #     'user': user.username,
+    #     'domain': get_current_site(request).domain,
+    #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+    #     'token': account_activation_token.make_token(user),
+    #     'protocol': 'https' if request.is_secure() else 'http'
+    # })
+
     message = render_to_string('profiles/emails/template_activate_account.html', {
         'user': user.username,
-        'domain': get_current_site(request).domain,
+        'domain': "neuronspark.sysumsc.cn",
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': account_activation_token.make_token(user),
-        'protocol': 'https' if request.is_secure() else 'http'
+        'protocol': 'https'
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
-    if email.send():
-        # @todo 存疑 'Dear {user.username}, please go to you email {to_email} inbox and click on received activation link to confirm and complete the registration. *Note: Check your spam folder.'
-        messages.success(request, f'{user.username}你好，请检查你的邮箱 {to_email} 并点击\
-            收到的激活链接来确认并完成注册。 注意：如果没有收到邮件，请检查垃圾邮件。')
-    else:
-        # Problem sending confirmation email to {to_email}, check if you typed it correctly.
-        messages.error(request, f'无法向 {to_email}发送邮件，请确认你的输入是否正确')
+    try:
+        if email.send():
+            # @todo 存疑 'Dear {user.username}, please go to you email {to_email} inbox and click on received activation link to confirm and complete the registration. *Note: Check your spam folder.'
+            messages.success(request, f'{user.username}你好，请检查你的邮箱 {to_email} 并点击\
+                收到的激活链接来确认并完成注册。 注意：如果没有收到邮件，请检查垃圾邮件。')
+        else:
+            # Problem sending confirmation email to {to_email}, check if you typed it correctly.
+            messages.error(request, f'无法向 {to_email}发送邮件，请确认你的输入是否正确')
+    except Exception as e:
+        print(f"发生错误: {e} \n{traceback.format_exc()}")
 
 
 def send_delete_account_confirmation_mail(request, user):
@@ -216,8 +228,13 @@ def sign_up(request):
         if form.is_valid():
             # Check if the email is in the DeletedUser table
             email = form.cleaned_data.get('email')
+            if not (email.endswith('@mail2.sysu.edu.cn') or email.endswith('@mail3.sysu.edu.cn')):
+                messages.error(request, "邮箱必须以 @mail2.sysu.edu.cn 或 @mail3.sysu.edu.cn 结尾。")
+                context['form'] = form
+                return render(request, 'registration/signup.html', context)
+
             if DeletedUser.objects.filter(email=email).exists():
-                messages.error(request, "This email has been previously deleted and cannot be used.")
+                messages.error(request, "此邮箱已被删除，无法使用。")
                 context['form'] = form
             else:
                 form.save()
@@ -368,7 +385,7 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
     form_class = CustomPasswordResetForm  # auth_forms.PasswordResetForm
     # email_template_name = ''  # Defaults to registration/password_reset_email.html if not supplied.
     # subject_template_name = ''  # Defaults to registration/password_reset_subject.txt if not supplied.
-    # token_generator = ''  # This will default to default_token_generator, it’s an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
+    # token_generator = ''  # This will default to default_token_generator, it's an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
     success_url = django.urls.reverse_lazy("accounts:password_reset_done")
     from_email = "info@codalab.org"
 
@@ -382,7 +399,7 @@ class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     """
     # template_name = '' # Default value is registration/password_reset_confirm.html.
     # form_class = '' # Defaults to django.contrib.auth.forms.SetPasswordForm.
-    # token_generator = '' # This will default to default_token_generator, it’s an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
+    # token_generator = '' # This will default to default_token_generator, it's an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
     # post_reset_login = '' # Defaults to False.
     success_url = django.urls.reverse_lazy("accounts:password_reset_complete")
 

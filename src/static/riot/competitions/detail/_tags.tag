@@ -3,13 +3,13 @@
         <div align="center" class="row">
             <div class="sixteen wide column">
                 <div class="ui">
-                    <h1>Tags</h1>
+                    <h1>标签</h1>
                     <div class="ui tag labels">
                         <a class="ui label">
-                            <i class="icon settings"></i> Beginner
+                            <i class="icon settings"></i> 初学者
                         </a>
                         <a class="ui label">
-                            <i class="icon wrench"></i> Mechanics
+                            <i class="icon wrench"></i> 机械
                         </a>
                     </div>
                 </div>

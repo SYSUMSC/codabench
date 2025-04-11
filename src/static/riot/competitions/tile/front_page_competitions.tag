@@ -2,7 +2,7 @@
     <div class="ui two column grid">
         <div class="eight wide column">
             <div class="ui large header">
-                热门基准
+                热门赛题
             </div>
             <div class="loader-container popular">
                 <div class="lds-ring">
@@ -18,7 +18,7 @@
 
         <div class="eight wide column">
             <div class="ui large header">
-                精选基准
+                精选赛题
             </div>
             <div class="loader-container popular">
                 <div class="lds-ring">
@@ -44,7 +44,7 @@
         self.get_frontpage_competitions = function (data) {
             return CODALAB.api.get_front_page_competitions(data)
                 .fail(function (response) {
-                    toastr.error("无法加载比赛列表")
+                    toastr.error("无法加载赛题列表")
                 })
                 .done(function (data) {
                     self.featured_competitions = data["featured_comps"]

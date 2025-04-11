@@ -1,9 +1,18 @@
 {% extends 'emails/base_email.txt' %}
 
 {% block content %}
-    You have been invited to join {{ organization }}.
-    Copy this URL into your web browser to accept. http://{{ site.domain }}{{ invite_url }}
+    您好！
 
+    您收到了来自 {{ organization.name }} 的邀请。
+
+    请点击以下链接接受邀请：
+
+    {{ invite_url }}
+
+    如果您无法点击链接，请复制链接并在浏览器中打开。
+
+    祝好，
+    Codabench 团队
 
     {{ new_post.content }}
 {% endblock %}

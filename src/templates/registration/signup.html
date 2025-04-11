@@ -53,6 +53,95 @@
 
             <div class="field">
                 <div class="ui left icon input">
+                    <i class="phone icon"></i>
+                    <input type="text"
+                           name="phone_number"
+                           placeholder="电话号码"
+                           id="id_phone_number"
+                           value="{{ form.phone_number.value|default:''}}"
+                           maxlength="{{ form.phone_number.field.max_length }}"
+                           required>
+                </div>
+            </div>
+            {% if form.phone_number.errors %}
+            <div class="ui red message">
+                {{ form.phone_number.errors }}
+            </div>
+            {% endif %}
+
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="id card icon"></i>
+                    <input type="text"
+                           name="student_id"
+                           placeholder="学号"
+                           id="id_student_id"
+                           value="{{ form.student_id.value|default:''}}"
+                           maxlength="{{ form.student_id.field.max_length }}"
+                           required>
+                </div>
+            </div>
+            {% if form.student_id.errors %}
+            <div class="ui red message">
+                {{ form.student_id.errors }}
+            </div>
+            {% endif %}
+
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="user icon"></i>
+                    <input type="text"
+                           name="real_name"
+                           placeholder="真实姓名"
+                           id="id_real_name"
+                           value="{{ form.real_name.value|default:''}}"
+                           maxlength="{{ form.real_name.field.max_length }}"
+                           required>
+                </div>
+            </div>
+            {% if form.real_name.errors %}
+            <div class="ui red message">
+                {{ form.real_name.errors }}
+            </div>
+            {% endif %}
+
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="graduation cap icon"></i>
+                    <input type="number"
+                           name="graduation_year"
+                           placeholder="毕业年份"
+                           id="id_graduation_year"
+                           value="{{ form.graduation_year.value|default:''}}"
+                           min="1950"
+                           max="2050"
+                           required>
+                </div>
+            </div>
+            {% if form.graduation_year.errors %}
+            <div class="ui red message">
+                {{ form.graduation_year.errors }}
+            </div>
+            {% endif %}
+
+            <div class="field">
+                <label for="id_education_level">学历</label>
+                <select name="education_level" id="id_education_level" required>
+                    <option value="" {% if not form.education_level.value %}selected{% endif %}>请选择学历</option>
+                    <option value="bachelor" {% if form.education_level.value == 'bachelor' %}selected{% endif %}>本科</option>
+                    <option value="master" {% if form.education_level.value == 'master' %}selected{% endif %}>硕士</option>
+                    <option value="phd" {% if form.education_level.value == 'phd' %}selected{% endif %}>博士</option>
+                    <option value="other" {% if form.education_level.value == 'other' %}selected{% endif %}>其他</option>
+                </select>
+            </div>
+            {% if form.education_level.errors %}
+            <div class="ui red message">
+                {{ form.education_level.errors }}
+            </div>
+            {% endif %}
+
+            <div class="field">
+                <div class="ui left icon input">
                     <i class="lock icon"></i>
                     <input type="password"
                            name="password1"

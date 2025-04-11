@@ -7,13 +7,6 @@
             <div class="item" data-tab="phases-tab">阶段</div>
             <div class="item" data-tab="participate-tab">我的提交</div>
             <div class="item" data-tab="results-tab">结果</div>
-            <a class="item" href="{URLS.FORUM(competition.forum)}">论坛</a>
-            <div class="right menu">
-                <div class="item">
-                    <help_button href="https://github.com/codalab/competitions-v2/wiki/Competition-Detail-Page"
-                                 tooltip_position="left center">帮助</help_button>
-                </div>
-            </div>
         </div>
 
         <!-- 开始使用选项卡 -->
@@ -201,7 +194,7 @@
                 </div>
                 <!-- 如果没有排行榜，显示此消息 -->
                 <div show="{_.isEmpty(competition.leaderboards)}">
-                    <div class="center aligned"><h2>此基准测试无可见排行榜</h2></div>
+                    <div class="center aligned"><h2>此题目无可见排行榜</h2></div>
                 </div>
                 <!-- 否则，显示排行榜 -->
                 <div show="{!_.isEmpty(competition.leaderboards)}">

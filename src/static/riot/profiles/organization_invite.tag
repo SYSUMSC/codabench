@@ -1,6 +1,6 @@
 <organization-invite>
     <div class="ui raised segment">
-        <h1 class="ui dividing header">Organization Invite</h1>
+        <h1 class="ui dividing header">队伍邀请</h1>
         <div if="{state === 'loading'}" class="ui placeholder">
             <div class="paragraph">
                 <div class="line"></div>
@@ -15,16 +15,16 @@
                 <div class="item">
                     <div class="content">
                         <div class="description">
-                            Would you like to accept invite to <strong>{invite_data.organization_name}</strong>
+                            您要接受来自 <strong>{invite_data.organization_name}</strong> 的邀请吗？
                         </div>
-                        <div class="extra">Invite Sent {invite_data.date_joined}</div>
+                        <div class="extra">邀请发送时间：{invite_data.date_joined}</div>
                         <div class="extra">
                             <div onclick="{accept_invite}" class="ui left floated positive button">
-                                Accept
+                                接受
                                 <i class="right check icon"></i>
                             </div>
                             <div onclick="{reject_invite}" class="ui right floated negative button">
-                                Reject
+                                拒绝
                                 <i class="right x icon"></i>
                             </div>
                         </div>
@@ -37,10 +37,10 @@
                 <div class="item">
                     <div class="content">
                         <div class="description">
-                            <h3 class="header">Invite Not Found</h3>
+                            <h3 class="header">未找到邀请</h3>
                         </div>
                         <div class="extra">
-                            <a href="/"><button class="ui right floated button primary">Return Home</button></a>
+                            <a href="/"><button class="ui right floated button primary">返回首页</button></a>
                         </div>
                     </div>
                 </div>
@@ -51,14 +51,13 @@
                 <div class="item">
                     <div class="content">
                         <div class="description">
-                            <h3 class="header">This invite is not for the user logged in.</h3>
+                            <h3 class="header">此邀请不是发给当前登录用户的。</h3>
                             <div class="text">
-                                Please make sure you are logged into the correct account, or have organization
-                                administrator send you an invite.
+                                请确保您登录了正确的账号，或请队伍管理员重新发送邀请。
                             </div>
                         </div>
                         <div class="extra">
-                            <a href="/"><button class="ui right floated button primary">Return Home</button></a>
+                            <a href="/"><button class="ui right floated button primary">返回首页</button></a>
                         </div>
                     </div>
                 </div>
@@ -69,14 +68,14 @@
                 <div class="item">
                     <div class="content">
                         <div class="description">
-                            <h3 class="header">Invite has already been accepted</h3>
+                            <h3 class="header">邀请已被接受</h3>
                             <div class="text">
-                                Redirecting you to the competition in 3 seconds.
+                                3秒后将跳转到竞赛页面。
                             </div>
                             <div class="ui active centered inline loader"></div>
                         </div>
                         <div class="extra">
-                            <a href="/"><button class="ui right floated button primary">Return Home</button></a>
+                            <a href="/"><button class="ui right floated button primary">返回首页</button></a>
                         </div>
                     </div>
                 </div>
@@ -87,15 +86,15 @@
                 <div class="item">
                     <div class="content">
                         <div class="description">
-                            <h3 class="header">Unknown Error.</h3>
+                            <h3 class="header">未知错误。</h3>
                             <div class="text">
-                                This invite could not be validated. If you think this is an error please contact the
-                                administrator or create a issue on the
-                                <a href="https://github.com/codalab/competitions-v2">CODALAB GITHUB</a>.
+                                无法验证此邀请。如果您认为这是一个错误，请联系管理员或在
+                                <a href="https://github.com/codalab/competitions-v2">CODALAB GITHUB</a>
+                                上提交问题。
                             </div>
                         </div>
                         <div class="extra">
-                            <a href="/"><button class="ui right floated button primary">Return Home</button></a>
+                            <a href="/"><button class="ui right floated button primary">返回首页</button></a>
                         </div>
                     </div>
                 </div>
@@ -151,7 +150,7 @@
 
                 })
                 .fail((response) => {
-                    toastr.error('Oops! An error has occurred. Try refreshing and then trying again.')
+                    toastr.error('抱歉！发生错误。请刷新页面后重试。')
                 })
         }
         self.reject_invite = () => {
@@ -161,7 +160,7 @@
                     window.location.href = '/'
                 })
                 .fail((response) => {
-                    toastr.error('Oops! An error has occurred. Try refreshing and then trying again.')
+                    toastr.error('抱歉！发生错误。请刷新页面后重试。')
                 })
         }
     </script>

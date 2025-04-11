@@ -1,18 +1,18 @@
 <log_window>
     <div if="{!opts.split_logs}">
-        <!-- We have to have this on a gross line so Pre formatting stays nice -->
+        <!-- 我们必须将其放在一行上，以便预格式化保持良好 -->
         <pre class="submission_output"><virtual
-            if="{ opts.lines === undefined }">Preparing submission... this may take a few moments..</virtual><virtual
+            if="{ opts.lines === undefined }">正在准备提交... 这可能需要几分钟..</virtual><virtual
             each="{ line in opts.lines }">{ line }</virtual></pre>
     </div>
     <div if="{opts.split_logs}">
-        <div>Scoring</div>
+        <div>评分</div>
         <pre class="submission_output"><virtual
-            if="{ _.get(opts.lines, 'program') === undefined }">Preparing submission... this may take a few moments..</virtual><virtual
+            if="{ _.get(opts.lines, 'program') === undefined }">正在准备提交... 这可能需要几分钟..</virtual><virtual
             each="{ line in _.get(opts.lines, 'program', []) }">{ line }</virtual></pre>
-        <div>Ingestion</div>
+        <div>摄取</div>
         <pre class="submission_output"><virtual
-            if="{ _.get(opts.lines, 'ingestion') === undefined }">Preparing submission... this may take a few moments..</virtual><virtual
+            if="{ _.get(opts.lines, 'ingestion') === undefined }">正在准备提交... 这可能需要几分钟..</virtual><virtual
             each="{ line in _.get(opts.lines, 'ingestion', []) }">{ line }</virtual></pre>
     </div>
     <div class="graph-container" show="{opts.show_graph && opts.detailed_result_url}">
@@ -21,7 +21,7 @@
     </div>
     <script>
         let self = this
-        // TODO: Decide what to do with this code relevant to chart.js settings. Not being used. Pull?
+        // TODO: 决定如何处理与 chart.js 设置相关的代码。未被使用。拉取？
         // self.graph_config = {
         //     type: 'line',
         //     data: {

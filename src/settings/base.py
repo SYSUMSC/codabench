@@ -158,7 +158,7 @@ SOCIAL_AUTH_USER_MODEL = 'profiles.User'
 # =============================================================================
 # Debugging
 # =============================================================================
-DEBUG = os.environ.get("DEBUG", False)
+DEBUG = os.environ.get("DEBUG", True)
 
 # =============================================================================
 # Database
@@ -425,32 +425,32 @@ DEFAULT_USER_QUOTA = 15 * 1024 * 1024 * 1024  # 15GB
 # =============================================================================
 # Debug
 # =============================================================================
-if DEBUG:
-    INSTALLED_APPS += ('debug_toolbar',)
-    MIDDLEWARE = ('debug_toolbar.middleware.DebugToolbarMiddleware',
-                  'querycount.middleware.QueryCountMiddleware',
-                  ) + MIDDLEWARE  # we want Debug Middleware at the top
-    # tricks to have debug toolbar when developing with docker
+# if DEBUG:
+#     INSTALLED_APPS += ('debug_toolbar',)
+#     MIDDLEWARE = ('debug_toolbar.middleware.DebugToolbarMiddleware',
+#                   'querycount.middleware.QueryCountMiddleware',
+#                   ) + MIDDLEWARE  # we want Debug Middleware at the top
+#     # tricks to have debug toolbar when developing with docker
 
-    INTERNAL_IPS = ['127.0.0.1']
+#     INTERNAL_IPS = ['127.0.0.1']
 
-    import socket
+#     import socket
 
-    try:
-        INTERNAL_IPS.append(socket.gethostbyname(socket.gethostname())[:-1])
-    except socket.gaierror:
-        pass
+#     try:
+#         INTERNAL_IPS.append(socket.gethostbyname(socket.gethostname())[:-1])
+#     except socket.gaierror:
+#         pass
 
-    QUERYCOUNT = {
-        'IGNORE_REQUEST_PATTERNS': [
-            r'^/admin/',
-            r'^/static/',
-        ]
-    }
+#     QUERYCOUNT = {
+#         'IGNORE_REQUEST_PATTERNS': [
+#             r'^/admin/',
+#             r'^/static/',
+#         ]
+#     }
 
-    DEBUG_TOOLBAR_CONFIG = {
-        "SHOW_TOOLBAR_CALLBACK": lambda request: True
-    }
+#     DEBUG_TOOLBAR_CONFIG = {
+#         "SHOW_TOOLBAR_CALLBACK": lambda request: True
+#     }
 
 # =========================================================================
 # Email
@@ -460,6 +460,7 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)
+EMAAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', False)
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', True)
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Codabench <noreply@codabench.org>')
 SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'noreply@codabench.org')

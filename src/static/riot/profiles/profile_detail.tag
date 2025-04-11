@@ -7,7 +7,7 @@
                 <div if="{selected_user.photo}"><img id="avatar" class="ui centered small rounded image" src="{selected_user.photo}"></div>
 
                 <!-- Competition Divider -->
-                <div class="ui horizontal divider">组织</div>
+                <div class="ui horizontal divider">队伍</div>
 
                 <!-- Competition Cards -->
                 <div each="{org in selected_user.organizations}" class="ui fluid card">
@@ -26,7 +26,7 @@
                     </div>
                     <div class="right aligned extra content">
                         <a class="status" href="/profiles/organization/{org.id}/">
-                            查看组织
+                            查看队伍
                             <i class="angle right icon"></i>
                         </a>
                     </div>
@@ -44,6 +44,40 @@
                     <div class="flex-container">
                         <div class="label">姓名</div>
                         <div class="value">{selected_user.first_name} {selected_user.last_name}</div>
+                    </div>
+                </div>
+
+                <!-- Real Name -->
+                <div if="{ selected_user.real_name }" class="about-block">
+                    <div class="flex-container">
+                        <div class="label">真实姓名</div>
+                        <div class="value">{selected_user.real_name}</div>
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div if="{ selected_user.phone_number }" class="about-block">
+                    <div class="flex-container">
+                        <div class="label">电话号码</div>
+                        <div class="value">{selected_user.phone_number}</div>
+                    </div>
+                </div>
+
+                <!-- Student ID -->
+                <div if="{ selected_user.student_id }" class="about-block">
+                    <div class="flex-container">
+                        <div class="label">学号</div>
+                        <div class="value">{selected_user.student_id}</div>
+                    </div>
+                </div>
+
+                <!-- Education Level -->
+
+                <!-- Graduation Year -->
+                <div if="{ selected_user.graduation_year }" class="about-block">
+                    <div class="flex-container">
+                        <div class="label">毕业年份</div>
+                        <div class="value">{selected_user.graduation_year}</div>
                     </div>
                 </div>
 
@@ -80,8 +114,7 @@
                 <!-- Location -->
                 <div if="{ selected_user.location }" class="about-block">
                     <div class="flex-container">
-                        <!-- @todo 原：Location -->
-                        <div class="label"></i>地理位置</div>
+                        <div class="label">地理位置</div>
                         <div class="value">{selected_user.location}</div>
                     </div>
                 </div>

@@ -1,11 +1,11 @@
 <organization-edit>
     <div class="ui raised segment">
-    <h1 class="ui dividing header">Organization Edit:</h1>
+    <h1 class="ui dividing header">编辑队伍：</h1>
     <form class="ui form" id="organization-form">
         <div class="field">
-            <label>Profile Photo</label>
+            <label>队伍照片</label>
             <label show="{ original_org_photo }">
-                Uploaded Photo: <a href="{ original_org_photo }" target="_blank">{ original_org_photo_name }</a>
+                已上传照片: <a href="{ original_org_photo }" target="_blank">{ original_org_photo_name }</a>
             </label>
             <div class="ui left action file input">
                 <button class="ui icon button" type="button" onclick="document.getElementById('profile_phtoto').click()">
@@ -13,52 +13,52 @@
                 </button>
                 <input id="profile_phtoto" type="file" ref="photo" accept="image/*">
 
-                <!-- Just showing the file after it is uploaded -->
+                <!-- 仅显示上传后的文件名 -->
                 <input value="{ logo_file_name }" readonly onclick="document.getElementById('profile_phtoto').click()">
             </div>
         </div>
         <div class="two fields">
             <div class="required field" id="name">
-                <label>Organization Name</label>
-                <input type="text" name="name" placeholder="Name">
+                <label>队伍名称</label>
+                <input type="text" name="name" placeholder="名称">
             </div>
             <div class="required field" id="email">
-                <label>Organization Email</label>
+                <label>队伍邮箱</label>
                 <input type="text" name="email" placeholder="email@organization.com">
             </div>
         </div>
         <div class="field" id="location">
-            <label>Location</label>
-            <input type="text" name="location" placeholder="Location">
+            <label>所在地</label>
+            <input type="text" name="location" placeholder="所在地">
         </div>
         <div class="field" id="description">
-            <label>Description</label>
+            <label>描述</label>
             <textarea name="description"></textarea>
         </div>
         <div class="two fields">
             <div class="field" id="website_url">
-                <label>Organization URL</label>
+                <label>队伍网址</label>
                 <input type="text" name="website_url" placeholder="https://organization.com">
             </div>
             <div class="field" id="linkedin_url">
-                <label>LinkedIn URL</label>
+                <label>LinkedIn 网址</label>
                 <input type="text" name="linkedin_url" placeholder="https://www.linkedin.com/company/organization">
             </div>
         </div>
         <div class="two fields">
             <div class="field" id="twitter_url">
-                <label>Twitter URL</label>
+                <label>Twitter 网址</label>
                 <input type="text" name="twitter_url" placeholder="https://twitter.com/organization">
             </div>
             <div class="field" id="github_url">
-                <label>Github URL</label>
+                <label>GitHub 网址</label>
                 <input type="text" name="github_url" placeholder="https://github.com/organization">
             </div>
         </div>
         <div class="ui error message"></div>
-        <div class="ui primary button" onclick="{save.bind(this)}" id="submit_button">Submit</div>
+        <div class="ui primary button" onclick="{save.bind(this)}" id="submit_button">提交</div>
         <a href="{self.organization.url}">
-            <button type="button" class="ui button">Back to Organization Page</button>
+            <button type="button" class="ui button">返回队伍页面</button>
         </a>
     </form>
     </div>
@@ -102,7 +102,7 @@
                         optional: false,
                         rules: [{
                             type: 'email',
-                            prompt: 'Please enter a valid {name}'
+                            prompt: '请输入有效的{name}'
                         }]
                     },
                     website_url: {
@@ -111,11 +111,11 @@
                         rules: [
                             {
                                 type: 'url',
-                                prompt: 'Please enter a valid {name}. Example: https://organization.com'
+                                prompt: '请输入有效的{name}。示例: https://organization.com'
                             },
                             {
                                 type: 'test_http',
-                                prompt: '{name} must start with "http://" or "https://"'
+                                prompt: '{name}必须以"http://"或"https://"开头'
                             }
                         ]
                     },
@@ -125,11 +125,11 @@
                         rules: [
                             {
                                 type: 'url',
-                                prompt: 'Please enter a valid {name}. Example: https://organization.com'
+                                prompt: '请输入有效的{name}。示例: https://organization.com'
                             },
                             {
                                 type: 'test_http',
-                                prompt: '{name} must start with "http://" or "https://"'
+                                prompt: '{name}必须以"http://"或"https://"开头'
                             }
                         ]
                     },
@@ -139,11 +139,11 @@
                         rules: [
                             {
                                 type: 'url',
-                                prompt: 'Please enter a valid {name}. Example: https://www.linkedin.com/company/organization'
+                                prompt: '请输入有效的{name}。示例: https://www.linkedin.com/company/organization'
                             },
                             {
                                 type: 'test_http',
-                                prompt: '{name} must start with "http://" or "https://"'
+                                prompt: '{name}必须以"http://"或"https://"开头'
                             }
                         ]
                     },
@@ -153,11 +153,11 @@
                         rules: [
                             {
                                 type: 'url',
-                                prompt: 'Please enter a valid {name}. Example: https://github.com/organization'
+                                prompt: '请输入有效的{name}。示例: https://github.com/organization'
                             },
                             {
                                 type: 'test_http',
-                                prompt: '{name} must start with "http://" or "https://"'
+                                prompt: '{name}必须以"http://"或"https://"开头'
                             }
                         ]
                     },
@@ -167,7 +167,7 @@
                     data.photo = self.org_photo
                     CODALAB.api.update_organization(data, self.organization.id)
                         .done(data => {
-                            toastr.success("Organization Saved")
+                            toastr.success("队伍信息已保存")
                             self.submit_button.prop('disabled', false)
                         })
                         .fail(data => {

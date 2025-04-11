@@ -150,6 +150,11 @@ class UserSerializer(ModelSerializer):
             'organizer_direct_message_updates',
             'allow_forum_notifications',
             'allow_organization_invite_emails',
+            'real_name',
+            'phone_number',
+            'student_id',
+            'education_level',
+            'graduation_year',
         )
 
     def get_organizations(self, instance):

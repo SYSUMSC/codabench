@@ -5,14 +5,14 @@
 {% block content %}
     {% if is_editor %}
         <div class="ui container" style="margin-bottom: 1em">
-            <a href="{{ organization.url }}edit/"><button type="button" class="ui left floated button">Edit Organization</button></a>
-            
-            <button class="ui red right floated button" onclick="{self.delete_organization({{ organization.id }})}" >
-                Delete Organization
+            <a href="{{ organization.url }}edit/"><button type="button" class="ui left floated button">编辑队伍</button></a>
+
+            <button class="ui red right floated button" onclick="self.delete_organization({{ organization.id }})" >
+                删除队伍
             </button>
-            
-            
-            
+
+
+
         </div>
     {% endif %}
     <div class="ui container">
@@ -36,23 +36,23 @@
                                 <p>{{ organization.description | linebreaks }}</p>
                             </div>
                             <div class="extra">
-                                Participating in Codabench since {{ organization.date_created }}
+                                加入 Codabench 时间: {{ organization.date_created }}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="ui container" style="margin-top: 2em">
-                <h1 class="ui dividing header">Socials</h1>
+                <h1 class="ui dividing header">社交媒体</h1>
                 {% if organization.email %}
                     <div class="header">
-                        <span class="three wide column"><i class="envelope icon"></i>Email:</span>
+                        <span class="three wide column"><i class="envelope icon"></i>邮箱:</span>
                         <a href="mailto:{{ organization.email }}">{{ organization.email }}</a>
                     </div>
                 {% endif %}
                 {% if organization.website_url %}
                     <div class="header">
-                        <span class="three wide column"><i class="world icon"></i>Website:</span>
+                        <span class="three wide column"><i class="world icon"></i>网站:</span>
                         <a href="{{ organization.website_url }}">{{ organization.website_url }}</a>
                     </div>
                 {% endif %}
@@ -76,15 +76,15 @@
                 {% endif %}
             </div>
             <div class="ui container" style="margin-top: 2em">
-                <h1 class="ui dividing header">Users</h1>
+                <h1 class="ui dividing header">用户</h1>
                 <table class="ui striped table">
                     <thead>
                     <tr>
-                        <th>Name</th>
+                        <th>姓名</th>
                         {% if is_editor or is_member %}
-                            <th>E-mail</th>
+                            <th>电子邮箱</th>
                         {% endif %}
-                        
+
                     </tr>
                     </thead>
                     <tbody>
@@ -95,7 +95,7 @@
                             {% if is_editor or is_member %}
                                 <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
                             {% endif %}
-                            
+
                         </tr>
                         {% endif %}
                     {% endfor %}
@@ -108,9 +108,9 @@
 
 {% block extra_js %}
     <script>
-    
+
         self.delete_organization = (organization_id) => {
-            if (confirm(`Are you sure you want to permanently delete this organization?`)) {
+            if (confirm(`确定要永久删除该队伍吗?`)) {
                 CODALAB.api.delete_organization(organization_id)
                     .done((resp) => {
                         if(resp.success){
@@ -121,7 +121,7 @@
                         }
                     })
                     .fail((errors) => {
-                        toastr.error('An Error has occurred')
+                        toastr.error('发生错误')
                     })
             }
         }
