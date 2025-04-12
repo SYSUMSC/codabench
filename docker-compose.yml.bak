@@ -25,7 +25,12 @@ services:
   #     custom_network:
 
   django:
-    build: .
+    build:
+      context: .
+      network: host
+      args:
+        HTTP_PROXY: ${HTTP_PROXY:-http://127.0.0.1:7890}
+        HTTPS_PROXY: ${HTTPS_PROXY:-http://127.0.0.1:7890}
     # NOTE: We use watchmedo to reload gunicorn nicely, Uvicorn + Gunicorn reloads don't work well
     command: bash -c "python manage.py collectstatic --noinput && cd /app/src &&  watchmedo auto-restart -p '*.py' --recursive -- gunicorn asgi:application -w 2 -k uvicorn.workers.UvicornWorker -b :8000 -b :80 --capture-output --log-level debug"
     environment:
@@ -98,6 +103,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.builder
+      network: host
+      args:
+        HTTP_PROXY: ${HTTP_PROXY:-http://127.0.0.1:7890}
+        HTTPS_PROXY: ${HTTPS_PROXY:-http://127.0.0.1:7890}
     volumes:
       - .:/app:delegated
     restart: unless-stopped
@@ -138,8 +147,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.rabbitmq
+      network: host
       args:
         - WORKER_CONNECTION_TIMEOUT=${WORKER_CONNECTION_TIMEOUT}
+        - HTTP_PROXY=${HTTP_PROXY:-http://127.0.0.1:7890}
+        - HTTPS_PROXY=${HTTPS_PROXY:-http://127.0.0.1:7890}
     # setting hostname here makes data persist properly between
     # containers being destroyed..!
     hostname: rabbit
@@ -165,6 +177,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.flower
+      network: host
+      args:
+        - HTTP_PROXY=${HTTP_PROXY:-http://127.0.0.1:7890}
+        - HTTPS_PROXY=${HTTPS_PROXY:-http://127.0.0.1:7890}
     env_file: .env
     environment:
       - CELERY_BROKER_URL=pyamqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@${RABBITMQ_HOST}:${RABBITMQ_PORT}//
@@ -204,6 +220,10 @@ services:
     working_dir: /app/src
     build:
       context: .
+      network: host
+      args:
+        - HTTP_PROXY=${HTTP_PROXY:-http://127.0.0.1:7890}
+        - HTTPS_PROXY=${HTTPS_PROXY:-http://127.0.0.1:7890}
     depends_on:
       - rabbit
       - db
@@ -230,6 +250,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.compute_worker_gpu
+      network: host
+      args:
+        - HTTP_PROXY=${HTTP_PROXY:-http://127.0.0.1:7890}
+        - HTTPS_PROXY=${HTTPS_PROXY:-http://127.0.0.1:7890}
     depends_on:
       - django
       - rabbit

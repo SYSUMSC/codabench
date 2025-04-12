@@ -249,7 +249,7 @@ services:
     working_dir: /app
     build:
       context: .
-      dockerfile: Dockerfile.compute_worker_gpu
+      dockerfile: Dockerfile.compute_worker
       network: host
       args:
         - HTTP_PROXY=${HTTP_PROXY:-http://127.0.0.1:7890}
