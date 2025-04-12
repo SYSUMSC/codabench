@@ -13,6 +13,7 @@
                     {pretty_description(description)}
                 </p>
                 <p class="organizer">
+                    <!-- @todo 这个翻译？？ -->
                     <em>队伍者: <strong>{created_by}</strong></em>
                 </p>
             </div>

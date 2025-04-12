@@ -2,13 +2,15 @@
 .ui.button
 	@extends .btn-scale-xs
 	@extends.round-md
+.ui input
+	@extends.round-md
 .ui.form
 	// @extends .round-md
 	>div.field
 		>div.ui.input
 			@extends.round-md
-			>input
-				@extends.round-md
+			// >input
+			// 	@extends.round-md
 		>select
 			@extends.round-md
 			padding-right: 20px
@@ -31,3 +33,40 @@
 .ui.segment
 	@extends.round-md
 
+.ui.menu.tabular
+	@extends.round-md
+	border: none !important
+	padding: 1rem 0.5rem!important
+	margin: 0.5rem !important
+	>div.item.active
+		// !通过更匹配的选择器进一步提高优先级
+		@extends.round-md
+		@extends.btn-scale-sm
+		@extends.transition-all
+		&.active
+			@extends.round-md
+			background: var(--color-primary)!important
+			color: white!important
+table.ui.table
+	@extends.round-md
+	overflow: hidden
+	>thead>tr>th
+		@extends.round-sm
+		@extends.transition-all
+		&:hover
+			// @extends.round-sm
+			transform: scale(1.02)
+			// background: var(--color-primary)!important
+			// color: white!important
+competition-tile .tile-wrapper
+	@extends.round-md
+	@extends.btn-scale-sm
+	@extends.transition-all
+	&:hover
+		@extends.round-md
+		// background: var(--color-primary)!important
+	div.comp-stats
+		@extends.round-md
+		@extends.bg-primary
+ui.image>img
+	@extends.round-md
