@@ -188,13 +188,14 @@ class OrganizationViewSet(mixins.CreateModelMixin,
 
         for member in members:
             if member.user.allow_organization_invite_emails:
+                #发送邀请用户加入队伍的邮件
                 send_mail(
                     context={
                         'user': member.user,
-                        'invite_url': f'{reverse("profiles:organization_accept_invite")}?token={member.token}',
+                        'invite_url': f'https://neuronspark.sysumsc.cn{reverse("profiles:organization_accept_invite")}?token={member.token}',
                         'organization': org.name,
                     },
-                    subject=f'You have been invited to join {org.name}',
+                    subject=f'你被邀请加入队伍： {org.name}',
                     html_file="profiles/emails/invite.html",
                     text_file="profiles/emails/invite.txt",
                     to_email=member.user.email

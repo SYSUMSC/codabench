@@ -10,9 +10,4 @@
     {{ invite_url }}
 
     如果您无法点击链接，请复制链接并在浏览器中打开。
-
-    祝好，
-    Codabench 团队
-
-    {{ new_post.content }}
 {% endblock %}
