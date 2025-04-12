@@ -4,7 +4,7 @@
         <div class="col">
             <div class="col-content">
                 今日已使用提交次数
-                <a class="float-left" data-tooltip="提交限制将在服务器时间午夜重置。" data-position="right center">
+                <a class="" data-tooltip="提交限制将在服务器时间午夜重置。" data-position="right center">
                     <i class="grey question circle icon"></i>
                 </a>
             </div>

@@ -256,10 +256,13 @@
             color #8c8c8c
         .index-column
             min-width 55px
+        //.leaderboard-table>table>thead>tr>th:hover
+        //    transform: none !important;
         .leaderboard-title
             position absolute
             left 50%
-            transform translate(-50%, 50%)
+            transform translateX(-50%)
+            >
         .ui.table > thead > tr.task-row > th
             background-color: #e8f6ff !important
         .eye-icon-link

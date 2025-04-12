@@ -1,4 +1,7 @@
 @import "src/static/stylus/components.styl"
+.ui.image>img, .ui.segment, .ui.message, .ui.submission-container, .submission-form, .ui.dropdown.selection
+	@extends.round-md
+
 .ui.button
 	@extends .btn-scale-xs
 	@extends.round-md
@@ -30,8 +33,6 @@
 			color: var(--color-primary-purple)!important
 		input:focus
 			border-color: var(--color-primary-purple)!important
-.ui.segment
-	@extends.round-md
 
 .ui.menu.tabular
 	@extends.round-md
@@ -43,6 +44,7 @@
 		@extends.round-md
 		@extends.btn-scale-sm
 		@extends.transition-all
+		// flex: 1
 		&.active
 			@extends.round-md
 			background: var(--color-primary)!important
@@ -52,15 +54,15 @@ table.ui.table
 	overflow: hidden
 	>thead>tr>th
 		@extends.round-sm
-		@extends.transition-all
-		&:hover
-			// @extends.round-sm
-			transform: scale(1.02)
-			// background: var(--color-primary)!important
-			// color: white!important
-competition-tile .tile-wrapper
+		// @extends.transition-all
+		// &:hover
+		// 	// @extends.round-sm
+		// 	transform: scale(1.02)
+		// 	// background: var(--color-primary)!important
+		// 	// color: white!important
+.tile-wrapper
 	@extends.round-md
-	@extends.btn-scale-sm
+	@extends.btn-scale-xs
 	@extends.transition-all
 	&:hover
 		@extends.round-md
@@ -68,5 +70,15 @@ competition-tile .tile-wrapper
 	div.comp-stats
 		@extends.round-md
 		@extends.bg-primary
-.ui.image>img
+.ui.tab
+	@extends.round-md
+	margin-left: 0 !important
+	margin-right: 0 !important
+.ui.comp-tabs>.ui.tab
+	min-height: 100vh
+.ui.accordion
+	.ui.title
+		@extends.round-md
+	.ui.content
+		@extends.round-md
 	@extends.round-md
