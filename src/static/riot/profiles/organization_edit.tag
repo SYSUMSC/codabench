@@ -27,7 +27,7 @@
                 <input type="text" name="email" placeholder="email@organization.com">
             </div>
         </div>
-        <div class="field" id="location">
+        <!-- <div class="field" id="location">
             <label>所在地</label>
             <input type="text" name="location" placeholder="所在地">
         </div>
@@ -54,7 +54,7 @@
                 <label>GitHub 网址</label>
                 <input type="text" name="github_url" placeholder="https://github.com/organization">
             </div>
-        </div>
+        </div> -->
         <div class="ui error message"></div>
         <div class="ui primary button" onclick="{save.bind(this)}" id="submit_button">提交</div>
         <a href="{self.organization.url}">
