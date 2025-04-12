@@ -26,34 +26,6 @@
                     <input type="text" name="email" placeholder="email@organization.com">
                 </div>
             </div>
-            <!-- <div class="field" id="location">
-                <label>所在地</label>
-                <input type="text" name="location" placeholder="所在地">
-            </div>
-            <div class="field" id="description">
-                <label>描述</label>
-                <textarea name="description"></textarea>
-            </div>
-            <div class="two fields">
-                <div class="field" id="website_url">
-                    <label>队伍网址</label>
-                    <input type="text" name="website_url" placeholder="https://organization.com">
-                </div>
-                <div class="field" id="linkedin_url">
-                    <label>LinkedIn 网址</label>
-                    <input type="text" name="linkedin_url" placeholder="https://www.linkedin.com/company/organization">
-                </div>
-            </div>
-            <div class="two fields">
-                <div class="field" id="twitter_url">
-                    <label>Twitter 网址</label>
-                    <input type="text" name="twitter_url" placeholder="https://twitter.com/organization">
-                </div>
-                <div class="field" id="github_url">
-                    <label>GitHub 网址</label>
-                    <input type="text" name="github_url" placeholder="https://github.com/organization">
-                </div>
-            </div> -->
             <div class="ui error message"></div>
             <button type="button" class="ui primary button" onclick="{save.bind(this)}" ref="submit_button">提交</button>
         </form>
