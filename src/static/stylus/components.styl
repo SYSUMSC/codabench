@@ -1,11 +1,90 @@
 :root
+    --color-primary-dark: #B26B43
     --color-primary: #E58A57;
     --color-secondary: #EEC1A4;
+    --color-primary-purple-dark: #6C75CA;
+    --color-primary-purple: #757FDE;
+    --color-secondary-purple: #BCC0E6
     --color-success: #28a745;
     --color-danger: #dc3545;
     --color-gray: #AAA;
     --color-gray-light: #DDD;
     --color-gray-dark: #555;
+
+.ml-auto
+    margin-left: auto!important
+.mr-auto
+    margin-right: auto!important
+.mx-auto
+    margin-left: auto!important
+    margin-right: auto!important
+.mt-auto
+    margin-top: auto!important
+.mb-auto
+    margin-bottom: auto!important
+.my-auto
+    margin-top: auto!important
+    margin-bottom: auto!important
+
+.bg-primary
+    background-color: var(--color-primary) !important
+.bg-primary-purple
+    background-color: var(--color-primary-purple)!important
+.bg-gray
+    background-color: var(--color-gray) !important
+.bg-gray-light
+    color: black !important
+    background-color: var(--color-gray-light) !important
+.bg-gray-dark
+    color: white!important
+    background-color: var(--color-gray-dark)!important
+.bg-success
+    background-color: var(--color-success)!important
+.bg-danger
+    background-color: var(--color-danger)!important
+
+.round-md
+    border-radius: 1rem!important
+.round-lg
+    border-radius: 2rem!important
+.round-xl
+    border-radius: 3rem!important
+.round-sm
+    border-radius: 0.5rem!important
+.round-xs
+    border-radius: 0.2rem!important
+
+.transition-all
+    transition: all 0.3s ease-in-out !important
+.transition-all-05
+    transition: all 0.5s ease-in-out!important
+.transition-all-1
+    transition: all 1s ease-in-out!important
+
+.bg-semi-transparent
+    background: rgba(255, 255, 255, 0.5)
+.bg-semi-transparent-plus
+    background: rgba(255, 255, 255, 0.8)
+    color: var(--color-primary)!important
+
+.text-primary
+    color: var(--color-primary)!important
+.text-primary-purple
+    color: var(--color-primary-purple)!important
+.text-secondary
+    color: var(--color-secondary)!important
+.text-secondary-purple
+    color: var(--color-secondary-purple)!important
+.text-success
+    color: var(--color-success)!important
+.text-danger
+    color: var(--color-danger)!important
+// .text-gray
+//     color: var(--color-gray)!important
+// .text-gray-light
+//     color: var(--color-gray-light)!important
+// .text-gray-dark
+//     color: var(--color-gray-dark)!important
 
 .btn-scale
     transition: transform 0.3s;
@@ -19,56 +98,82 @@
         transform: scale(1.1);
     &:active
         transform: scale(0.9);
+.btn-scale-xs
+    transition: transform 0.3s;
+    &:hover
+        transform: scale(1.05);
+    &:active
+        transform: scale(0.95);
+
+
+.btn-primary
+    color white !important
+    @extends .bg-primary
+    transition: all 0.3s ease-in-out !important
+    &:hover
+        background-color: var(--color-primary-dark)!important
+.btn-primary-purple
+    color white !important
+    @extends.bg-primary-purple
+    transition: all 0.3s ease-in-out !important
+    &:hover
+        background-color: var(--color-primary-purple-dark)!important
+.btn-gray
+    color black!important
+    @extends.bg-gray
+    transition: all 0.3s ease-in-out!important
+    &:hover
+        background-color: #888!important
+.btn-gray-light
+    color black!important
+    @extends.bg-gray-light
+    transition: all 0.3s ease-in-out!important
+    &:hover
+        background-color: var(--color-gray)!important
+.btn-gray-dark
+    color white!important
+    @extends.bg-gray-dark
+    transition: all 0.3s ease-in-out!important
+    &:hover
+        background-color: #666!important
 
 .btn-neon-primary
+    box-shadow: none
     &:hover
         box-shadow: 0 0 10px var(--color-primary) !important
 .btn-neon-secondary
+    box-shadow: none
     &:hover
         box-shadow: 0 0 10px var(--color-secondary)!important
+.btn-neon-primary-purple
+    box-shadow: none
+    &:hover
+        box-shadow: 0 0 10px var(--color-primary-purple)!important
+.btn-neon-secondary-purple
+    box-shadow: none
+    &:hover
+        box-shadow: 0 0 10px var(--color-secondary-purple)!important
 .btn-neon-success
+    box-shadow: none
     &:hover
         box-shadow: 0 0 10px var(--color-success)!important
 .btn-neon-danger
+    box-shadow: none
     &:hover
         box-shadow: 0 0 10px var(--color-danger)!important
 .btn-neon-gray
+    box-shadow: none
     &:hover
         box-shadow: 0 0 10px var(--color-gray)!important
 .btn-neon-gray-light
+    box-shadow: none
     &:hover
         box-shadow: 0 0 10px var(--color-gray-light)!important
 .btn-neon-gray-dark
+    box-shadow: none
     &:hover
         box-shadow: 0 0 10px var(--color-gray-dark)!important
 
-.bg-gray
-    background-color: var(--color-gray) !important
-.bg-gray-light
-    color: black !important
-    background-color: var(--color-gray-light) !important
-.bg-gray-dark
-    color: white!important
-    background-color: var(--color-gray-dark)!important
-.bg-success
-    background-color: var(--color-success)!important
-.bg-danger
-    background-color: var(--color-danger)!important
-.bg-primary
-    background-color: var(--color-primary) !important
-
-.round-md
-    border-radius: 1rem!important
-.round-lg
-    border-radius: 2rem!important
-.round-xl
-    border-radius: 3rem!important
-.round-sm
-    border-radius: 0.5rem!important
-.round-xs
-    border-radius: 0.2rem!important
-
-.bg-semi-transparent
-    background: rgba(255, 255, 255, 0.5)
-.bg-semi-transparent-plus
-    background: rgba(255, 255, 255, 0.8)
+.input.primary
+    &:focus
+        border-color: var(--color-primary-dark)!important

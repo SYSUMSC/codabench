@@ -1,0 +1,33 @@
+@import "src/static/stylus/components.styl"
+.ui.button
+	@extends .btn-scale-xs
+	@extends.round-md
+.ui.form
+	// @extends .round-md
+	>div.field
+		>div.ui.input
+			@extends.round-md
+			>input
+				@extends.round-md
+		>select
+			@extends.round-md
+			padding-right: 20px
+			// >option
+			// 	@extends.round-md
+			// 	padding: 0.5rem
+			// 	border: none
+			// 	background: rgba(255, 255, 255, 0.85)
+			// 	backdrop-filter: blur(10px)
+	&.signup
+		a
+			color: var(--color-primary)!important
+		input:focus
+			border-color: var(--color-primary)!important
+	&.login
+		a
+			color: var(--color-primary-purple)!important
+		input:focus
+			border-color: var(--color-primary-purple)!important
+.ui.segment
+	@extends.round-md
+

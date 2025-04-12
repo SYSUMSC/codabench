@@ -3,16 +3,16 @@
 
 {% block content %}
 <div class="six wide centered column">
-    {% if form.non_field_errors %}
-    <div class="ui red message">
-        {{ form.non_field_errors }}
-    </div>
-    {% endif %}
-    <h2 class="ui blue centered header">
-        注册
-    </h2>
     <div class="ui stacked segment">
-        <form class="ui form" method="post">
+        {% if form.non_field_errors %}
+        <div class="ui red message">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        <h2 class="ui centered header text-primary">
+            注册
+        </h2>
+        <form class="ui form signup" method="post">
             {% csrf_token %}
             <div class="field">
                 <div class="ui left icon input">
@@ -177,16 +177,17 @@
             {% endif %}
 
             <div>
+                <!-- style=" width:fit-content;margin-left: auto;" -->
                 <input type="checkbox" name="checkbox" id="id_checkbox" required>
                 <!-- @todo 同，存疑 -->
                 <label for="id_checkbox">我同意<a href="https://github.com/codalab/codalab-competitions/wiki/Privacy"
                         target="_blank">《隐私条款》</a>。</label>
             </div>
 
-            <button class="ui blue fluid submit button" type="submit">注册</button>
+            <button class="ui blue fluid submit button btn-primary" type="submit">注册</button>
         </form>
         <div class="ui divider"></div>
-        <p>已经有帐号了？<a href="{% url 'accounts:login' %}">登录</a>。</p>
+        <p class="center">已经有帐号了？<a href="{% url 'accounts:login' %}">登录</a>。</p>
     </div>
 
 </div>

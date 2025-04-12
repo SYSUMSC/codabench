@@ -193,9 +193,9 @@
                             </div>
                         </div>
                     {% else %}
-                        <a href="{% url 'accounts:login' %}" class="ui button item bg-gray-dark btn-neon-gray-dark">登录</a>
+                        <a href="{% url 'accounts:login' %}" class="ui button item btn-gray-dark btn-neon-gray-dark">登录</a>
                         {% if ENABLE_SIGN_UP %}
-                            <a href="{% url 'accounts:signup' %}" class="ui button item bg-primary btn-neon-primary">注册</a>
+                            <a href="{% url 'accounts:signup' %}" class="ui button item btn-primary btn-neon-primary">注册</a>
                         {% endif %}
                     {% endif %}
                 </div>
