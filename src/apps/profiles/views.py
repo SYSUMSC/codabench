@@ -29,6 +29,8 @@ from datasets.models import Data, DataGroup
 from tasks.models import Task
 from forums.models import Post
 from utils.email import codalab_send_mail
+# 自己添加的
+from profiles.helpers import send_mail
 
 
 class LoginView(auth_views.LoginView):
@@ -335,6 +337,7 @@ def log_in(request):
 
 # Password Reset views/forms below
 # auth_forms
+# 重置密码表单
 class CustomPasswordResetForm(auth_forms.PasswordResetForm):
     """
         Subclassed auth_forms.PasswordResetForm in order to add a print statement
@@ -353,6 +356,15 @@ class CustomPasswordResetForm(auth_forms.PasswordResetForm):
         """
         Send a django.core.mail.EmailMultiAlternatives to `to_email`.
         """
+        print(f"调用send_mail {subject_template_name} \n {email_template_name} \n {context} \n {from_email} \n {to_email} \n {html_email_template_name}")
+        # context['csrf_token'] = "abc"
+        # send_mail(
+        #     context=context,
+        #     subject=f'重置密码',
+        #     html_file="registration/password_reset_form.html",
+        #     text_file="registration/password_reset_form.html",
+        #     to_email=to_email
+        # )
         subject = render_to_string(subject_template_name, context)
         # Email subject *must not* contain newlines
         subject = "".join(subject.splitlines())
@@ -368,6 +380,7 @@ class CustomPasswordResetForm(auth_forms.PasswordResetForm):
 
 
 # auth_views
+# 这里好像引用了password_reset的
 # https://devdocs.io/django~2.2/topics/auth/default#django.contrib.auth.views.PasswordChangeView # Search for PasswordResetView
 class CustomPasswordResetView(auth_views.PasswordResetView):
     """
@@ -387,7 +400,8 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
     # subject_template_name = ''  # Defaults to registration/password_reset_subject.txt if not supplied.
     # token_generator = ''  # This will default to default_token_generator, it's an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
     success_url = django.urls.reverse_lazy("accounts:password_reset_done")
-    from_email = "info@codalab.org"
+    # 修改，修复
+    from_email = "hurk3@mail2.sysu.edu.cn"
 
 
 class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
