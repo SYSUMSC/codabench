@@ -457,7 +457,7 @@
             font-size 1.3em
 
         .details-menu .active.item, .details-menu .item
-            margin -2px auto !important
+            // margin -2px auto !important
             cursor pointer
 
         .home-tab
