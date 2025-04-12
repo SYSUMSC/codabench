@@ -190,4 +190,60 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取用户名输入框和表单元素
+    const usernameInput = document.getElementById('id_username');
+    const form = document.querySelector('.ui.form');
+
+    // 创建错误消息元素
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'ui red message';
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '用户名不能包含中文字符';
+
+    // 将错误消息元素插入到用户名输入框后面
+    usernameInput.parentNode.parentNode.appendChild(errorDiv);
+
+    // 添加输入事件监听器
+    usernameInput.addEventListener('input', validateUsername);
+    usernameInput.addEventListener('blur', validateUsername);
+
+    // 表单提交前验证
+    form.addEventListener('submit', function(event) {
+        if (!isValidUsername(usernameInput.value)) {
+            event.preventDefault();
+            showError();
+        }
+    });
+
+    // 验证用户名函数
+    function validateUsername() {
+        if (!isValidUsername(usernameInput.value)) {
+            showError();
+        } else {
+            hideError();
+        }
+    }
+
+    // 检查用户名是否包含中文字符
+    function isValidUsername(value) {
+        const pattern = /[\u4e00-\u9fa5]/;
+        return !pattern.test(value);
+    }
+
+    // 显示错误消息
+    function showError() {
+        errorDiv.style.display = 'block';
+        usernameInput.classList.add('error');
+    }
+
+    // 隐藏错误消息
+    function hideError() {
+        errorDiv.style.display = 'none';
+        usernameInput.classList.remove('error');
+    }
+});
+</script>
 {% endblock %}
