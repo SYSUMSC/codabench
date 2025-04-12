@@ -50,7 +50,7 @@
                                                 class="contact-email">{competition.contact_email}</span>)</span>
                                     </div>
                                 </div>
-                                
+
                                 <!-- 时间信息 -->
                                 <div class="info-card">
                                     <span class="emoji-icon">⏰</span>
@@ -102,19 +102,6 @@
                                         </div>
                                         </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="three wide column">
-                <div class="stat-buttons">
-                    <!-- todo: 关闭这些按钮的鼠标点击和悬停效果，因为它们不可点击 -->
-                    <div class="ui tiny left labeled fluid button">
-                        <a class="ui tiny basic red label">{competition.participants_count}</a>
-                        <div class="ui tiny red button">参与者</div>
-                    </div>
-                    <div class="ui tiny left labeled fluid button">
-                        <a class="ui tiny basic teal label">{competition.submissions_count}</a>
-                        <div class="ui tiny teal button">提交</div>
                     </div>
                 </div>
             </div>
