@@ -335,6 +335,7 @@ def log_in(request):
 
 # Password Reset views/forms below
 # auth_forms
+# 重置密码表单
 class CustomPasswordResetForm(auth_forms.PasswordResetForm):
     """
         Subclassed auth_forms.PasswordResetForm in order to add a print statement
@@ -387,7 +388,8 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
     # subject_template_name = ''  # Defaults to registration/password_reset_subject.txt if not supplied.
     # token_generator = ''  # This will default to default_token_generator, it's an instance of django.contrib.auth.tokens.PasswordResetTokenGenerator.
     success_url = django.urls.reverse_lazy("accounts:password_reset_done")
-    from_email = "info@codalab.org"
+    # 修改，修复
+    from_email = "hurk3@mail2.sysu.edu.cn"
 
 
 class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
