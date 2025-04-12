@@ -368,10 +368,17 @@ body
     // background: #EEC1A450
     // backdrop-filter: blur(3px)
 
-.ui.header.announce
-	@extends.bg-primary
-	padding: 0.5rem 1rem!important
-	min-width: 60%
-	>p
-		font-size: 1.8rem
-		font-weight: 700
+.ui.segment-container.announce
+	>div.header
+    @extends.bg-primary
+    padding: 0.5rem 1rem!important
+    min-width: 60%
+    >p
+      font-size: 1.8rem
+      font-weight: 700
+  >div.container-content
+    height: fit-content
+    padding: 0 3rem
+    color black !important
+    text-align: start !important
+    white-space: break-spaces !important

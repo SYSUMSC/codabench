@@ -50,7 +50,7 @@
                                                 class="contact-email">{competition.contact_email}</span>)</span>
                                     </div>
                                 </div>
-                                
+
                                 <!-- 时间信息 -->
                                 <div class="info-card">
                                     <span class="emoji-icon">⏰</span>
@@ -443,6 +443,7 @@
             cursor pointer
 
         .competition-image
+            padding: 1rem
             box-shadow 3px 3px 5px darkgrey
 
         .underline
@@ -471,8 +472,8 @@
             background linear-gradient(to right, #ff9966, #ff5e62)
             color #fff
             border 1px solid #E6E9EB
-            border-radius 5px
-            padding 10px
+            border-radius 2rem
+            padding 1rem
             display flex
             align-items center
             margin-left 1rem
