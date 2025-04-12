@@ -3,16 +3,16 @@
 
 {% block content %}
 <div class="six wide centered column">
-    {% if form.non_field_errors %}
-    <div class="ui red message">
-        {{ form.non_field_errors }}
-    </div>
-    {% endif %}
-    <h2 class="ui blue centered header">
-        注册
-    </h2>
     <div class="ui stacked segment">
-        <form class="ui form" method="post">
+        {% if form.non_field_errors %}
+        <div class="ui red message">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        <h2 class="ui centered header text-primary">
+            注册
+        </h2>
+        <form class="ui form signup" method="post">
             {% csrf_token %}
             <div class="field">
                 <div class="ui left icon input">
@@ -23,6 +23,7 @@
                            id="id_username"
                            value="{{ form.username.value|default:''}}"
                            maxlength="{{ form.username.field.max_length }}"
+                           minlength="5"
                            autofocus
                            required>
                 </div>
@@ -42,7 +43,10 @@
                            id="id_email"
                            value="{{ form.email.value|default:''}}"
                            maxlength="{{ form.email.field.max_length }}"
+                           parttern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+                           title="请输入有效的邮箱地址"
                            required>
+                        <!-- @todo 无法检验类似abc@a的错误 -->
                 </div>
             </div>
             {% if form.email.errors %}
@@ -60,6 +64,9 @@
                            id="id_phone_number"
                            value="{{ form.phone_number.value|default:''}}"
                            maxlength="{{ form.phone_number.field.max_length }}"
+                           pattern="^1\d{10}$"
+                           title="请输入有效的电话号码"
+                           inputmode="numeric"
                            required>
                 </div>
             </div>
@@ -78,6 +85,9 @@
                            id="id_student_id"
                            value="{{ form.student_id.value|default:''}}"
                            maxlength="{{ form.student_id.field.max_length }}"
+                           pattern="^[0-9]{8}$"
+                           title="请输入有效的学号"
+                           inputmode="numeric"
                            required>
                 </div>
             </div>
@@ -177,16 +187,17 @@
             {% endif %}
 
             <div>
+                <!-- style=" width:fit-content;margin-left: auto;" -->
                 <input type="checkbox" name="checkbox" id="id_checkbox" required>
                 <!-- @todo 同，存疑 -->
                 <label for="id_checkbox">我同意<a href="https://github.com/codalab/codalab-competitions/wiki/Privacy"
                         target="_blank">《隐私条款》</a>。</label>
             </div>
 
-            <button class="ui blue fluid submit button" type="submit">注册</button>
+            <button class="ui blue fluid submit button btn-primary" type="submit">注册</button>
         </form>
         <div class="ui divider"></div>
-        <p>已经有帐号了？<a href="{% url 'accounts:login' %}">登录</a>。</p>
+        <p class="center">已经有帐号了？<a href="{% url 'accounts:login' %}">登录</a>。</p>
     </div>
 
 </div>

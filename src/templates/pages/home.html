@@ -7,8 +7,9 @@
 
 {% block top_div_extra_content %}
 
-    <div id="logo_div" class="ui text container">
+    <div id="logo_div" class="ui text">
         <img id="jumbo_logo" src="{% static 'img/MSC-dark.png' %}">
+        <div class="logo-title">NeuronSpark 2025</div>
     </div>
 
 {% endblock %}
@@ -17,13 +18,14 @@
 
     <!-- 公告  -->
     {% if announcement %}
-    <div style="margin:auto;" class="segment-container ui segment full-width">
-        <div class="ui header">
-            <p>公告</p>
+    <div style="margin: 0 auto; overflow: hidden;min-width: 60%;height: fit-content;"
+        class="segment-container ui segment full-width">
+        <div class="ui header announce">
+            <p>📣公告📣</p>
         </div>
         <div class="container-content">
             <div class="center aligned column">
-                {{ announcement | safe }}
+                {{ announcement | safe }}abcdefg
             </div>
         </div>
     </div>

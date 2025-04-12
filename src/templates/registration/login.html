@@ -3,18 +3,18 @@
 
 {% block content %}
 <div class="sixteen wide mobile six wide computer centered column">
-    {% if ENABLE_SIGN_IN %}
-    <h2 class="ui blue centered header">
-        登录
-    </h2>
-    <!-- @todo 翻译这里的错误信息 -->
-    {% if activation_error %}
-    <div class="ui red message">
-        {{ activation_error }}或点击<a href="{% url 'accounts:resend_activation' %}">这里</a>重新发送激活邮件
-    </div>
-    {% endif %}
-    <div class="ui stacked segment">
-        <form class="ui form" method="POST">
+    <div class="ui segment">
+        {% if ENABLE_SIGN_IN %}
+        <h2 class="ui centered header text-primary-purple">
+            登录
+        </h2>
+        <!-- @todo 翻译这里的错误信息 -->
+        {% if activation_error %}
+        <div class="ui red message">
+            {{ activation_error }}或点击<a href="{% url 'accounts:resend_activation' %}">这里</a>重新发送激活邮件
+        </div>
+        {% endif %}
+        <form class="ui form login" method="POST">
             {% csrf_token %}
             {% if form.non_field_errors %}
             <div class="ui red message">
@@ -57,13 +57,14 @@
                            required>
                 </div>
             </div>
-            <button class="ui fluid blue submit button" type="submit">登录</button>
+            <p class="ml-auto" style="width: fit-content; margin: 0 0 0.3rem 0;"><a
+                    href="{% url 'accounts:password_reset' %}">忘记密码？</a>
+            </p>
+            <button class="ui fluid submit button btn-primary-purple" type="submit">登录</button>
             <div class="ui divider"></div>
             {% if ENABLE_SIGN_UP %}
-                <p>还没有账号？<a href="{% url 'accounts:signup' %}">注册</a>。</p>
+                <p class="center">还没有账号？<a href="{% url 'accounts:signup' %}">注册</a>。</p>
             {% endif %}
-            <p><a href="{% url 'accounts:password_reset' %}">忘记密码？</a></p>
-
             <div class="ui error message"></div>
         </form>
     </div>

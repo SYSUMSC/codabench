@@ -128,21 +128,23 @@
     <div id="header" class="ui inverted vertical center aligned segment masthead
         {% block top_div_extra_class %}{% endblock %}">
         <div id="bg"></div>
-        <div class="ui container">
+        <div class="header-placeholder"></div>
+        <div class="header-content">
             <div id="topleft_menu" class="ui secondary inverted menu">
                 <span class="left item">
                     <a href="/" id="home-logo">
                         <img class="ui mini image" src="/static/img/MSC-dark.png">
                     </a>
                     <div class="ui search" id="site-wide-competition-search">
-                        <div class="ui left icon input search-width">
+                        <div class="ui left icon competition-search-parent">
                             <input id="competition-search" class="prompt" type="text" placeholder="搜索赛题">
                             <i class="search icon"></i>
                         </div>
-                        <div class="results search-width scrollable-height-limit"></div>
+                        <div class="results search-width scrollable-height-limit round-lg bg-semi-transparent" style="padding: 0 !important;">
+                        </div>
                     </div>
                 </span>
-                <div class="right menu item">
+                <div class="right menu item header-menu">
                     <div id="competition_dropdown" class="ui dropdown item">
                         <div class="text">
                             <i class="ui small trophy icon"></i>
@@ -150,7 +152,7 @@
                         </div>
                         <i class="dropdown icon"></i>
                         <div class="menu">
-                            <div class="header"></div>
+                            <!-- <div class="header"></div> -->
                             <a class="item" href="{% url "competitions:management" %}">赛题管理</a>
                             <a class="item" href="{% url "competitions:public" %}">公共赛题列表</a>
                         </div>
@@ -178,7 +180,7 @@
                     </a>
 
                     {% if user.is_authenticated %}
-                        <div id="user_dropdown" class="ui dropdown item">
+                        <div id="user_dropdown" class="ui dropdown item bg-primary btn-neon-primary">
                             <div class="text">
                                 <i class="icon user outline"></i>
                                 {{ request.user.username }}
@@ -243,9 +245,9 @@
                             </div>
                         </div>
                     {% else %}
-                        <a href="{% url 'accounts:login' %}" class="ui button style_button item">登录</a>
+                        <a href="{% url 'accounts:login' %}" class="ui button item btn-gray-dark btn-neon-gray-dark">登录</a>
                         {% if ENABLE_SIGN_UP %}
-                            <a href="{% url 'accounts:signup' %}" class="ui button style_button item">注册</a>
+                            <a href="{% url 'accounts:signup' %}" class="ui button item btn-primary btn-neon-primary">注册</a>
                         {% endif %}
                     {% endif %}
                 </div>

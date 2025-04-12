@@ -1,0 +1,38 @@
+@import "src/static/stylus/components.styl"
+#home-logo
+  padding .5rem
+  position: relative
+  // overflow: hidden
+  transition: transform 0.3s ease
+  @extends .btn-scale
+
+  &::after
+    content ''
+    position absolute
+    top 5%
+    left 5%
+    width 90%
+    height 90%
+    border 2px solid #ddd
+    border-radius 50%
+    box-shadow 0 0 3px #ddd
+    clip-path inset(100% 0 0 0)
+    pointer-events none
+  &:hover
+    &::after
+      animation circle-reveal 1s cubic-bezier(0.4, 0, 0.2, 1) both
+  &:not(:hover)::after
+    animation circle-hide 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards
+
+@keyframes circle-reveal
+  0%
+    clip-path: inset(100% 0 0 0)
+  100%
+    clip-path: inset(0 0 0 0)
+
+@keyframes circle-hide
+  0%
+    clip-path: inset(0 0 0 0)
+  100%
+    clip-path: inset(100% 0 0 0)
+

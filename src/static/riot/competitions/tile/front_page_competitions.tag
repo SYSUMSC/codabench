@@ -15,7 +15,7 @@
                 </div>
             </div>
             <competition-tile each="{popular_competitions}"></competition-tile>
-            <a class="show-more" href="/competitions/public/">显示更多</a>
+            <a class="show-more btn-scale-sm round-md" href="/competitions/public/">显示更多</a>
         </div>
 
         <!--<div class="eight wide column">
@@ -74,13 +74,17 @@
             font-size: 1.1em;
             text-decoration: none;
             transition: background-color 0.3s, transform 0.3s;
+
         }
 
-        .show-more:hover {
-            background-color: #467799;
-            transform: scale(1.05);
-            text-decoration: none;
-        }
+        // .show-more:hover {
+        //     background-color: #467799;
+        //     transform: scale(1.1);
+        // }
+        // .show-more:hover {
+        //     background-color: #467799;
+        //     transform: scale(0.9);
+        // }
 
         .sub-header-link {
             line-height: 0.25em;
