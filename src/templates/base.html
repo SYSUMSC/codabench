@@ -26,10 +26,58 @@
     <!-- Latex -->
     <link rel="stylesheet" href="https://cdn.mengze.vip/npm/katex@0.13.11/dist/katex.min.css">
 
+    <!-- 移动设备检测 -->
+    <style>
+        #mobile-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 9999;
+            text-align: center;
+            padding-top: 30vh;
+            font-size: 24px;
+            line-height: 1.5;
+        }
+    </style>
+    <script>
+        function isMobileDevice() {
+            return (window.innerWidth <= 768) ||
+                   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        window.addEventListener('load', function() {
+            if (isMobileDevice()) {
+                document.getElementById('mobile-warning').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (isMobileDevice()) {
+                document.getElementById('mobile-warning').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.getElementById('mobile-warning').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+
     {% block extra_head %}
     {% endblock %}
 </head>
 <body>
+
+<!-- 移动设备警告 -->
+<div id="mobile-warning">
+    <h1>请使用电脑访问</h1>
+    <p>本网站不适合在移动设备上使用</p>
+    <p>请使用电脑端访问以获得最佳体验</p>
+</div>
 
 {% if messages %}
     {% for message in messages %}
@@ -113,10 +161,14 @@
                         <i selenium="tasks" class="ui small file icon"></i>
                         资源
                     </a>
+                    {% if user.is_authenticated %}
+                    {% if request.user.is_staff %}
                     <a class="item" href="{% url "queues:management" %}">
                         <i class="ui small computer icon"></i>
                         队列管理
                     </a>
+                    {% endif %}
+                    {% endif %}
                     <a class="item" href="{% url 'leaderboards:overall_leaderboard' %}">
                         <i class="ui small chart bar icon"></i>
                         总排行榜

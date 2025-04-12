@@ -1,6 +1,8 @@
 <front-page-competitions>
-    <div class="ui two column grid">
-        <div class="eight wide column">
+<!-- two column-->
+    <div class="ui grid">
+<!-- eight-->
+        <div class="wide column">
             <div class="ui large header">
                 热门赛题
             </div>
@@ -16,7 +18,7 @@
             <a class="show-more btn-scale-sm round-md" href="/competitions/public/">显示更多</a>
         </div>
 
-        <div class="eight wide column">
+        <!--<div class="eight wide column">
             <div class="ui large header">
                 精选赛题
             </div>
@@ -29,8 +31,8 @@
                 </div>
             </div>
             <competition-tile each="{featured_competitions}"></competition-tile>
-            <a class="show-more btn-scale-sm round-md" href="/competitions/public/">显示更多</a>
-        </div>
+            <a class="show-more" href="/competitions/public/">显示更多</a>
+        </div>-->
     </div>
 
 

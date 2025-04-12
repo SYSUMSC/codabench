@@ -48,6 +48,12 @@ class SignUpForm(UserCreationForm):
             raise forms.ValidationError(
                 "Username must have at least 5 characters and at most 15 characters"
             )
+        # 检查是否包含中文字符
+        import re
+        if re.search(r'[\u4e00-\u9fa5]', data):
+            raise forms.ValidationError(
+                "用户名不能包含中文字符"
+            )
         return data
 
     class Meta:
