@@ -33,9 +33,9 @@
         </tr>
         <tr>
             <th class="center aligned">#</th>
-            <th>参赛者</th>
-            <th>提交次数</th>
-            <th>日期</th>
+            <th>Participant</th>
+            <th>Entries</th>
+            <th>Date</th>
             <th>ID</th>
             <th each="{ column in filtered_columns }" colspan="1">{column.title}</th>
 
@@ -256,13 +256,10 @@
             color #8c8c8c
         .index-column
             min-width 55px
-        //.leaderboard-table>table>thead>tr>th:hover
-        //    transform: none !important;
         .leaderboard-title
             position absolute
             left 50%
-            transform translateX(-50%)
-            >
+            transform translate(-50%, 50%)
         .ui.table > thead > tr.task-row > th
             background-color: #e8f6ff !important
         .eye-icon-link
