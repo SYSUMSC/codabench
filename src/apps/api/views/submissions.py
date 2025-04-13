@@ -166,8 +166,9 @@ class SubmissionViewSet(ModelViewSet):
                 membership = organization.membership_set.get(user=request.user)
             except Membership.DoesNotExist:
                 raise ValidationError('You must be apart of a organization to submit for them')
-            if membership.group not in Membership.PARTICIPANT_GROUP:
-                raise ValidationError('You do not have participant permissions for this group')
+            # 判断用户可否提交，暂时移除
+            # if membership.group not in Membership.PARTICIPANT_GROUP:
+            #     raise ValidationError('You do not have participant permissions for this group')
         return super(SubmissionViewSet, self).create(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
