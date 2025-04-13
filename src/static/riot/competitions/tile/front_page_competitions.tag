@@ -59,6 +59,7 @@
 
     <style>
         front-page-competitions {
+            width: 60%;
             margin: 3em 1.5em;
         }
 
