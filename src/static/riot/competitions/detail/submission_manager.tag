@@ -57,7 +57,7 @@
                 </th>
                 <th class="sorted descending collapsing">ID #</th>
                 <th>文件名</th>
-                <th if="{ opts.admin }">所有者</th>
+                <th>提交人</th>
                 <th if="{ opts.admin }">阶段</th>
                 <th>日期</th>
                 <th>状态</th>
@@ -87,7 +87,7 @@
                 </td>
                 <td>{ submission.id }</td>
                 <td>{ submission.filename }</td>
-                <td if="{ opts.admin }">{ submission.owner }</td>
+                <td>{ submission.owner }</td>
                 <td if="{ opts.admin }">{ submission.phase.name }</td>
                 <td>{ pretty_date(submission.created_when) }</td>
                 <td class="right aligned collapsing">
@@ -256,7 +256,13 @@
                             return item
                         })
                     } else {
-                        self.submissions = _.filter(submissions, sub => sub.owner === CODALAB.state.user.username)
+                        // No filtering needed - the backend now returns all submissions from the user's organization
+                        self.submissions = submissions.map((item) => {
+                            item.phase = opts.competition.phases.filter((phase) => {
+                                return phase.id === item.phase
+                            })[0]
+                            return item
+                        })
                     }
                     if (!opts.admin) {
                         CODALAB.events.trigger('submissions_loaded', self.submissions)

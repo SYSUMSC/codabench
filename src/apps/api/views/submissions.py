@@ -111,7 +111,7 @@ class SubmissionViewSet(ModelViewSet):
             return SubmissionCreationSerializer
         else:
             return SubmissionSerializer
-
+    #用户获取赛题提交
     def get_queryset(self):
         # On GETs lets optimize the query to reduce DB calls
         qs = super().get_queryset()
@@ -120,11 +120,16 @@ class SubmissionViewSet(ModelViewSet):
                 return Submission.objects.none()
 
             if not self.request.user.is_superuser and not self.request.user.is_staff and not self.request.user.is_bot:
+                # Get user's organizations
+                user_orgs = self.request.user.organizations.all()
+
                 # if you're the creator of the submission or a collaborator on the competition
+                # or the submission is from your organization
                 qs = qs.filter(
                     Q(owner=self.request.user) |
                     Q(phase__competition__created_by=self.request.user) |
-                    Q(phase__competition__collaborators__in=[self.request.user.pk])
+                    Q(phase__competition__collaborators__in=[self.request.user.pk]) |
+                    Q(organization__in=user_orgs)
                 ).distinct()
             qs = qs.select_related(
                 'phase',
@@ -133,6 +138,7 @@ class SubmissionViewSet(ModelViewSet):
                 'participant__user',
                 'owner',
                 'data',
+                'organization',
             ).prefetch_related(
                 'children',
                 'scores',
@@ -206,7 +212,7 @@ class SubmissionViewSet(ModelViewSet):
     def has_admin_permission(self, user, submission):
         competition = submission.phase.competition
         return user.is_authenticated and (user.is_superuser or user in competition.all_organizers or user.is_bot)
-
+    #提交排行榜操作
     @action(detail=True, methods=('POST', 'DELETE'))
     def submission_leaderboard_connection(self, request, pk):
 
@@ -216,11 +222,21 @@ class SubmissionViewSet(ModelViewSet):
         # get submission phase
         phase = submission.phase
 
-        # only super user, owner of submission and competition organizer can proceed
+        # only super user, owner of submission, competition organizer, or organization member can proceed
+        is_org_member = False
+        if submission.organization and request.user.is_authenticated:
+            try:
+                # Check if user is a member of the submission's organization
+                membership = submission.organization.membership_set.get(user=request.user)
+                is_org_member = membership.group in Membership.ALL_GROUP
+            except Membership.DoesNotExist:
+                is_org_member = False
+
         if not (
             request.user.is_superuser or
             request.user == submission.owner or
-            request.user in phase.competition.all_organizers
+            request.user in phase.competition.all_organizers or
+            is_org_member
         ):
             raise PermissionDenied("You cannot perform this action, contact the competition organizer!")
 
@@ -231,7 +247,17 @@ class SubmissionViewSet(ModelViewSet):
         if request.method == 'POST':
             # Removing any existing submissions on leaderboard unless multiples are allowed
             if submission.phase.leaderboard.submission_rule != Leaderboard.ADD_DELETE_MULTIPLE:
+                # Remove existing submissions from the same owner
                 Submission.objects.filter(phase=phase, owner=submission.owner).update(leaderboard=None)
+
+                # If submission has an organization, remove any existing submissions from the same organization
+                if submission.organization:
+                    Submission.objects.filter(
+                        phase=phase,
+                        organization=submission.organization,
+                        leaderboard__isnull=False
+                    ).update(leaderboard=None)
+
             leaderboard = phase.leaderboard
             if submission.has_children:
                 Submission.objects.filter(parent=submission).update(leaderboard=leaderboard)
@@ -240,8 +266,12 @@ class SubmissionViewSet(ModelViewSet):
                 submission.save()
 
         if request.method == 'DELETE':
+            # Check if the leaderboard rule allows deletion
             if submission.phase.leaderboard.submission_rule not in [Leaderboard.ADD_DELETE, Leaderboard.ADD_DELETE_MULTIPLE]:
-                raise PermissionDenied("You are not allowed to remove a submission on this phase")
+                # If user is the owner or an organization member, allow them to remove from leaderboard
+                # regardless of the leaderboard rule
+                if not (request.user == submission.owner or is_org_member):
+                    raise PermissionDenied("You are not allowed to remove a submission on this phase")
             submission.leaderboard = None
             submission.save()
             Submission.objects.filter(parent=submission).update(leaderboard=None)
