@@ -36,7 +36,6 @@
               <table class="ui celled table">
                 <thead>
                   <tr>
-                    <th>比赛</th>
                     <th>题目</th>
                     <th>得分</th>
                   </tr>
@@ -45,7 +44,6 @@
                   {% for score in entry.detailed_scores %}
                   <tr>
                     <td>{{ score.competition_title }}</td>
-                    <td>{{ score.leaderboard_title }}</td>
                     <td>{{ score.score|floatformat:2 }}</td>
                   </tr>
                   {% empty %}
