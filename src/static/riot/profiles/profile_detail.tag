@@ -56,12 +56,6 @@
                 </div>
 
                 <!-- Phone Number -->
-                <div if="{ selected_user.phone_number }" class="about-block">
-                    <div class="flex-container">
-                        <div class="label">电话号码</div>
-                        <div class="value">{selected_user.phone_number}</div>
-                    </div>
-                </div>
 
                 <!-- Student ID -->
                 <div if="{ selected_user.student_id }" class="about-block">
