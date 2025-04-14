@@ -170,11 +170,13 @@ class OrganizationViewSet(mixins.CreateModelMixin,
         org = self.get_object()
         user_ids = request.data.get('users', [])
 
-        # 筛选出尚未加入任何队伍的用户
-        users = User.objects.filter(id__in=user_ids).exclude(membership__isnull=False)
+        # 筛选出尚未加入任何队伍的用户（排除只有INVITED状态的用户）
+        users = User.objects.filter(id__in=user_ids).exclude(
+            membership__group__in=Membership.ALL_GROUP
+        )
 
         if not users:
-            return Response({"message": "邀请的某些用户已经在其他队伍了"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "邀请的某些用户已经在其他队伍了或已经接受了其他队伍的邀请"}, status=status.HTTP_400_BAD_REQUEST)
 
         # 检查是否超过队伍人数限制（最多3人）
         current_member_count = org.membership_set.filter(group__in=Membership.ALL_GROUP).count()
