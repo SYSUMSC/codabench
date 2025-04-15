@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load i18n %}
+
+{% block extra_head %}
+<style>
+    html {
+        scroll-behavior: smooth; /* 启用平滑滚动 */
+        scroll-padding-top: 80px; /* 为固定头部预留空间 */
+    }
+    .announcement-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .announcement-header {
+        background-color: #f8f9fa;
+        border-radius: 8px 8px 0 0;
+        padding: 20px 25px;
+        margin-bottom: 0 !important;
+        border-bottom: 2px solid #e9ecef;
+        color: #2185d0;
+    }
+    .announcement-section {
+        margin-bottom: 30px !important;
+        border: none !important;
+        box-shadow: 0 1px 10px rgba(0,0,0,0.05) !important;
+        border-radius: 8px !important;
+        overflow: hidden;
+    }
+    .announcement-item {
+        margin: 15px 0 !important;
+        border-left: 4px solid #2185d0 !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+        transition: all 0.2s ease;
+        position: relative; /* 为锚点定位做准备 */
+    }
+    .announcement-item:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+        transform: translateY(-2px);
+    }
+    .announcement-item:target {
+        box-shadow: 0 0 15px rgba(33, 133, 208, 0.4) !important;
+        border-left-width: 6px !important;
+    }
+    .news-item {
+        border-left: 4px solid #21ba45 !important;
+    }
+    .news-item:target {
+        box-shadow: 0 0 15px rgba(33, 186, 69, 0.4) !important;
+        border-left-width: 6px !important;
+    }
+    .news-title {
+        color: #21ba45;
+        margin-bottom: 5px !important;
+    }
+    .announcement-title {
+        display: block;
+        margin-bottom: 10px;
+    }
+    .announcement-title h4 {
+        color: #2185d0;
+        margin-bottom: 5px !important;
+    }
+    .news-date {
+        color: #767676;
+        font-size: 0.9em;
+        margin-bottom: 15px;
+        display: block;
+    }
+    .markdown-content {
+        line-height: 1.6;
+    }
+    .markdown-content p {
+        margin-bottom: 1em;
+    }
+    .markdown-content ul, .markdown-content ol {
+        padding-left: 2em;
+        margin-bottom: 1em;
+    }
+    .markdown-content h1, .markdown-content h2, .markdown-content h3,
+    .markdown-content h4, .markdown-content h5, .markdown-content h6 {
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+    }
+    .page-title {
+        text-align: center;
+        margin: 20px 0 30px;
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+    .section-title {
+        font-size: 1.5em;
+        font-weight: 500;
+        margin-bottom: 0.5em;
+        color: #1a1a1a;
+    }
+    .section-icon {
+        margin-right: 8px;
+    }
+    .anchor-link {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        color: #2185d0;
+    }
+    .news-item .anchor-link {
+        color: #21ba45;
+    }
+    .announcement-item:hover .anchor-link {
+        opacity: 0.7;
+    }
+    .anchor-link:hover {
+        opacity: 1 !important;
+    }
+    .highlight-target {
+        animation: highlight-pulse 2s ease-in-out;
+    }
+    @keyframes highlight-pulse {
+        0% { box-shadow: 0 0 15px rgba(33, 133, 208, 0.4); }
+        50% { box-shadow: 0 0 25px rgba(33, 133, 208, 0.7); }
+        100% { box-shadow: 0 0 15px rgba(33, 133, 208, 0.4); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ui container announcement-container">
+    <h1 class="page-title">公告列表</h1>
+
+    <!-- 所有公告 -->
+    {% if announcements %}
+        <div class="ui segment announcement-section">
+            <h3 class="ui header announcement-header">
+                <i class="bullhorn icon section-icon"></i>
+                <div class="content section-title">系统公告</div>
+            </h3>
+            <div class="ui padded segment">
+                {% for announcement in announcements %}
+                    <div id="announcement-{{ announcement.id }}" class="ui padded segment announcement-item">
+                        <div class="content">
+                            <a href="#announcement-{{ announcement.id }}" class="announcement-title">
+                                <h4 class="ui header">公告 #{{ announcement.id }}</h4>
+                            </a>
+                            <div class="markdown-content" data-markdown="{{ announcement.text }}"></div>
+                        </div>
+                        <a href="#announcement-{{ announcement.id }}" class="anchor-link" title="复制公告链接">
+                            <i class="linkify icon"></i>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="ui info message">
+            <div class="header">暂无公告</div>
+            <p>目前没有系统公告。</p>
+        </div>
+    {% endif %}
+
+    <!-- 新闻列表 -->
+    {% if news_posts %}
+        <div class="ui segment announcement-section">
+            <h3 class="ui header announcement-header">
+                <i class="newspaper icon section-icon"></i>
+                <div class="content section-title">新闻动态</div>
+            </h3>
+            <div class="ui padded segment">
+                {% for post in news_posts %}
+                    <div id="news-{{ post.id }}" class="ui padded segment announcement-item news-item">
+                        <div class="content">
+                            <div class="header">
+                                {% if post.link %}
+                                    <a href="{{ post.link }}" target="_blank">
+                                        <h4 class="news-title">{{ post.title }}</h4>
+                                    </a>
+                                {% else %}
+                                    <a href="#news-{{ post.id }}">
+                                        <h4 class="news-title">{{ post.title }}</h4>
+                                    </a>
+                                {% endif %}
+                                <span class="news-date">{{ post.created_when|date:"Y年m月d日" }}</span>
+                            </div>
+                            <div class="description">
+                                <div class="markdown-content" data-markdown="{{ post.text }}"></div>
+                            </div>
+                        </div>
+                        <a href="#news-{{ post.id }}" class="anchor-link" title="复制新闻链接">
+                            <i class="linkify icon"></i>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="ui info message">
+            <div class="header">暂无新闻</div>
+            <p>目前没有新闻动态。</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // 渲染所有Markdown内容
+        $('.markdown-content').each(function() {
+            const markdownText = $(this).attr('data-markdown');
+            if (markdownText) {
+                // 使用系统自带的renderMarkdownWithLatex函数，支持Markdown和LaTeX
+                const renderedContent = renderMarkdownWithLatex(markdownText);
+                $(this).empty();
+                renderedContent.forEach(node => {
+                    $(this).append(node.cloneNode(true));
+                });
+            }
+        });
+
+        // 处理锁定链接的点击事件
+        $('.anchor-link').on('click', function(e) {
+            e.preventDefault();
+
+            // 获取完整URL包含锁定
+            const url = window.location.origin + window.location.pathname + $(this).attr('href');
+
+            // 复制到剪贴板
+            navigator.clipboard.writeText(url).then(function() {
+                // 显示成功消息
+                toastr.success('链接已复制到剪贴板');
+            }).catch(function() {
+                // 如果复制失败，则正常导航到锁定
+                window.location.hash = $(this).attr('href');
+            });
+        });
+
+        // 如果页面加载时有锁定，滚动到锁定元素
+        if (window.location.hash) {
+            // 给予一点时间让页面完全加载
+            setTimeout(function() {
+                const targetElement = $(window.location.hash);
+                if (targetElement.length) {
+                    // 滚动到目标元素
+                    $('html, body').animate({
+                        scrollTop: targetElement.offset().top - 80 // 考虑顶部导航栏的高度
+                    }, 500);
+
+                    // 高亮目标元素
+                    targetElement.addClass('highlight-target');
+                    setTimeout(function() {
+                        targetElement.removeClass('highlight-target');
+                    }, 2000);
+                }
+            }, 300);
+        }
+    });
+</script>
+{% endblock %}

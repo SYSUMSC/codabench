@@ -123,6 +123,25 @@ class MonitorQueuesView(TemplateView):
     template_name = 'pages/monitor_queues.html'
 
 
+class AnnouncementsView(TemplateView):
+    template_name = 'pages/announcements.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        # Get all announcements
+        announcements = Announcement.objects.all().order_by('-id')
+
+        # Get all news posts
+        news_posts = NewsPost.objects.all().order_by('-created_when')
+
+        # Add to context
+        context['announcements'] = announcements
+        context['news_posts'] = news_posts
+
+        return context
+
+
 def page_not_found_view(request, exception):
     print(request)
     return render(request, '404.html', status=404)

@@ -12,5 +12,6 @@ urlpatterns = [
     path('organize', views.OrganizeView.as_view(), name="organize"),
     path('server_status', views.ServerStatusView.as_view(), name="server_status"),
     path('monitor_queues', views.MonitorQueuesView.as_view(), name="monitor_queues"),
+    path('announcements', views.AnnouncementsView.as_view(), name="announcements"),
     # path('test', views.CompetitionListTestView.as_view()),
 ]

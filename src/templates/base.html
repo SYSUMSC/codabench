@@ -113,8 +113,9 @@
 <div class="ui thin sidebar left inverted vertical overlay menu">
     <div class="ui container">
         <a href="{% url "pages:home" %}" class="item">赛题</a>
-        <a class="item">Chahub</a>
-        <a href="https://chagrade.lri.fr/" class="item">Chagrade</a>
+        <a href="{% url "pages:announcements" %}" class="item">公告</a>
+        <a href="{% url "leaderboards:overall_leaderboard" %}" class="item">总排行榜</a>
+        <a href="{% url "acknowledgement:index" %}" class="item">致谢</a>
     </div>
 </div>
 
@@ -172,6 +173,11 @@
                     <a class="item" href="{% url 'leaderboards:overall_leaderboard' %}">
                         <i class="ui small chart bar icon"></i>
                         总排行榜
+                    </a>
+
+                    <a class="item" href="{% url 'pages:announcements' %}">
+                        <i class="ui small bullhorn icon"></i>
+                        公告
                     </a>
 
                     <a class="item" href="{% url 'acknowledgement:index' %}">
@@ -420,6 +426,7 @@
             TASK_DETAIL: function (pk) {
                 return "{% url "tasks:detail" pk=0 %}".replace(0, pk)
             },
+            ANNOUNCEMENTS: "{% url "pages:announcements" %}",
             LOGIN: "{% url 'accounts:login' %}",
             SIGNUP: "{% url 'accounts:signup' %}",
         }
