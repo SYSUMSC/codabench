@@ -55,10 +55,11 @@
             all unset
             text-decoration none
             cursor pointer
+            margin-right auto
 
         .tile-wrapper
             border solid 1px gainsboro
-            display inline-grid
+            display flex
             grid-template-columns 0.1fr 3fr 1.3fr
             min-width 425px
             background-color #fff
@@ -104,6 +105,8 @@
             padding 10px
             text-align center
             font-size 12px
+            flex-shrink 0
+            /* align-self flex-end */
 
         .organizer
             font-size 13px
