@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="ui container">
+    <div class="ui segment">
+        <h2 class="ui header">GPU CDK 领取</h2>
+        <div class="ui divider"></div>
+
+        <div class="ui basic segment">
+            <p>每个加入组织的用户可以领取一个 GPU CDK，用于访问 GPU 资源。</p>
+            <p>每个用户只能领取一次，领取后将会在此页面显示。</p>
+        </div>
+
+        {% if user_cdk %}
+            <div class="ui success message">
+                <div class="header">您已成功领取 CDK</div>
+                <p>您的 CDK 代码是: <strong>{{ user_cdk.code }}</strong></p>
+                <p>领取时间: {{ user_cdk.claimed_at }}</p>
+            </div>
+        {% elif is_in_org %}
+            <div class="ui warning message">
+                <div class="header">领取须知</div>
+                <p>领取后无法更换，请确认后再领取。</p>
+            </div>
+            <button id="claim-cdk-btn" class="ui primary button">领取 CDK</button>
+            <div id="claim-result" class="ui message" style="display: none;"></div>
+        {% else %}
+            <div class="ui negative message">
+                <div class="header">无法领取</div>
+                <p>您需要先加入一个组织才能领取 CDK。</p>
+                <a href="{% url 'profiles:organization_create' %}" class="ui button">创建组织</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if is_in_org and not user_cdk %}
+<script>
+    $(document).ready(function() {
+        $('#claim-cdk-btn').on('click', function() {
+            $(this).addClass('loading disabled');
+            
+            $.ajax({
+                url: '{% url "cdks:api_claim" %}',
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    $('#claim-result')
+                        .removeClass('negative')
+                        .addClass('positive')
+                        .html('<div class="header">领取成功</div><p>您的 CDK 代码是: <strong>' + response.cdk + '</strong></p>')
+                        .show();
+                    $('#claim-cdk-btn').hide();
+                },
+                error: function(xhr) {
+                    let errorMsg = '领取失败，请稍后再试';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    
+                    $('#claim-result')
+                        .removeClass('positive')
+                        .addClass('negative')
+                        .html('<div class="header">领取失败</div><p>' + errorMsg + '</p>')
+                        .show();
+                    
+                    $('#claim-cdk-btn').removeClass('loading disabled');
+                }
+            });
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}
