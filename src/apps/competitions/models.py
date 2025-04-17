@@ -510,7 +510,9 @@ class Submission(ChaHubSaveMixin, models.Model):
 
     description = models.CharField(max_length=240, default="", blank=True, null=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='submission', on_delete=models.DO_NOTHING)
-    organization = models.ForeignKey(Organization, related_name='submissions', on_delete=models.DO_NOTHING, null=True)
+    # 将 on_delete 从 DO_NOTHING 改为 CASCADE，这样删除队伍时会自动删除所有相关提交
+    # 解决了删除队伍时外键约束错误的问题
+    organization = models.ForeignKey(Organization, related_name='submissions', on_delete=models.CASCADE, null=True)
     status = models.CharField(max_length=128, choices=STATUS_CHOICES, default=SUBMITTING, null=False, blank=False)
     status_details = models.TextField(null=True, blank=True)
     phase = models.ForeignKey(Phase, related_name='submissions', on_delete=models.CASCADE)
