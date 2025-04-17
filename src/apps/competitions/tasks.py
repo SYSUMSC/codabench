@@ -791,11 +791,12 @@ def batch_send_email(comp_id, content):
         logger.info(f'Not sending emails because competition with id {comp_id} could not be found')
         return
 
-    codalab_send_markdown_email(
-        subject=f'A message from the admins of {competition.title}',
-        markdown_content=content,
-        recipient_list=[participant.user.email for participant in competition.participants.all()]
-    )
+    # Commented out to reduce email sending
+    # codalab_send_markdown_email(
+    #     subject=f'A message from the admins of {competition.title}',
+    #     markdown_content=content,
+    #     recipient_list=[participant.user.email for participant in competition.participants.all()]
+    # )
 
 
 @app.task(queue='site-worker', soft_time_limit=60 * 5)

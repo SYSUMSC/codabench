@@ -351,15 +351,18 @@ class CompetitionViewSet(ModelViewSet):
             participant.status = 'approved'
         elif competition.registration_auto_approve:
             participant.status = 'approved'
-            send_participation_accepted_emails(participant)
+            # Commented out to reduce email sending
+            # send_participation_accepted_emails(participant)
         else:
             # check if user is in whitelist emails then approve directly
             if user.email in list(competition.whitelist_emails.values_list('email', flat=True)):
                 participant.status = 'approved'
-                send_participation_accepted_emails(participant)
+                # Commented out to reduce email sending
+                # send_participation_accepted_emails(participant)
             else:
                 participant.status = 'pending'
-                send_participation_requested_emails(participant)
+                # Commented out to reduce email sending
+                # send_participation_requested_emails(participant)
 
         participant.save()
         return Response({'participant_status': participant.status}, status=status.HTTP_201_CREATED)
@@ -844,12 +847,13 @@ class CompetitionParticipantViewSet(ModelViewSet):
             if 'status' in request.data:
                 participation_status = request.data['status']
                 participant = self.get_object()
-                emails = {
-                    'approved': send_participation_accepted_emails,
-                    'denied': send_participation_denied_emails,
-                }
-                if participation_status in emails:
-                    emails[participation_status](participant)
+                # Commented out to reduce email sending
+                # emails = {
+                #     'approved': send_participation_accepted_emails,
+                #     'denied': send_participation_denied_emails,
+                # }
+                # if participation_status in emails:
+                #     emails[participation_status](participant)
 
         return super().update(request, *args, **kwargs)
 
@@ -863,5 +867,6 @@ class CompetitionParticipantViewSet(ModelViewSet):
             message = request.data['message']
         except KeyError:
             return Response({'detail': 'A message is required to send an email'}, status=status.HTTP_400_BAD_REQUEST)
-        send_direct_participant_email(participant=participant, content=message)
+        # Commented out to reduce email sending
+        # send_direct_participant_email(participant=participant, content=message)
         return Response({}, status=status.HTTP_200_OK)
