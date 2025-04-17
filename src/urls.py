@@ -21,6 +21,7 @@ urlpatterns = [
     # 新增致谢
     path('acknowledgement/', include('acknowledgement.urls', namespace="acknowledgement")),
     path('leaderboards/', include('leaderboards.urls', namespace="leaderboards")),
+    path('cdks/', include('cdks.urls', namespace="cdks")),
 
     # Third party
     path('api/', include('api.urls')),

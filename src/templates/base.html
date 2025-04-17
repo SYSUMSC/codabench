@@ -116,6 +116,7 @@
         <a href="{% url "pages:announcements" %}" class="item">公告</a>
         <a href="{% url "leaderboards:overall_leaderboard" %}" class="item">总排行榜</a>
         <a href="{% url "acknowledgement:index" %}" class="item">致谢</a>
+        <a href="{% url "cdks:claim" %}" class="item">GPU CDK</a>
     </div>
 </div>
 
@@ -183,6 +184,11 @@
                     <a class="item" href="{% url 'acknowledgement:index' %}">
                         <i class="info circle icon"></i>
                         致谢
+                    </a>
+
+                    <a class="item" href="{% url 'cdks:claim' %}">
+                        <i class="server icon"></i>
+                        GPU CDK
                     </a>
 
                     {% if user.is_authenticated %}
