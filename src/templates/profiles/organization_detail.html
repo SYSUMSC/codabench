@@ -3,16 +3,20 @@
 {% load humanize %}
 
 {% block content %}
+    {% if has_submissions %}
+        <div class="ui warning message">
+            <div class="header">警告</div>
+            <p>该队伍已有提交记录，不能再邀请新成员、移除成员或删除队伍。</p>
+        </div>
+    {% endif %}
+
     {% if is_editor %}
         <div class="ui container" style="margin-bottom: 1em">
             <a href="{{ organization.url }}edit/"><button type="button" class="ui left floated button">编辑队伍</button></a>
 
-            <button class="ui red right floated button" onclick="self.delete_organization({{ organization.id }})" >
+            <button class="ui red right floated button" onclick="self.delete_organization({{ organization.id }})" {% if has_submissions %}disabled="disabled"{% endif %}>
                 删除队伍
             </button>
-
-
-
         </div>
     {% endif %}
     <div class="ui container">

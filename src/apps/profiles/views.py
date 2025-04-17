@@ -24,7 +24,7 @@ from .forms import SignUpForm, LoginForm, ActivationForm
 from .models import User, DeletedUser, Organization, Membership
 from oidc_configurations.models import Auth_Organization
 from .tokens import account_activation_token, account_deletion_token
-from competitions.models import Competition
+from competitions.models import Competition, Submission
 from datasets.models import Data, DataGroup
 from tasks.models import Task
 from forums.models import Post
@@ -436,11 +436,15 @@ class OrganizationCreateView(LoginRequiredMixin, TemplateView):
 
 class OrganizationDetailView(LoginRequiredMixin, DetailView):
     queryset = Organization.objects.all()
+    template_name = 'profiles/organization_detail.html'
 
     def get_context_data(self, **kwargs):
         context = {}
         if self.object:
             context['organization'] = OrganizationDetailSerializer(self.object).data
+            # 检查队伍是否有提交记录
+            context['has_submissions'] = Submission.objects.filter(organization=self.object).exists()
+
         membership = self.object.membership_set.filter(user=self.request.user)
         if len(membership) == 1:
             context['is_editor'] = membership.first().group in Membership.EDITORS_GROUP
@@ -466,7 +470,14 @@ class OrganizationEditView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = {}
         if self.object:
-            context['organization'] = json.dumps(OrganizationEditSerializer(self.object).data)
+            # 检查队伍是否有提交记录
+            has_submissions = Submission.objects.filter(organization=self.object).exists()
+
+            # 将数据添加到序列化对象中
+            org_data = OrganizationEditSerializer(self.object).data
+            org_data['has_submissions'] = has_submissions
+
+            context['organization'] = json.dumps(org_data)
         return context
 
 

@@ -20,6 +20,7 @@ from api.serializers.profiles import MyProfileSerializer, UserSerializer, \
 from profiles.helpers import send_mail
 from profiles.models import Organization, Membership
 from profiles.views import send_delete_account_confirmation_mail
+from competitions.models import Submission
 
 User = get_user_model()
 
@@ -168,6 +169,11 @@ class OrganizationViewSet(mixins.CreateModelMixin,
     @action(detail=True, methods=['post'], permission_classes=[IsOrganizationEditor])
     def invite_users(self, request, pk=None):
         org = self.get_object()
+
+        # 检查队伍是否已有提交，如果有则不允许邀请新成员
+        if Submission.objects.filter(organization=org).exists():
+            return Response({"message": "队伍已有提交记录，不能再邀请新成员"}, status=status.HTTP_400_BAD_REQUEST)
+
         user_ids = request.data.get('users', [])
 
         # 筛选出尚未加入任何队伍的用户（排除只有INVITED状态的用户）
@@ -211,6 +217,11 @@ class OrganizationViewSet(mixins.CreateModelMixin,
         ser = DeleteMembershipSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         organization = self.get_object()
+
+        # 检查队伍是否已有提交，如果有则不允许移除成员
+        if Submission.objects.filter(organization=organization).exists():
+            return Response({"message": "队伍已有提交记录，不能移除成员"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             member = organization.membership_set.get(pk=request.data['membership'])
         except Membership.DoesNotExist:
@@ -242,6 +253,10 @@ class OrganizationViewSet(mixins.CreateModelMixin,
             return Response('Deleted Invite', status=status.HTTP_200_OK)
 
         elif request.method == 'POST':
+            # 检查队伍是否已有提交，如果有则不允许接受邀请
+            if Submission.objects.filter(organization=membership.organization).exists():
+                return Response({"message": "该队伍已有提交记录，不能再接受新成员"}, status=status.HTTP_400_BAD_REQUEST)
+
             # 检查是否超过队伍人数限制（最多3人）
             current_member_count = membership.organization.membership_set.filter(group__in=Membership.ALL_GROUP).count()
             if current_member_count >= 3:
@@ -280,6 +295,14 @@ class OrganizationViewSet(mixins.CreateModelMixin,
         try:
             org = Organization.objects.get(id=pk)
             member = org.membership_set.get(user=request.user)
+
+            # 检查队伍是否已有提交，如果有则不允许删除队伍
+            if Submission.objects.filter(organization=org).exists():
+                return Response({
+                    "success": False,
+                    "message": "队伍已有提交记录，不能删除队伍"
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             if member.group == Membership.OWNER:
                 org.delete()
                 return Response({
