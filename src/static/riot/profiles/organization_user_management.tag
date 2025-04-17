@@ -1,11 +1,11 @@
 <organization-user-management>
     <div class="ui raised segment">
         <h1 class="ui dividing header">用户管理：</h1>
-        <div if="{organization.has_submissions}" class="ui warning message">
+        <div if="{organization.has_submissions === true}" class="ui warning message">
             <div class="header">警告</div>
             <p>该队伍已有提交记录，不能再邀请新成员或移除成员。</p>
         </div>
-        <div class="ui right floated small green button" id="invite-user-button" onclick="{invite_users.bind(this)}" if="{!organization.has_submissions}">
+        <div class="ui right floated small green button" id="invite-user-button" onclick="{invite_users.bind(this)}" if="{organization.has_submissions !== true}">
             邀请用户
             <i class="user plus icon right"></i>
         </div>
@@ -45,7 +45,7 @@
                     </td>
                     <td if="{user['group'] !== 'OWNER'}"><button class="ui mini icon negative button"
                             onclick="{delete_member.bind(this, user.id, user.user.name)}"
-                            disabled="{organization.has_submissions}">
+                            disabled="{organization.has_submissions === true}">
                             <i class="x icon"></i>
                         </button></td>
                     <td if="{user['group'] === 'OWNER'}"></td>
@@ -81,9 +81,13 @@
 
     <script>
         self_manage = this
-        self_manage.members = organization.members
-        self_manage.organization_name = organization.name
-        self_manage.organization_id = organization.id
+        // Make sure organization is defined to prevent errors
+        if (typeof organization === 'undefined') {
+            organization = { members: [], name: '', id: 0, has_submissions: false }
+        }
+        self_manage.members = organization.members || []
+        self_manage.organization_name = organization.name || ''
+        self_manage.organization_id = organization.id || 0
         self_manage.pending_member_name = ''
 
         self_manage.one("mount", function () {
@@ -165,7 +169,7 @@
 
         self_manage.delete_member = (id, username) => {
             // 检查队伍是否有提交记录
-            if (organization.has_submissions) {
+            if (organization.has_submissions === true) {
                 toastr.error('队伍已有提交记录，不能移除成员')
                 return
             }
@@ -179,7 +183,7 @@
 
         self_manage.invite_users = () => {
             // 检查队伍是否有提交记录
-            if (organization.has_submissions) {
+            if (organization.has_submissions === true) {
                 toastr.error('队伍已有提交记录，不能再邀请新成员')
                 return
             }

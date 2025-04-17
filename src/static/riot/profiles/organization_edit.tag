@@ -36,10 +36,15 @@
     </div>
     <script>
         self = this
+        // Make sure organization is defined to prevent errors
+        if (typeof organization === 'undefined') {
+            organization = { name: '', email: '', location: '', description: '', website_url: '', linkedin_url: '', twitter_url: '', github_url: '', has_submissions: false }
+        }
         self.organization = organization
-        self.original_org_photo_name = typeof self.organization.photo !== 'undefined' ? null : self.organization.photo.replace(/\\/g, '/').replace(/.*\//, '')
+        self.original_org_photo_name = typeof self.organization.photo !== 'undefined' ? null : (self.organization.photo ? self.organization.photo.replace(/\\/g, '/').replace(/.*\//, '') : '')
         self.original_org_photo = self.organization.photo
-        delete self.organization.photo
+        // Store a copy of the photo instead of deleting it from the organization object
+        // This prevents issues with other components that use the organization object
 
 
         self.one("mount", function () {

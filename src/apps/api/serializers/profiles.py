@@ -207,11 +207,17 @@ class OrganizationDetailSerializer(OrganizationSerializer):
 
 class OrganizationEditSerializer(OrganizationSerializer):
     members = OrganizationMembershipSerializer(source='membership_set', many=True, read_only=True)
+    has_submissions = SerializerMethodField(read_only=True)
 
     class Meta(OrganizationSerializer.Meta):
         fields = OrganizationSerializer.Meta.fields + (
             'members',
+            'has_submissions',
         )
+
+    def get_has_submissions(self, instance):
+        from competitions.models import Submission
+        return Submission.objects.filter(organization=instance).exists()
 
 
 class DeleteMembershipSerializer(Serializer):
