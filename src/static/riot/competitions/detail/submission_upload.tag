@@ -50,16 +50,16 @@
                 </div>
 
                 <div class="ui six wide field">
-                    <label>提交者:
+                    <label class="required-answer">提交队伍:
                     <span class="ui mini circular icon button"
-                        data-tooltip="只能以队伍名义提交"
+                        data-tooltip="必须以队伍名义提交，不允许个人提交"
                         data-position="top center">
                         <i class="question icon"></i>
                     </span>
                     </label>
 
-                    <select name="organizations" id="organization_dropdown" class="ui dropdown">
-                        <!--option value="None">个人</option-->
+                    <select name="organizations" id="organization_dropdown" class="ui dropdown" required>
+                        <option value="">-- 选择队伍 --</option>
                         <option each="{org in organizations}" value="{org.id}">{org.name}</option>
                         <option if="{_.size(organizations) === 0}" value="add_organization">+ 添加新队伍</option>
                     </select>
@@ -173,7 +173,9 @@
                 .done((data) => {
                     self.organizations = data
                     if (self.organizations.length === 0){
-                        $('#organization_dropdown').hide()
+                        // Don't hide the dropdown, we need to show the 'add team' option
+                        // $('#organization_dropdown').hide()
+                        toastr.warning('You need to create or join a team before you can make submissions')
                     }
                     self.update()
                 })
@@ -442,8 +444,14 @@
                     self.lines = {}
                     let dropdown = $('#organization_dropdown')
                     let organization = dropdown.dropdown('get value')
-                    if(organization === 'add_organization' | organization === 'None'){
-                        organization = null
+                    if(organization === 'add_organization'){
+                        toastr.error('You must create and select a team before submitting')
+                        $('#organization_dropdown').removeAttr('disabled')
+                        return
+                    } else if(organization === 'None'){
+                        toastr.error('You must submit as part of a team. Individual submissions are not allowed.')
+                        $('#organization_dropdown').removeAttr('disabled')
+                        return
                     }
                     dropdown.attr('disabled', 'disabled')
 

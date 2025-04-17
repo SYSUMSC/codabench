@@ -166,15 +166,18 @@ class SubmissionViewSet(ModelViewSet):
         return qs
 
     def create(self, request, *args, **kwargs):
-        if 'organization' in request.data and request.data['organization'] is not None:
-            organization = get_object_or_404(Organization, pk=request.data['organization'])
-            try:
-                membership = organization.membership_set.get(user=request.user)
-            except Membership.DoesNotExist:
-                raise ValidationError('You must be apart of a organization to submit for them')
-            # 判断用户可否提交，暂时移除
-            # if membership.group not in Membership.PARTICIPANT_GROUP:
-            #     raise ValidationError('You do not have participant permissions for this group')
+        # 必须以队伍（organization组织）的形式提交，不允许单独提交
+        if 'organization' not in request.data or request.data['organization'] is None:
+            raise ValidationError('必须以队伍为单位提交')
+
+        organization = get_object_or_404(Organization, pk=request.data['organization'])
+        try:
+            membership = organization.membership_set.get(user=request.user)
+        except Membership.DoesNotExist:
+            raise ValidationError('You must be a part of an organization to submit for them')
+        # 判断用户可否提交，暂时移除
+        # if membership.group not in Membership.PARTICIPANT_GROUP:
+        #     raise ValidationError('You do not have participant permissions for this group')
         return super(SubmissionViewSet, self).create(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):

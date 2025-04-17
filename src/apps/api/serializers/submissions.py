@@ -14,6 +14,7 @@ from api.serializers.submission_leaderboard import SubmissionScoreSerializer
 from competitions.models import Submission, SubmissionDetails, CompetitionParticipant, Phase
 from datasets.models import Data
 from utils.data import make_url_sassy
+from profiles.models import Organization
 
 from tasks.models import Task
 from queues.models import Queue
@@ -84,6 +85,7 @@ class SubmissionCreationSerializer(DefaultUserCreateMixin, serializers.ModelSeri
     filename = serializers.SerializerMethodField(read_only=True)
     tasks = serializers.PrimaryKeyRelatedField(queryset=Task.objects.all(), required=False, write_only=True, many=True)
     phase = serializers.PrimaryKeyRelatedField(queryset=Phase.objects.all(), required=True)
+    organization = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.all(), required=True)
     queue = serializers.PrimaryKeyRelatedField(queryset=Queue.objects.all(), required=False, allow_null=True)
     created_when = serializers.DateTimeField(format="%Y-%m-%d %H:%M", required=False)
     scores = SubmissionScoreSerializer(many=True, required=False)
@@ -111,6 +113,7 @@ class SubmissionCreationSerializer(DefaultUserCreateMixin, serializers.ModelSeri
         extra_kwargs = {
             'secret': {"write_only": True},
             'description': {"read_only": True},
+            'organization': {"required": True},
             # 'status': {"read_only": True},
         }
 
@@ -130,6 +133,10 @@ class SubmissionCreationSerializer(DefaultUserCreateMixin, serializers.ModelSeri
 
     def validate(self, attrs):
         data = super().validate(attrs)
+
+        # 必须以队伍（organization组织）的形式提交，不允许单独提交
+        if not attrs.get('organization'):
+            raise ValidationError('必须以队伍为单位提交')
 
         if attrs.get('fact_sheet_answers'):
             fact_sheet_answers = data['fact_sheet_answers']
