@@ -1,11 +1,11 @@
 <organization-user-management>
     <div class="ui raised segment">
         <h1 class="ui dividing header">用户管理：</h1>
-        <div if="{organization.has_submissions === true}" class="ui warning message">
+        <div if="{has_submissions}" class="ui warning message">
             <div class="header">警告</div>
             <p>该队伍已有提交记录，不能再邀请新成员或移除成员。</p>
         </div>
-        <div class="ui right floated small green button" id="invite-user-button" onclick="{invite_users.bind(this)}" if="{organization.has_submissions !== true}">
+        <div class="ui right floated small green button" id="invite-user-button" onclick="{invite_users.bind(this)}" if="{!has_submissions}">
             邀请用户
             <i class="user plus icon right"></i>
         </div>
@@ -45,7 +45,7 @@
                     </td>
                     <td if="{user['group'] !== 'OWNER'}"><button class="ui mini icon negative button"
                             onclick="{delete_member.bind(this, user.id, user.user.name)}"
-                            disabled="{organization.has_submissions === true}">
+                            disabled="{parent.has_submissions}">
                             <i class="x icon"></i>
                         </button></td>
                     <td if="{user['group'] === 'OWNER'}"></td>
@@ -89,6 +89,13 @@
         self_manage.organization_name = organization.name || ''
         self_manage.organization_id = organization.id || 0
         self_manage.pending_member_name = ''
+
+        // Store has_submissions as a direct property of the component
+        // to avoid accessing it through the organization object
+        self_manage.has_submissions = false
+        if (organization && typeof organization.has_submissions === 'boolean') {
+            self_manage.has_submissions = organization.has_submissions
+        }
 
         self_manage.one("mount", function () {
             $('.ui.inline.dropdown').dropdown({
@@ -169,7 +176,7 @@
 
         self_manage.delete_member = (id, username) => {
             // 检查队伍是否有提交记录
-            if (organization.has_submissions === true) {
+            if (self_manage.has_submissions) {
                 toastr.error('队伍已有提交记录，不能移除成员')
                 return
             }
@@ -183,7 +190,7 @@
 
         self_manage.invite_users = () => {
             // 检查队伍是否有提交记录
-            if (organization.has_submissions === true) {
+            if (self_manage.has_submissions) {
                 toastr.error('队伍已有提交记录，不能再邀请新成员')
                 return
             }
