@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<style>
+    .ui.action.input {
+        width: 100%;
+    }
+
+    #file-name {
+        cursor: default;
+    }
+
+    .ui.icon.button label {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ui container">
+    <div class="ui segment">
+        <h1 class="ui header">题解 PDF 上传</h1>
+
+        <div class="ui info message">
+            <div class="header">提交说明</div>
+            <ul class="list">
+                <li>请上传 PDF 格式的题解文件</li>
+                <li>每个队伍只能上传一个题解文件</li>
+                <li>提交时间：{{ submission_start_date|date:"Y年m月d日" }} 至 {{ submission_end_date|date:"Y年m月d日" }}</li>
+                <li>文件将被上传到私有存储，仅组织者可以访问</li>
+            </ul>
+        </div>
+
+        {% if not can_submit %}
+        <div class="ui warning message">
+            <div class="header">提交已关闭</div>
+            <p>当前不在提交时间范围内，无法上传题解。</p>
+        </div>
+        {% endif %}
+
+        {% if organizations %}
+        <div id="upload-form" class="ui form" {% if not can_submit %}style="display: none;"{% endif %}>
+            <div class="field">
+                <label>队伍</label>
+                <select id="organization-select" class="ui dropdown">
+                    <option value="">选择队伍</option>
+                    {% for org in organizations %}
+                    <option value="{{ org.id }}">{{ org.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label>题解名称</label>
+                <input type="text" id="solution-name" placeholder="题解名称">
+            </div>
+
+            <div class="field">
+                <label>描述 (可选)</label>
+                <textarea id="solution-description" rows="2"></textarea>
+            </div>
+
+            <div class="field">
+                <label>PDF 文件</label>
+                <div class="ui action input">
+                    <input type="text" id="file-name" readonly placeholder="选择PDF文件...">
+                    <label for="pdf-file" class="ui icon button">
+                        <i class="file pdf icon"></i>
+                        浏览文件
+                    </label>
+                    <input type="file" id="pdf-file" accept=".pdf" style="display: none;">
+                </div>
+            </div>
+
+            <button id="upload-button" class="ui primary button">上传</button>
+        </div>
+
+        <div class="ui indicating progress" id="upload-progress" style="display: none;">
+            <div class="bar">
+                <div class="progress"></div>
+            </div>
+            <div class="label">上传中...</div>
+        </div>
+
+        <div class="ui success message" id="upload-success" style="display: none;">
+            <div class="header">上传成功</div>
+            <p>题解已成功上传。</p>
+            <a href="{% url 'solutions:list' %}" class="ui button">查看已上传的题解</a>
+        </div>
+
+        <div class="ui error message" id="upload-error" style="display: none;">
+            <div class="header">上传失败</div>
+            <p id="error-message"></p>
+        </div>
+        {% else %}
+        <div class="ui warning message">
+            <div class="header">没有可用的队伍</div>
+            <p>您需要先创建或加入一个队伍才能上传题解。</p>
+            <a href="{% url 'profiles:organization_create' %}" class="ui button">创建队伍</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('.ui.dropdown').dropdown();
+
+        // Update file name display when a file is selected
+        $('#pdf-file').change(function() {
+            var fileName = $(this).val().split('\\').pop();
+            $('#file-name').val(fileName);
+        });
+
+        $('#upload-button').click(function() {
+            // Reset messages
+            $('#upload-error').hide();
+            $('#upload-success').hide();
+
+            // Validate form
+            var organizationId = $('#organization-select').val();
+            var solutionName = $('#solution-name').val();
+            var pdfFile = $('#pdf-file')[0].files[0];
+
+            if (!organizationId) {
+                showError('请选择队伍');
+                return;
+            }
+
+            if (!solutionName) {
+                showError('请输入题解名称');
+                return;
+            }
+
+            if (!pdfFile) {
+                showError('请选择PDF文件');
+                return;
+            }
+
+            if (pdfFile.type !== 'application/pdf') {
+                showError('请上传PDF格式的文件');
+                return;
+            }
+
+            // Create solution PDF entry
+            $.ajax({
+                url: '{% url "solutions:api_create" %}',
+                type: 'POST',
+                data: {
+                    organization: organizationId,
+                    name: solutionName,
+                    description: $('#solution-description').val()
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+                },
+                success: function(data) {
+                    // Upload the file
+                    uploadFile(data.sassy_url, pdfFile, data.key);
+                },
+                error: function(xhr) {
+                    var errorMsg = '创建题解记录失败';
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMsg = xhr.responseJSON.error;
+                    }
+                    showError(errorMsg);
+                }
+            });
+        });
+
+        function uploadFile(url, file, key) {
+            // Show progress bar
+            $('#upload-form').hide();
+            $('#upload-progress').show();
+
+            // Create form data for file upload
+            var formData = new FormData();
+            formData.append('file', file);
+
+            // Upload file
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', function(e) {
+                        if (e.lengthComputable) {
+                            var percentComplete = Math.round((e.loaded / e.total) * 100);
+                            $('#upload-progress .progress').text(percentComplete + '%');
+                            $('#upload-progress .bar').css('width', percentComplete + '%');
+                        }
+                    }, false);
+                    return xhr;
+                },
+                success: function() {
+                    // Mark upload as complete
+                    $.ajax({
+                        url: '{% url "solutions:api_complete" key="00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', key),
+                        type: 'POST',
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+                        },
+                        success: function() {
+                            $('#upload-progress').hide();
+                            $('#upload-success').show();
+                        },
+                        error: function(xhr) {
+                            var errorMsg = '标记上传完成失败';
+                            if (xhr.responseJSON && xhr.responseJSON.error) {
+                                errorMsg = xhr.responseJSON.error;
+                            }
+                            showError(errorMsg);
+                            $('#upload-progress').hide();
+                            $('#upload-form').show();
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    showError('上传文件失败: ' + (xhr.responseText || xhr.statusText));
+                    $('#upload-progress').hide();
+                    $('#upload-form').show();
+                }
+            });
+        }
+
+        function showError(message) {
+            $('#error-message').text(message);
+            $('#upload-error').show();
+        }
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

@@ -22,6 +22,7 @@ urlpatterns = [
     path('acknowledgement/', include('acknowledgement.urls', namespace="acknowledgement")),
     path('leaderboards/', include('leaderboards.urls', namespace="leaderboards")),
     path('cdks/', include('cdks.urls', namespace="cdks")),
+    path('solutions/', include('solutions.urls', namespace="solutions")),
 
     # Third party
     path('api/', include('api.urls')),

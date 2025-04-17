@@ -62,6 +62,7 @@ OUR_APPS = (
     'announcements',
     'oidc_configurations',
     'cdks',
+    'solutions',
 )
 INSTALLED_APPS = THIRD_PARTY_APPS + OUR_APPS
 

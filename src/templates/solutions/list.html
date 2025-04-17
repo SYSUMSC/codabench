@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="ui container">
+    <div class="ui segment">
+        <h1 class="ui header">已上传的题解</h1>
+        
+        <a href="{% url 'solutions:upload' %}" class="ui primary button">上传新题解</a>
+        
+        {% if solutions %}
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>题解名称</th>
+                    <th>队伍</th>
+                    <th>上传时间</th>
+                    <th>文件大小</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for solution in solutions %}
+                <tr>
+                    <td>{{ solution.name }}</td>
+                    <td>{{ solution.organization.name }}</td>
+                    <td>{{ solution.created_when|date:"Y-m-d H:i" }}</td>
+                    <td>{{ solution.file_size|floatformat:2 }} KB</td>
+                    <td>
+                        <button class="ui mini button download-button" data-key="{{ solution.key }}">下载</button>
+                        <button class="ui mini negative button delete-button" data-key="{{ solution.key }}">删除</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="ui message">
+            <p>您的队伍尚未上传任何题解。</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="ui small modal" id="delete-modal">
+    <div class="header">确认删除</div>
+    <div class="content">
+        <p>确定要删除这个题解吗？此操作无法撤销。</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">取消</div>
+        <div class="ui positive button">删除</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Download button
+        $('.download-button').click(function() {
+            var key = $(this).data('key');
+            
+            $.ajax({
+                url: '{% url "solutions:api_download" key="00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', key),
+                type: 'GET',
+                success: function(data) {
+                    // Open the download URL in a new tab
+                    window.open(data.download_url, '_blank');
+                },
+                error: function(xhr) {
+                    var errorMsg = '获取下载链接失败';
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMsg = xhr.responseJSON.error;
+                    }
+                    alert(errorMsg);
+                }
+            });
+        });
+        
+        // Delete button
+        $('.delete-button').click(function() {
+            var key = $(this).data('key');
+            var button = $(this);
+            
+            // Show confirmation modal
+            $('#delete-modal')
+                .modal({
+                    closable: true,
+                    onDeny: function() {
+                        // Do nothing
+                    },
+                    onApprove: function() {
+                        // Delete the solution
+                        $.ajax({
+                            url: '{% url "solutions:api_delete" key="00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', key),
+                            type: 'DELETE',
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+                            },
+                            success: function() {
+                                // Remove the row from the table
+                                button.closest('tr').remove();
+                                
+                                // If no more solutions, show message
+                                if ($('tbody tr').length === 0) {
+                                    $('table').replaceWith('<div class="ui message"><p>您的队伍尚未上传任何题解。</p></div>');
+                                }
+                            },
+                            error: function(xhr) {
+                                var errorMsg = '删除题解失败';
+                                if (xhr.responseJSON && xhr.responseJSON.error) {
+                                    errorMsg = xhr.responseJSON.error;
+                                }
+                                alert(errorMsg);
+                            }
+                        });
+                    }
+                })
+                .modal('show');
+        });
+        
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}
