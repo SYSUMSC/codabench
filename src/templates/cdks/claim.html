@@ -10,6 +10,7 @@
         <div class="ui basic segment">
             <p>每个加入组织的用户可以领取一个 GPU CDK，用于访问 GPU 资源。</p>
             <p>每个用户只能领取一次，领取后将会在此页面显示。</p>
+            <p>领取后，在 <a href="https://gpugeek.com/voucher" target="_blank">https://gpugeek.com/voucher</a> 点击`兑换券`并使用            </p>
         </div>
 
         {% if user_cdk %}
@@ -42,7 +43,7 @@
     $(document).ready(function() {
         $('#claim-cdk-btn').on('click', function() {
             $(this).addClass('loading disabled');
-            
+
             $.ajax({
                 url: '{% url "cdks:api_claim" %}',
                 type: 'POST',
@@ -62,13 +63,13 @@
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMsg = xhr.responseJSON.message;
                     }
-                    
+
                     $('#claim-result')
                         .removeClass('positive')
                         .addClass('negative')
                         .html('<div class="header">领取失败</div><p>' + errorMsg + '</p>')
                         .show();
-                    
+
                     $('#claim-cdk-btn').removeClass('loading disabled');
                 }
             });
