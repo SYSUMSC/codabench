@@ -216,14 +216,19 @@ def overall_leaderboard(request):
         except Exception as e:
             print(f"Error getting scores for submission {sub.id}: {str(e)}")
 
+        # 计算小题分数之和，确保与总分一致
+        submission_score_sum = sum(item['score'] for item in detailed_scores) if detailed_scores else float(score)
+
         # 添加到该组织的时间线数据中
         org_timeline_data[org_id].append({
             'timestamp': timestamp,
-            'score': float(score),
-            'total_score': org_total_score,  # 添加组织总分
+            'score': float(score),  # 当前提交的分数
+            'total_score': submission_score_sum,  # 使用小题分数之和作为总分
             'submission_id': sub.id,  # 添加提交ID以便于追踪
             'detailed_scores': detailed_scores  # 添加小题分数详情，用于调试
         })
+
+        print(f"Submission {sub.id} - Score: {float(score)}, Detailed scores sum: {submission_score_sum}, Org total: {org_total_score}")
 
     # 为每个组织处理时间线数据，使用实际提交时间而不是按小时分组
     for org_id in org_timeline_data:
@@ -245,15 +250,20 @@ def overall_leaderboard(request):
             if point['score'] > current_max_score:
                 current_max_score = point['score']
 
+            # 获取小题分数详情
+            detailed_scores = point.get('detailed_scores', [])
+            # 计算小题分数之和
+            total_score = sum(item['score'] for item in detailed_scores) if detailed_scores else point.get('score', 0)
+
             # 添加到处理后的数据中，包含当前提交分数和累计最高分
             processed_data.append({
                 'timestamp': point['timestamp'],
                 'score': point['score'],
                 'cumulative_max': current_max_score,
                 'submission_id': point.get('submission_id', None),
-                'detailed_scores': point.get('detailed_scores', []),  # 保留小题分数详情
+                'detailed_scores': detailed_scores,  # 保留小题分数详情
                 'is_key_time': point.get('is_key_time', False),  # 保留关键时间点标记
-                'total_score': point.get('total_score', 0)  # 保留总分信息
+                'total_score': total_score  # 使用小题分数之和作为总分
             })
 
         # 替换原始数据
@@ -282,12 +292,18 @@ def overall_leaderboard(request):
                 for key_time in key_times:
                     if prev_time < key_time < current_time:
                         # 在关键时间点添加一个数据点，使用前一个点的分数
+                        detailed_scores = prev_point.get('detailed_scores', [])
+                        # 计算小题分数之和
+                        total_score = sum(item['score'] for item in detailed_scores) if detailed_scores else prev_point.get('score', 0)
+
                         filled_data.append({
                             'timestamp': key_time.strftime('%Y-%m-%d %H:%M:%S'),
                             'score': prev_point.get('cumulative_max', prev_point['score']),
                             'cumulative_max': prev_point.get('cumulative_max', prev_point['score']),
                             'is_key_time': True,  # 标记为关键时间点
-                            'detailed_scores': prev_point.get('detailed_scores', [])  # 保留前一个点的小题分数详情
+                            'detailed_scores': detailed_scores,  # 保留前一个点的小题分数详情
+                            'total_score': total_score,  # 使用小题分数之和作为总分
+                            'submission_id': None  # 关键时间点没有提交ID
                         })
 
                 # 添加当前点
@@ -315,25 +331,33 @@ def overall_leaderboard(request):
             # 确保结束时间点在当前点之后
             current_time = datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S')
             if current_time < end_time:
+                detailed_scores = point.get('detailed_scores', [])
+                # 计算小题分数之和
+                total_score = sum(item['score'] for item in detailed_scores) if detailed_scores else point.get('score', 0)
+
                 org_timeline_data[org_id].append({
                     'timestamp': end_time.strftime('%Y-%m-%d %H:%M:%S'),
                     'score': point.get('cumulative_max', point.get('score', 0)),
                     'cumulative_max': point.get('cumulative_max', point.get('score', 0)),
                     'is_key_time': True,
-                    'detailed_scores': point.get('detailed_scores', []),  # 保留小题分数详情
-                    'total_score': point.get('total_score', 0),  # 保留总分信息
+                    'detailed_scores': detailed_scores,  # 保留小题分数详情
+                    'total_score': total_score,  # 使用小题分数之和作为总分
                     'submission_id': None  # 关键时间点没有提交ID
                 })
             # 如果当前点已经在结束时间之后，添加一个小时后的点
             else:
                 new_time = current_time + timedelta(hours=1)
+                detailed_scores = point.get('detailed_scores', [])
+                # 计算小题分数之和
+                total_score = sum(item['score'] for item in detailed_scores) if detailed_scores else point.get('score', 0)
+
                 org_timeline_data[org_id].append({
                     'timestamp': new_time.strftime('%Y-%m-%d %H:%M:%S'),
                     'score': point.get('cumulative_max', point.get('score', 0)),
                     'cumulative_max': point.get('cumulative_max', point.get('score', 0)),
-                    'detailed_scores': point.get('detailed_scores', []),  # 保留小题分数详情
+                    'detailed_scores': detailed_scores,  # 保留小题分数详情
                     'is_key_time': False,  # 不是关键时间点
-                    'total_score': point.get('total_score', 0),  # 保留总分信息
+                    'total_score': total_score,  # 使用小题分数之和作为总分
                     'submission_id': None  # 没有提交ID
                 })
 
@@ -353,13 +377,17 @@ def overall_leaderboard(request):
             # 如果最后一个点的时间早于结束时间，添加结束时间点
             if last_time < chart_end_time:
                 # 直接添加结束时间点，不需要每小时填充
+                detailed_scores = last_point.get('detailed_scores', [])
+                # 计算小题分数之和
+                total_score = sum(item['score'] for item in detailed_scores) if detailed_scores else last_point.get('score', 0)
+
                 org_timeline_data[org_id].append({
                     'timestamp': chart_end_time.strftime('%Y-%m-%d %H:%M:%S'),
                     'score': last_point.get('score', 0),
                     'cumulative_max': last_point.get('cumulative_max', 0),
-                    'total_score': org_total_score,  # 添加组织总分
+                    'total_score': total_score,  # 使用小题分数之和作为总分
                     'is_key_time': True,  # 标记为关键时间点
-                    'detailed_scores': last_point.get('detailed_scores', [])  # 保留前一个点的小题分数详情
+                    'detailed_scores': detailed_scores  # 保留前一个点的小题分数详情
                 })
 
     # 准备图表数据
@@ -382,10 +410,10 @@ def overall_leaderboard(request):
                 'data': [
                     {
                         'x': point['timestamp'],  # 实际时间点
-                        'y': float(point.get('total_score', point.get('cumulative_max', 0))),  # 优先使用总分，如果没有则使用累计最高分
+                        'y': float(point.get('cumulative_max', 0)),  # 使用累计最高分作为图表显示值
                         'submission_id': point.get('submission_id', None),  # 提交ID
                         'is_key_time': point.get('is_key_time', False),  # 是否为关键时间点
-                        'total_score': float(point.get('total_score', 0)),  # 组织总分
+                        'total_score': float(point.get('total_score', 0)),  # 当前提交的总分（小题分数之和）
                         'detailed_scores': point.get('detailed_scores', [])  # 小题分数数组，用于调试
                     } for point in org_timeline_data[org_id]
                 ],
