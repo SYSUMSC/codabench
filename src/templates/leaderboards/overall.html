@@ -158,9 +158,8 @@
 
         // 转换数据格式
         dataset.data.forEach(function(point) {
-          var date = new Date(point.x);
-          // 格式化为 YYYY-MM-DD HH:00 保留小时信息
-          var formattedDate = date.toISOString().replace(/T(\d+):\d+:\d+\.\d+Z/, ' $1:00');
+          // 直接使用原始时间字符串，避免时区转换问题
+          var formattedDate = point.x;
           allDates.push(formattedDate);
 
           // 确保分数是有效的数字
@@ -237,11 +236,8 @@
         tooltip: {
           trigger: 'axis',
           formatter: function(params) {
-            // 格式化时间显示
-            var parts = params[0].axisValue.split(' ');
-            var dateParts = parts[0].split('-');
-            var hour = parts[1].split(':')[0];
-            var formattedTime = dateParts[0] + '-' + dateParts[1] + '-' + dateParts[2] + ' ' + hour + ':00';
+            // 直接使用原始时间字符串
+            var formattedTime = params[0].axisValue;
 
             var result = formattedTime + '<br/>';
             params.forEach(function(param) {
@@ -275,13 +271,13 @@
           alignWithLabel: true,
           axisLabel: {
             formatter: function(value) {
-              // 将格式化的日期字符串转换回日期对象
+              // 将格式化的日期字符串转换为更简洁的格式
               var parts = value.split(' ');
               var dateParts = parts[0].split('-');
-              var hour = parts[1].split(':')[0];
+              var timeParts = parts[1].split(':');
 
               // 返回格式化的日期和小时： MM-DD HH:00
-              return dateParts[1] + '-' + dateParts[2] + ' ' + hour + ':00';
+              return dateParts[1] + '-' + dateParts[2] + ' ' + timeParts[0] + ':00';
             },
             fontSize: 10,
             interval: function(index, value) {
@@ -292,15 +288,8 @@
           },
           // 限制显示的数据范围
           min: '2025-04-18 12:00',
-          // 计算实际结束时间（取结束时间和当前时间的较小值）
-          max: (function() {
-            var endDate = new Date('2025-04-24T20:00:00');
-            var currentDate = new Date();
-            // 使用较小的日期作为结束时间
-            var actualEndDate = new Date(Math.min(endDate.getTime(), currentDate.getTime()));
-            // 格式化为 YYYY-MM-DD HH:00
-            return actualEndDate.toISOString().replace(/T(\d+):\d+:\d+\.\d+Z/, ' $1:00');
-          })()
+          // 使用服务器传递的实际结束时间
+          max: '{{ actual_end_date }}'
         },
         yAxis: {
           type: 'value',
