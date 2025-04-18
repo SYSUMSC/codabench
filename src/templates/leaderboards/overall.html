@@ -158,9 +158,25 @@
 
         // 转换数据格式，使用实际提交时间
         dataset.data.forEach(function(point) {
-          // 直接使用原始时间字符串
-          var formattedDate = point.x;
-          allDates.push(formattedDate);
+          // 将时间字符串转换为日期对象然后获取时间戳
+          var dateObj;
+          try {
+            // 尝试将时间字符串转换为日期对象
+            dateObj = new Date(point.x);
+            // 检查是否是有效的日期
+            if (isNaN(dateObj.getTime())) {
+              // 如果无效，使用当前时间
+              console.warn('Invalid date:', point.x);
+              dateObj = new Date();
+            }
+          } catch (e) {
+            console.error('Error parsing date:', e);
+            dateObj = new Date();
+          }
+
+          // 使用时间戳作为数据点的x值
+          var timestamp = dateObj.getTime();
+          allDates.push(timestamp);
 
           // 确保分数是有效的数字
           var score = parseFloat(point.y);
@@ -169,7 +185,10 @@
           }
 
           // 添加额外信息到数据点
-          var dataPoint = [formattedDate, score];
+          var dataPoint = [timestamp, score];
+
+          // 添加原始时间字符串以便调试
+          dataPoint.originalDate = point.x;
 
           // 添加额外属性以供工具提示使用
           dataPoint.actualScore = point.actual_score || score;
@@ -258,16 +277,38 @@
           trigger: 'axis',
           formatter: function(params) {
             // 获取时间并格式化显示
-            var formattedTime = params[0].axisValue;
+            var formattedTime = '';
 
-            // 尝试将时间格式化为更友好的形式
+            // 处理时间戳或时间字符串
             try {
-              var dateParts = formattedTime.split(' ');
-              var date = dateParts[0];
-              var time = dateParts[1];
-              formattedTime = date + ' ' + time;
+              var axisValue = params[0].axisValue;
+
+              // 检查是否为数字时间戳
+              if (!isNaN(Number(axisValue))) {
+                // 如果是数字时间戳，转换为日期对象
+                var date = new Date(Number(axisValue));
+                formattedTime = date.getFullYear() + '-' +
+                               String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                               String(date.getDate()).padStart(2, '0') + ' ' +
+                               String(date.getHours()).padStart(2, '0') + ':' +
+                               String(date.getMinutes()).padStart(2, '0') + ':' +
+                               String(date.getSeconds()).padStart(2, '0');
+              } else if (typeof axisValue === 'string') {
+                // 如果是字符串，尝试格式化
+                var dateParts = axisValue.split(' ');
+                if (dateParts.length >= 2) {
+                  var date = dateParts[0];
+                  var time = dateParts[1];
+                  formattedTime = date + ' ' + time;
+                } else {
+                  formattedTime = axisValue;
+                }
+              } else {
+                formattedTime = String(axisValue);
+              }
             } catch(e) {
-              // 如果格式化失败，使用原始时间字符串
+              // 如果格式化失败，使用原始值的字符串表示
+              formattedTime = String(params[0].axisValue);
             }
 
             var result = '<div style="font-weight:bold;">' + formattedTime + '</div>';
@@ -335,22 +376,23 @@
               var month = (date.getMonth() + 1).toString().padStart(2, '0');
               var day = date.getDate().toString().padStart(2, '0');
               var hours = date.getHours().toString().padStart(2, '0');
+              var minutes = date.getMinutes().toString().padStart(2, '0');
 
-              // 返回格式化的日期和小时： MM-DD HH:00
-              return month + '-' + day + ' ' + hours + ':00';
+              // 返回格式化的日期和小时： MM-DD HH:MM
+              return month + '-' + day + ' ' + hours + ':' + minutes;
             },
             fontSize: 10,
             interval: function(index, value) {
               // 每6小时显示一个标签，减少标签数量
               var date = new Date(value);
-              return date.getHours() % 6 === 0;
+              return date.getHours() % 6 === 0 && date.getMinutes() === 0;
             },
             rotate: 30
           },
           // 限制显示的数据范围
-          min: '2025-04-18 11:00:00',  // 从比赛开始前1小时开始
+          min: new Date('2025-04-18 11:00:00').getTime(),  // 从比赛开始前1小时开始
           // 使用服务器传递的实际结束时间
-          max: '{{ actual_end_date }}'
+          max: new Date('{{ actual_end_date }}').getTime()
         },
         yAxis: {
           type: 'value',
