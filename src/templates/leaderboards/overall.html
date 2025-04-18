@@ -95,8 +95,8 @@
                     <th><strong>{{ entry.total_points|floatformat:2 }}</strong></th>
                   </tr>
                   {% if show_avg_submission_time and entry.avg_submission_time %}
-                  <tr>
-                    <th class="right aligned"><strong>平均提交时间</strong></th>
+                  <tr class="positive">
+                    <th class="right aligned"><strong>平均提交时间</strong> <i class="info circle icon" title="当总分相同时，平均提交时间越早的队伍排名越靠前"></i></th>
                     <th><strong>{{ entry.avg_submission_time|date:"Y-m-d H:i:s" }}</strong></th>
                   </tr>
                   {% endif %}
@@ -152,6 +152,20 @@
     padding: 0.5em;
     height: auto !important;
     overflow: hidden;
+  }
+
+  /* 平均提交时间样式 */
+  .ui.table td.collapsing .ui.label {
+    white-space: nowrap;
+    font-size: 0.85em;
+    background-color: #f8f8f9;
+    color: rgba(0,0,0,.6);
+  }
+
+  /* 信息图标样式 */
+  .info.circle.icon {
+    color: #2185d0;
+    cursor: help;
   }
 </style>
 {% endblock %}
@@ -285,7 +299,7 @@
       var option = {
         // 添加标题
         title: {
-          text: '队伍得分小时统计',
+          text: '前20名队伍得分时间线',
           left: 'center',
           textStyle: {
             fontSize: 14
