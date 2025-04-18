@@ -171,7 +171,11 @@ def overall_leaderboard(request):
                 'borderColor': f'hsl({(i * 36) % 360}, 70%, 50%)',  # 使用HSL颜色空间生成不同颜色
                 'backgroundColor': f'hsla({(i * 36) % 360}, 70%, 50%, 0.1)',
                 'fill': False,
-                'tension': 0.4  # 使线条更平滑
+                'tension': 0.4,  # 使线条更平滑
+                'showLine': True,  # 显示线条
+                'pointRadius': 4,  # 数据点半径
+                'pointHoverRadius': 6,  # 鼠标悬停时数据点半径
+                'lineTension': 0.3  # 线条张力（平滑度）
             }
             chart_data['datasets'].append(dataset)
 

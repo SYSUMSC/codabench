@@ -167,6 +167,18 @@
         type: 'line',
         data: chartData,
         options: {
+          elements: {
+            line: {
+              tension: 0.3,  // 线条弹性（平滑度）
+              borderWidth: 2,  // 线条宽度
+              fill: false  // 不填充线条下方区域
+            },
+            point: {
+              radius: 4,  // 数据点半径
+              hoverRadius: 6,  // 鼠标悬停时数据点半径
+              borderWidth: 2  // 数据点边框宽度
+            }
+          },
           responsive: false,
           maintainAspectRatio: true,
           interaction: {
@@ -228,6 +240,31 @@
           }
         }
       });
+
+      // 使用MutationObserver监视图表容器的变化，确保图表高度不变
+      var chartContainer = document.querySelector('.chart-container');
+      var chartCanvas = document.getElementById('scoreTimelineChart');
+
+      var observer = new MutationObserver(function(mutations) {
+        $(chartCanvas).css({
+          'height': '150px',
+          'max-height': '150px'
+        });
+      });
+
+      observer.observe(chartContainer, {
+        attributes: true,
+        childList: true,
+        subtree: true
+      });
+
+      // 每秒检查一次图表高度，确保其不变
+      setInterval(function() {
+        $(chartCanvas).css({
+          'height': '150px',
+          'max-height': '150px'
+        });
+      }, 1000);
     } else {
       // 如果没有数据，显示提示信息
       $('#scoreTimelineChart').parent().append('<div class="ui info message">暂无得分时间线数据</div>');
