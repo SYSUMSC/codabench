@@ -581,8 +581,8 @@
               });
             });
 
-            // 按100取整后+100作为最大值
-            return Math.ceil(maxScore / 100) * 100 + 100;
+            // 按100取整后+200作为最大值，确保有足够的空间
+            return Math.ceil(maxScore / 100) * 100 + 200;
           }(),
           // 动态计算合适的间隔
           interval: function() {
@@ -613,7 +613,7 @@
             }
           }(),
           // 添加空白空间，防止溢出
-          boundaryGap: ['20%', '20%'],
+          boundaryGap: ['20%', '30%'],
           // 确保数据不会超出图表边界
           scale: true,
           axisLabel: {
