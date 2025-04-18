@@ -59,7 +59,6 @@
                     </label>
 
                     <select name="organizations" id="organization_dropdown" class="ui dropdown" required>
-                        <option value="">-- 选择队伍 --</option>
                         <option each="{org in organizations}" value="{org.id}">{org.name}</option>
                         <option if="{_.size(organizations) === 0}" value="add_organization">+ 添加新队伍</option>
                     </select>
@@ -181,6 +180,9 @@
                         toastr.warning('您需要创建或加入一个队伍才能提交。点击下拉菜单中的"添加新队伍"选项或者联系队长邀请您加入队伍。')
                         // Add a visible warning message above the dropdown
                         $('.ui.form').prepend('<div class="ui warning message"><div class="header">注意</div><p>您当前没有队伍，需要创建或加入一个队伍才能提交。</p><p>请点击下拉菜单中的"添加新队伍"选项创建队伍，或联系队长邀请您加入队伍。</p></div>')
+                    } else {
+                        // If teams are available, automatically select the first team
+                        $('#organization_dropdown').dropdown('set selected', self.organizations[0].id)
                     }
                     self.update()
                 })
