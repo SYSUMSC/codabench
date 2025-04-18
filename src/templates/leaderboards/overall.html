@@ -1,6 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% comment %}
+<!-- 将队伍数据转换为JSON存储在页面中 -->
+{% for entry in leaderboard_list %}
+<script id="team-data-{{ entry.organization.id }}" type="application/json">
+{
+  "name": "{{ entry.organization.name }}",
+  "total_points": {{ entry.total_points|floatformat:2 }},
+  {% if show_avg_submission_time and entry.avg_submission_time %}
+  "avg_submission_time": "{{ entry.avg_submission_time|date:'Y-m-d H:i:s' }}",
+  {% else %}
+  "avg_submission_time": null,
+  {% endif %}
+  "detailed_scores": [
+    {% for score in entry.detailed_scores %}
+    {"competition_title": "{{ score.competition_title }}", "score": {{ score.score|floatformat:2 }}}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endfor %}
+{% endcomment %}
 <div class="ui container">
   <h1 class="ui header">总体排行榜（队伍）</h1>
 
@@ -74,52 +95,7 @@
     </tbody>
   </table>
 
-  <!-- Modals for team details (outside of table) -->
-  {% for entry in leaderboard_list %}
-  <div class="ui modal" id="modal-org-{{ entry.organization.id }}" style="max-width: 600px; margin: 0 auto !important;">
-    <i class="close icon"></i>
-    <div class="header">
-      {{ entry.organization.name }} 的详细得分
-    </div>
-    <div class="content">
-      <table class="ui celled table">
-        <thead>
-          <tr>
-            <th class="twelve wide">比赛</th>
-            <th class="four wide">得分</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for score in entry.detailed_scores %}
-          <tr>
-            <td>{{ score.competition_title }}</td>
-            <td>{{ score.score|floatformat:2 }}</td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="2" class="center aligned">暂无详细得分数据</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th class="right aligned"><strong>总分</strong></th>
-            <th><strong>{{ entry.total_points|floatformat:2 }}</strong></th>
-          </tr>
-          {% if show_avg_submission_time and entry.avg_submission_time %}
-          <tr class="positive">
-            <th class="right aligned"><strong>平均提交时间</strong> <i class="info circle icon" title="当总分相同时，平均提交时间越早的队伍排名越靠前"></i></th>
-            <th><strong>{{ entry.avg_submission_time|date:"Y-m-d H:i:s" }}</strong></th>
-          </tr>
-          {% endif %}
-        </tfoot>
-      </table>
-    </div>
-    <div class="actions">
-      <div class="ui cancel button">关闭</div>
-    </div>
-  </div>
-  {% endfor %}
+  <!-- 不再需要静态模态框，使用layer.js动态创建 -->
 </div>
 
 {% endblock %}
@@ -147,23 +123,16 @@
     margin-top: 0;
   }
 
-  /* 修复模态框垂直居中问题 */
-  .ui.modal {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    margin: 0 !important;
-    max-height: 80vh;
-    overflow-y: auto;
+  /* layer.js 模态框样式调整 */
+  .layui-layer-title {
+    font-weight: bold;
+    font-size: 16px;
   }
 
-  /* 特别针对队伍详情模态框 */
-  [id^="modal-org-"] {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    margin-top: 0 !important;
+  /* 确保layer模态框内的表格样式正确 */
+  .layui-layer-content .ui.table {
+    margin: 0;
+    border-radius: 0.28571429rem;
   }
 
   #scoreTimelineChart {
@@ -211,30 +180,73 @@
       }
     });
 
-    // 点击分数显示详细得分弹窗
+    // 点击分数显示详细得分弹窗 - 使用layer.js
+
     $('.score-details').on('click', function(e) {
       e.preventDefault();
       var orgId = $(this).data('org-id');
-      var $modal = $('#modal-org-' + orgId);
+      var orgName = $(this).data('org-name');
 
-      // 显示模态框
-      $modal.modal('show');
+      // 生成表格HTML
+      var tableHtml = '<table class="ui celled table">'
+        + '<thead>'
+        + '<tr>'
+        + '<th class="twelve wide">比赛</th>'
+        + '<th class="four wide">得分</th>'
+        + '</tr>'
+        + '</thead>'
+        + '<tbody>';
 
-      // 强制居中定位
-      setTimeout(function() {
-        $modal.css({
-          'top': '50%',
-          'left': '50%',
-          'transform': 'translate(-50%, -50%)',
-          'margin-top': '0'
-        });
-      }, 10);
+      // 直接使用当前页面上的数据
+      // 注意：如果需要从服务器获取最新数据，需要实现相应的API端点
+      var totalPoints = $(this).text().trim();
+
+      // 使用layer.js直接显示弹窗
+      // 获取详细得分数据
+      {% for entry in leaderboard_list %}
+      if ({{ entry.organization.id }} == orgId) {
+        // 添加比赛得分行
+        {% for score in entry.detailed_scores %}
+        tableHtml += '<tr>'
+          + '<td>{{ score.competition_title }}</td>'
+          + '<td>{{ score.score|floatformat:2 }}</td>'
+          + '</tr>';
+        {% empty %}
+        tableHtml += '<tr><td colspan="2" class="center aligned">暂无详细得分数据</td></tr>';
+        {% endfor %}
+
+        // 添加表格尾部
+        tableHtml += '</tbody>'
+          + '<tfoot>'
+          + '<tr>'
+          + '<th class="right aligned"><strong>总分</strong></th>'
+          + '<th><strong>{{ entry.total_points|floatformat:2 }}</strong></th>'
+          + '</tr>';
+
+        {% if show_avg_submission_time and entry.avg_submission_time %}
+        tableHtml += '<tr class="positive">'
+          + '<th class="right aligned"><strong>平均提交时间</strong> <i class="info circle icon" title="当总分相同时，平均提交时间越早的队伍排名越靠前"></i></th>'
+          + '<th><strong>{{ entry.avg_submission_time|date:"Y-m-d H:i:s" }}</strong></th>'
+          + '</tr>';
+        {% endif %}
+      }
+      {% endfor %}
+
+      tableHtml += '</tfoot></table>';
+
+      // 使用layer.js显示弹窗
+      layer.open({
+        type: 1,
+        title: orgName + ' 的详细得分',
+        area: ['600px', 'auto'],
+        shadeClose: true,
+        content: tableHtml
+      });
     });
 
-    // 确保关闭按钮正常工作
-    $('.ui.modal .close.icon, .ui.modal .ui.cancel.button').on('click', function() {
-      $(this).closest('.ui.modal').modal('hide');
-    });
+    // 不再需要生成分数表格HTML的函数，直接在点击事件中处理
+
+    // 不再需要手动处理关闭按钮，layer.js会自动处理
 
     // 初始化ECharts实例
     var chartContainer = document.getElementById('scoreTimelineChart');
