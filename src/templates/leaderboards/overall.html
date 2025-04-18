@@ -7,7 +7,7 @@
   <!-- 前10名队伍得分时间线图表 -->
   <div class="ui segment chart-container">
     <h3 class="ui header" style="margin: 0.5em;">前10名队伍得分时间线</h3>
-    <canvas id="scoreTimelineChart" width="800" height="300" style="width: 100%; height: 300px; max-height: 300px;"></canvas>
+    <div id="scoreTimelineChart" style="width: 100%; height: 300px;"></div>
   </div>
   <table class="ui celled table">
     <thead>
@@ -119,22 +119,18 @@
   #scoreTimelineChart {
     width: 100% !important;
     height: 300px !important;
-    max-height: 300px !important;
   }
 
   .ui.segment.chart-container {
     padding: 0.5em;
     height: auto !important;
-    max-height: 220px !important;
     overflow: hidden;
   }
 </style>
-<link rel="stylesheet" href="https://cdn.mengze.vip/npm/chart.js@3.9.1/dist/chart.min.css">
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.mengze.vip/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script src="https://cdn.mengze.vip/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <script>
   $(document).ready(function() {
     // 点击分数显示详细得分弹窗
@@ -144,129 +140,108 @@
       $('#modal-org-' + orgId).modal('show');
     });
 
-    // 防止图表自动调整大小
-    $(window).on('resize', function() {
-      $('#scoreTimelineChart').css({
-        'height': '300px',
-        'max-height': '300px'
-      });
-    });
+    // 初始化ECharts实例
+    var chartContainer = document.getElementById('scoreTimelineChart');
+    var myChart = echarts.init(chartContainer);
 
-    // 初始化得分时间线图表
-    var ctx = document.getElementById('scoreTimelineChart').getContext('2d');
-    var chartData = {{ chart_data|safe }};
+    // 获取原始数据
+    var originalData = {{ chart_data|safe }};
 
-    if (chartData.datasets && chartData.datasets.length > 0) {
-      // 强制设置画布高度
-      $('#scoreTimelineChart').css({
-        'height': '300px',
-        'max-height': '300px'
-      });
+    if (originalData.datasets && originalData.datasets.length > 0) {
+      // 准备ECharts数据
+      var series = [];
+      var allDates = [];
 
-      var scoreTimelineChart = new Chart(ctx, {
-        type: 'line',
-        data: chartData,
-        options: {
-          elements: {
-            line: {
-              tension: 0.3,  // 线条弹性（平滑度）
-              borderWidth: 2,  // 线条宽度
-              fill: false,  // 不填充线条下方区域
-              cubicInterpolationMode: 'monotone'  // 使用单调插值模式，确保线条平滑
-            },
-            point: {
-              radius: 4,  // 数据点半径
-              hoverRadius: 6,  // 鼠标悬停时数据点半径
-              borderWidth: 2  // 数据点边框宽度
-            }
+      // 处理每个数据集
+      originalData.datasets.forEach(function(dataset) {
+        var seriesData = [];
+
+        // 转换数据格式
+        dataset.data.forEach(function(point) {
+          var date = new Date(point.x);
+          var formattedDate = date.toISOString().split('T')[0]; // 格式化为YYYY-MM-DD
+          allDates.push(formattedDate);
+          seriesData.push([formattedDate, point.y]);
+        });
+
+        // 添加到系列中
+        series.push({
+          name: dataset.label,
+          type: 'line',
+          data: seriesData,
+          smooth: true,
+          symbol: 'circle',
+          symbolSize: 6,
+          lineStyle: {
+            width: 2,
+            color: dataset.borderColor
           },
-          spanGaps: true,  // 跨越空白点，连接数据点
-          responsive: false,
-          maintainAspectRatio: true,
-          interaction: {
-            mode: 'index',
-            intersect: false,
-          },
-          plugins: {
-            title: {
-              display: false
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' 分';
-                }
-              }
-            },
-            legend: {
-              position: 'top',
-              labels: {
-                boxWidth: 12,
-                padding: 8,
-                font: {
-                  size: 11
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              type: 'time',
-              time: {
-                unit: 'day',
-                displayFormats: {
-                  day: 'MM-dd'
-                },
-                tooltipFormat: 'yyyy-MM-dd HH:mm:ss'
-              },
-              title: {
-                display: false
-              },
-              ticks: {
-                font: {
-                  size: 10
-                }
-              }
-            },
-            y: {
-              title: {
-                display: false
-              },
-              beginAtZero: true,
-              ticks: {
-                font: {
-                  size: 10
-                }
-              }
-            }
+          itemStyle: {
+            color: dataset.borderColor
           }
-        }
-      });
-
-      // 使用MutationObserver监视图表容器的变化，确保图表高度不变
-      var chartContainer = document.querySelector('.chart-container');
-      var chartCanvas = document.getElementById('scoreTimelineChart');
-
-      var observer = new MutationObserver(function(mutations) {
-        $(chartCanvas).css({
-          'height': '300px',
-          'max-height': '300px'
         });
       });
 
-      observer.observe(chartContainer, {
-        attributes: true,
-        childList: true,
-        subtree: true
-      });
+      // 获取唯一的日期并排序
+      var uniqueDates = [...new Set(allDates)].sort();
 
-      // 每秒检查一次图表高度，确保其不变
-      setInterval(function() {
-        $(chartCanvas).css({
-          'height': '300px',
-          'max-height': '300px'
-        });
-      }, 1000);
+      // 设置图表选项
+      var option = {
+        tooltip: {
+          trigger: 'axis',
+          formatter: function(params) {
+            var result = params[0].axisValue + '<br/>';
+            params.forEach(function(param) {
+              result += param.marker + ' ' + param.seriesName + ': ' + param.value[1].toFixed(2) + ' 分<br/>';
+            });
+            return result;
+          }
+        },
+        legend: {
+          data: originalData.datasets.map(function(dataset) { return dataset.label; }),
+          top: 0,
+          textStyle: {
+            fontSize: 11
+          },
+          itemWidth: 12,
+          itemHeight: 8,
+          padding: 8
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          top: '40px',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: uniqueDates,
+          axisLabel: {
+            formatter: function(value) {
+              var date = new Date(value);
+              return (date.getMonth() + 1) + '-' + date.getDate();
+            },
+            fontSize: 10
+          }
+        },
+        yAxis: {
+          type: 'value',
+          axisLabel: {
+            fontSize: 10
+          }
+        },
+        series: series
+      };
+
+      // 设置图表选项并渲染
+      myChart.setOption(option);
+
+      // 窗口大小变化时，重新调整图表大小
+      window.addEventListener('resize', function() {
+        myChart.resize();
+      });
     } else {
       // 如果没有数据，显示提示信息
       $('#scoreTimelineChart').parent().append('<div class="ui info message">暂无得分时间线数据</div>');
