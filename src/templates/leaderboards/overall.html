@@ -569,10 +569,49 @@
         yAxis: {
           type: 'value',
           min: 0,
-          // 设置最大值为1000，确保所有分数都能正确显示
-          max: 1000,
-          // 设置刻度间隔为100
-          interval: 100,
+          // 动态计算最大值和间隔
+          max: function() {
+            // 找出所有数据中的最大值
+            var maxScore = 0;
+            series.forEach(function(s) {
+              s.data.forEach(function(point) {
+                if (point[1] > maxScore) {
+                  maxScore = point[1];
+                }
+              });
+            });
+
+            // 按100取整后+100作为最大值
+            return Math.ceil(maxScore / 100) * 100 + 100;
+          }(),
+          // 动态计算合适的间隔
+          interval: function() {
+            // 找出所有数据中的最大值
+            var maxScore = 0;
+            series.forEach(function(s) {
+              s.data.forEach(function(point) {
+                if (point[1] > maxScore) {
+                  maxScore = point[1];
+                }
+              });
+            });
+
+            // 计算合适的间隔
+            var calculatedMax = Math.ceil(maxScore / 100) * 100 + 100;
+
+            // 根据最大值选择合适的间隔
+            if (calculatedMax <= 500) {
+              return 50; // 小于500时，用50作为间隔
+            } else if (calculatedMax <= 1000) {
+              return 100; // 500-1000之间，用100作为间隔
+            } else if (calculatedMax <= 2000) {
+              return 200; // 1000-2000之间，用200作为间隔
+            } else if (calculatedMax <= 5000) {
+              return 500; // 2000-5000之间，用500作为间隔
+            } else {
+              return 1000; // 大于5000时，用1000作为间隔
+            }
+          }(),
           // 添加空白空间，防止溢出
           boundaryGap: ['20%', '20%'],
           // 确保数据不会超出图表边界
