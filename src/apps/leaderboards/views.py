@@ -176,7 +176,11 @@ def overall_leaderboard(request):
                 'timestamp': start_timestamp,
                 'score': 0.0,
                 'cumulative_max': 0.0,
-                'debug_total_score': float(org_total_score)  # 添加调试信息
+                'debug_total_score': float(org_total_score),  # 添加调试信息
+                'detailed_scores': [],  # 添加空的小题分数详情
+                'is_key_time': False,  # 起始点不是关键时间点
+                'total_score': 0.0,  # 起始时总分为0
+                'submission_id': None  # 起始时没有提交ID
             }
         ]
 
@@ -193,12 +197,24 @@ def overall_leaderboard(request):
 
         # 获取该提交的小题分数详情，用于调试
         detailed_scores = []
-        for score_obj in sub.scores.all():
-            detailed_scores.append({
-                'column_id': score_obj.column_id,
-                'column_title': score_obj.column.title if hasattr(score_obj.column, 'title') else f'Column {score_obj.column_id}',
-                'score': float(score_obj.score)
-            })
+        try:
+            # 获取所有分数并预加载 column 关系
+            all_scores = sub.scores.select_related('column').all()
+            print(f"Found {len(all_scores)} scores for submission {sub.id}")
+
+            for score_obj in all_scores:
+                try:
+                    column_title = score_obj.column.title if hasattr(score_obj.column, 'title') else f'Column {score_obj.column_id}'
+                    detailed_scores.append({
+                        'column_id': score_obj.column_id,
+                        'column_title': column_title,
+                        'score': float(score_obj.score)
+                    })
+                    print(f"Added score for column {column_title}: {float(score_obj.score)}")
+                except Exception as e:
+                    print(f"Error processing score {score_obj.id}: {str(e)}")
+        except Exception as e:
+            print(f"Error getting scores for submission {sub.id}: {str(e)}")
 
         # 添加到该组织的时间线数据中
         org_timeline_data[org_id].append({
@@ -234,7 +250,10 @@ def overall_leaderboard(request):
                 'timestamp': point['timestamp'],
                 'score': point['score'],
                 'cumulative_max': current_max_score,
-                'submission_id': point.get('submission_id', None)
+                'submission_id': point.get('submission_id', None),
+                'detailed_scores': point.get('detailed_scores', []),  # 保留小题分数详情
+                'is_key_time': point.get('is_key_time', False),  # 保留关键时间点标记
+                'total_score': point.get('total_score', 0)  # 保留总分信息
             })
 
         # 替换原始数据
@@ -300,7 +319,10 @@ def overall_leaderboard(request):
                     'timestamp': end_time.strftime('%Y-%m-%d %H:%M:%S'),
                     'score': point.get('cumulative_max', point.get('score', 0)),
                     'cumulative_max': point.get('cumulative_max', point.get('score', 0)),
-                    'is_key_time': True
+                    'is_key_time': True,
+                    'detailed_scores': point.get('detailed_scores', []),  # 保留小题分数详情
+                    'total_score': point.get('total_score', 0),  # 保留总分信息
+                    'submission_id': None  # 关键时间点没有提交ID
                 })
             # 如果当前点已经在结束时间之后，添加一个小时后的点
             else:
@@ -308,7 +330,11 @@ def overall_leaderboard(request):
                 org_timeline_data[org_id].append({
                     'timestamp': new_time.strftime('%Y-%m-%d %H:%M:%S'),
                     'score': point.get('cumulative_max', point.get('score', 0)),
-                    'cumulative_max': point.get('cumulative_max', point.get('score', 0))
+                    'cumulative_max': point.get('cumulative_max', point.get('score', 0)),
+                    'detailed_scores': point.get('detailed_scores', []),  # 保留小题分数详情
+                    'is_key_time': False,  # 不是关键时间点
+                    'total_score': point.get('total_score', 0),  # 保留总分信息
+                    'submission_id': None  # 没有提交ID
                 })
 
         # 确保数据包含到结束时间的数据点，使图表显示完整数据
