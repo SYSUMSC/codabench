@@ -135,8 +135,8 @@ class SubmissionCreationSerializer(DefaultUserCreateMixin, serializers.ModelSeri
         data = super().validate(attrs)
 
         # 必须以队伍（organization组织）的形式提交，不允许单独提交
-        if not attrs.get('organization'):
-            raise ValidationError('必须以队伍为单位提交')
+        # if not attrs.get('organization'):
+        #     raise ValidationError('必须以队伍为单位提交')
 
         if attrs.get('fact_sheet_answers'):
             fact_sheet_answers = data['fact_sheet_answers']

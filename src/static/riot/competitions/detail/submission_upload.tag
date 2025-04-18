@@ -63,6 +63,9 @@
                         <option each="{org in organizations}" value="{org.id}">{org.name}</option>
                         <option if="{_.size(organizations) === 0}" value="add_organization">+ 添加新队伍</option>
                     </select>
+                    <div class="ui pointing red basic label">
+                        必须选择一个队伍才能提交！个人提交将被拒绝。
+                    </div>
 
                 </div>
 
@@ -177,7 +180,7 @@
                         // $('#organization_dropdown').hide()
                         toastr.warning('您需要创建或加入一个队伍才能提交。点击下拉菜单中的"添加新队伍"选项或者联系队长邀请您加入队伍。')
                         // Add a visible warning message above the dropdown
-                        $('.ui.form').prepend('<div class="ui warning message"><div class="header">注意</div><p>您当前没有队伍，需要创建或加入一个队伍才能提交。</p></div>')
+                        $('.ui.form').prepend('<div class="ui warning message"><div class="header">注意</div><p>您当前没有队伍，需要创建或加入一个队伍才能提交。</p><p>请点击下拉菜单中的"添加新队伍"选项创建队伍，或联系队长邀请您加入队伍。</p></div>')
                     }
                     self.update()
                 })
@@ -374,10 +377,24 @@
         }
 
         self.check_can_upload = function () {
+            // First check if a team is selected
+            let dropdown = $('#organization_dropdown')
+            let organization = dropdown.dropdown('get value')
+
+            if (!organization || organization === '') {
+                toastr.error('必须选择一个队伍才能提交！')
+                self.clear_form()
+                return
+            }
+
+            if (organization === 'add_organization') {
+                toastr.error('请先创建并选择一个队伍才能提交')
+                self.clear_form()
+                return
+            }
 
             // Check if selected phase accepts submissions (within the deadline of the phase)
             if(self.selected_phase.status === "Current"){
-
                 CODALAB.api.can_make_submissions(self.selected_phase.id)
                     .done(function (data) {
                         if (data.can) {
@@ -423,6 +440,22 @@
         self.upload = function () {
             self.display_output = true
 
+            // Validate organization selection again as a safety check
+            let dropdown = $('#organization_dropdown')
+            let organization = dropdown.dropdown('get value')
+
+            if (!organization || organization === '') {
+                toastr.error('必须选择一个队伍才能提交！')
+                self.clear_form()
+                return
+            }
+
+            if (organization === 'add_organization') {
+                toastr.error('请先创建并选择一个队伍才能提交')
+                self.clear_form()
+                return
+            }
+
             let checkbox_answers = $('#select_tasks_accordion').find('.ui.checkbox').checkbox('is checked')
             let task_ids_to_run = []
             if(self.selected_tasks.length > 1){
@@ -447,11 +480,11 @@
                     let dropdown = $('#organization_dropdown')
                     let organization = dropdown.dropdown('get value')
                     if(organization === 'add_organization'){
-                        toastr.error('You must create and select a team before submitting')
+                        toastr.error('请先创建并选择一个队伍才能提交')
                         $('#organization_dropdown').removeAttr('disabled')
                         return
-                    } else if(organization === 'None'){
-                        toastr.error('You must submit as part of a team. Individual submissions are not allowed.')
+                    } else if(organization === '' || organization === 'None'){
+                        toastr.error('必须以队伍名义提交，不允许个人提交')
                         $('#organization_dropdown').removeAttr('disabled')
                         return
                     }

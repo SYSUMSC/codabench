@@ -167,8 +167,8 @@ class SubmissionViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         # 必须以队伍（organization组织）的形式提交，不允许单独提交
-        if 'organization' not in request.data or request.data['organization'] is None:
-            raise ValidationError('必须以队伍为单位提交')
+        # if 'organization' not in request.data or request.data['organization'] is None:
+        #     raise ValidationError('必须以队伍为单位提交')
 
         organization = get_object_or_404(Organization, pk=request.data['organization'])
         try:
