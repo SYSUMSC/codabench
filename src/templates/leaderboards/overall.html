@@ -12,7 +12,7 @@
   <!-- 前20名队伍得分时间线图表 -->
   <div class="ui segment chart-container">
     <h3 class="ui header" style="margin: 0.5em;">前20名队伍得分时间线（2025年4月18日 12:00 至 {{ actual_end_date }}）</h3>
-    <div id="scoreTimelineChart" style="width: 100%; height: 300px;"></div>
+    <div id="scoreTimelineChart" style="width: 100%; height: 350px;"></div>
   </div>
   <table class="ui celled table">
     <thead>
@@ -149,13 +149,16 @@
 
   #scoreTimelineChart {
     width: 100% !important;
-    height: 300px !important;
+    height: 350px !important;
+    position: relative;
+    overflow: visible !important;
   }
 
   .ui.segment.chart-container {
     padding: 0.5em;
     height: auto !important;
-    overflow: hidden;
+    overflow: visible;
+    margin-bottom: 1.5em;
   }
 
   /* 平均提交时间样式 */
@@ -456,7 +459,7 @@
           left: '3%',
           right: '4%',
           bottom: '3%',
-          top: '40px',
+          top: '50px',
           containLabel: true
         },
         xAxis: {
@@ -522,9 +525,23 @@
           max: 1000,
           // 设置刻度间隔为100
           interval: 100,
+          // 添加空白空间，防止溢出
+          boundaryGap: ['20%', '20%'],
+          // 确保数据不会超出图表边界
+          scale: true,
           axisLabel: {
             fontSize: 10,
-            formatter: '{value} 分'
+            formatter: '{value} 分',
+            margin: 10
+          },
+          // 确保轴线不会被截断
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: '#eee',
+              width: 1,
+              type: 'solid'
+            }
           }
         },
         series: series
@@ -532,6 +549,11 @@
 
       // 设置图表选项并渲染
       myChart.setOption(option);
+
+      // 确保图表完全渲染
+      setTimeout(function() {
+        myChart.resize();
+      }, 100);
 
       // 添加缩放结束事件处理，确保数据始终可见
       var lastZoomStart = 0;
@@ -555,7 +577,12 @@
 
       // 添加窗口调整事件
       window.addEventListener('resize', function() {
-        myChart.resize();
+        // 确保图表在调整大小时不会溢出
+        setTimeout(function() {
+          myChart.resize();
+          // 重新应用选项以确保正确显示
+          myChart.setOption(option);
+        }, 200);
       });
 
       // 打印调试信息，查看数据是否正确
