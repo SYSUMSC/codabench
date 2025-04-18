@@ -302,9 +302,13 @@
           dataPoint.originalDate = point.x;
 
           // 添加额外属性以供工具提示使用
-          dataPoint.actualScore = point.actual_score || score;
           dataPoint.submissionId = point.submission_id || null;
           dataPoint.isKeyTime = point.is_key_time || false;
+          // 添加小题分数详情，仅用于控制台调试
+          if (point.detailed_scores && point.detailed_scores.length > 0) {
+            dataPoint.detailedScores = point.detailed_scores;
+            console.log('Detailed scores for point at ' + point.x + ':', point.detailed_scores);
+          }
 
           seriesData.push(dataPoint);
         });
@@ -461,15 +465,11 @@
               // 如果有总分信息，显示总分
               if (point.total_score) {
                 scoreDisplay = point.total_score.toFixed(2) + ' 分 (总分)';
-
-                // 如果有实际提交分数，显示实际提交分数
-                if (point.submissionId && point.actualScore) {
-                  scoreDisplay += ' [本次提交: ' + point.actualScore.toFixed(2) + ' 分]';
-                }
               }
-              // 如果没有总分信息，但有实际提交分数且与显示分数不同，显示两者
-              else if (point.submissionId && point.actualScore !== param.value[1]) {
-                scoreDisplay += ' (本次提交: ' + point.actualScore.toFixed(2) + ' 分)';
+
+              // 如果有小题分数详情，在控制台输出调试信息
+              if (point.detailedScores && point.detailedScores.length > 0) {
+                console.log('当前点的小题分数详情:', point.detailedScores);
               }
 
               // 添加特殊标记

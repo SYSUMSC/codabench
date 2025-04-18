@@ -191,12 +191,22 @@ def overall_leaderboard(request):
         org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
         org_total_score = float(org_entry['total_points']) if org_entry else 0
 
+        # 获取该提交的小题分数详情，用于调试
+        detailed_scores = []
+        for score_obj in sub.scores.all():
+            detailed_scores.append({
+                'column_id': score_obj.column_id,
+                'column_title': score_obj.column.title if hasattr(score_obj.column, 'title') else f'Column {score_obj.column_id}',
+                'score': float(score_obj.score)
+            })
+
         # 添加到该组织的时间线数据中
         org_timeline_data[org_id].append({
             'timestamp': timestamp,
             'score': float(score),
             'total_score': org_total_score,  # 添加组织总分
-            'submission_id': sub.id  # 添加提交ID以便于追踪
+            'submission_id': sub.id,  # 添加提交ID以便于追踪
+            'detailed_scores': detailed_scores  # 添加小题分数详情，用于调试
         })
 
     # 为每个组织处理时间线数据，使用实际提交时间而不是按小时分组
@@ -257,7 +267,8 @@ def overall_leaderboard(request):
                             'timestamp': key_time.strftime('%Y-%m-%d %H:%M:%S'),
                             'score': prev_point.get('cumulative_max', prev_point['score']),
                             'cumulative_max': prev_point.get('cumulative_max', prev_point['score']),
-                            'is_key_time': True  # 标记为关键时间点
+                            'is_key_time': True,  # 标记为关键时间点
+                            'detailed_scores': prev_point.get('detailed_scores', [])  # 保留前一个点的小题分数详情
                         })
 
                 # 添加当前点
@@ -321,7 +332,8 @@ def overall_leaderboard(request):
                     'score': last_point.get('score', 0),
                     'cumulative_max': last_point.get('cumulative_max', 0),
                     'total_score': org_total_score,  # 添加组织总分
-                    'is_key_time': True  # 标记为关键时间点
+                    'is_key_time': True,  # 标记为关键时间点
+                    'detailed_scores': last_point.get('detailed_scores', [])  # 保留前一个点的小题分数详情
                 })
 
     # 准备图表数据
@@ -345,10 +357,10 @@ def overall_leaderboard(request):
                     {
                         'x': point['timestamp'],  # 实际时间点
                         'y': float(point.get('total_score', point.get('cumulative_max', 0))),  # 优先使用总分，如果没有则使用累计最高分
-                        'actual_score': float(point.get('score', 0)),  # 实际提交分数
                         'submission_id': point.get('submission_id', None),  # 提交ID
                         'is_key_time': point.get('is_key_time', False),  # 是否为关键时间点
-                        'total_score': float(point.get('total_score', 0))  # 组织总分
+                        'total_score': float(point.get('total_score', 0)),  # 组织总分
+                        'detailed_scores': point.get('detailed_scores', [])  # 小题分数数组，用于调试
                     } for point in org_timeline_data[org_id]
                 ],
                 'borderColor': f'hsl({(i * 36) % 360}, 70%, 50%)',  # 使用HSL颜色空间生成不同颜色
