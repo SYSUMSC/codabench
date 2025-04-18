@@ -102,11 +102,17 @@ def overall_leaderboard(request):
         for lb_id, score in org_scores.items():
             if lb_id in leaderboards:
                 lb_info = leaderboards[lb_id]
+                # 添加最新提交时间信息
+                submission_time = None
+                if org_id in org_best_submissions and lb_id in org_best_submissions[org_id]:
+                    submission_time = org_best_submissions[org_id][lb_id].created_when
+
                 detailed_scores.append({
                     'leaderboard_id': lb_id,
                     'leaderboard_title': lb_info['leaderboard'].title,
                     'competition_title': lb_info['competition_title'] or '未知比赛',  # 如果没有比赛标题，显示“未知比赛”
-                    'score': score
+                    'score': score,
+                    'submission_time': submission_time  # 添加最新提交时间
                 })
 
         # 按排行榜标题排序
