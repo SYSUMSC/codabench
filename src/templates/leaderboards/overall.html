@@ -7,7 +7,7 @@
   <!-- 前10名队伍得分时间线图表 -->
   <div class="ui segment chart-container">
     <h3 class="ui header" style="margin: 0.5em;">前10名队伍得分时间线</h3>
-    <canvas id="scoreTimelineChart" width="800" height="150" style="width: 100%; height: 150px; max-height: 150px;"></canvas>
+    <canvas id="scoreTimelineChart" width="800" height="300" style="width: 100%; height: 300px; max-height: 300px;"></canvas>
   </div>
   <table class="ui celled table">
     <thead>
@@ -118,8 +118,8 @@
 
   #scoreTimelineChart {
     width: 100% !important;
-    height: 150px !important;
-    max-height: 150px !important;
+    height: 300px !important;
+    max-height: 300px !important;
   }
 
   .ui.segment.chart-container {
@@ -147,8 +147,8 @@
     // 防止图表自动调整大小
     $(window).on('resize', function() {
       $('#scoreTimelineChart').css({
-        'height': '150px',
-        'max-height': '150px'
+        'height': '300px',
+        'max-height': '300px'
       });
     });
 
@@ -159,8 +159,8 @@
     if (chartData.datasets && chartData.datasets.length > 0) {
       // 强制设置画布高度
       $('#scoreTimelineChart').css({
-        'height': '150px',
-        'max-height': '150px'
+        'height': '300px',
+        'max-height': '300px'
       });
 
       var scoreTimelineChart = new Chart(ctx, {
@@ -249,8 +249,8 @@
 
       var observer = new MutationObserver(function(mutations) {
         $(chartCanvas).css({
-          'height': '150px',
-          'max-height': '150px'
+          'height': '300px',
+          'max-height': '300px'
         });
       });
 
@@ -263,8 +263,8 @@
       // 每秒检查一次图表高度，确保其不变
       setInterval(function() {
         $(chartCanvas).css({
-          'height': '150px',
-          'max-height': '150px'
+          'height': '300px',
+          'max-height': '300px'
         });
       }, 1000);
     } else {
