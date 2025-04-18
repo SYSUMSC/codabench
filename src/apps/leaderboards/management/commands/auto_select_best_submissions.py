@@ -5,6 +5,7 @@ from competitions.models import Submission
 from leaderboards.models import Leaderboard, SubmissionScore
 from profiles.models import Organization, User, Membership
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,11 @@ class Command(BaseCommand):
             action='store_true',
             help='强制为每个列选择最佳提交，即使没有主要列的得分'
         )
+        parser.add_argument(
+            '--filter-null-tasks',
+            action='store_true',
+            help='过滤掉detailed_results中task为null的提交'
+        )
 
     def has_admin_members(self, organization):
         """检查组织是否有管理员成员"""
@@ -48,11 +54,31 @@ class Command(BaseCommand):
 
         return False
 
+    def has_null_task_in_detailed_results(self, submission):
+        """检查提交的detailed_results中是否有task为null的项"""
+        # 如果没有detailed_result字段，返回False
+        if not hasattr(submission, 'detailed_result') or not submission.detailed_result:
+            return False
+
+        # 尝试从submission对象中获取detailed_results数据
+        try:
+            # 在实际应用中，这里需要根据detailed_results的实际存储方式来获取数据
+            # 如果detailed_results是作为JSON字段存储在数据库中
+            if hasattr(submission, 'detailed_results') and submission.detailed_results:
+                for result in submission.detailed_results:
+                    if result.get('task') is None:
+                        return True
+        except Exception as e:
+            logger.error(f"检查detailed_results时出错: {str(e)}")
+
+        return False
+
     def handle(self, *args, **options):
         dry_run = options.get('dry_run')
         verbose = options.get('verbose')
         include_admin_orgs = options.get('include-admin-orgs')
         force_all_columns = options.get('force-all-columns')
+        filter_null_tasks = options.get('filter-null-tasks')
 
         if dry_run:
             self.stdout.write(self.style.WARNING('执行干运行模式，不会实际修改数据库'))
@@ -142,11 +168,40 @@ class Command(BaseCommand):
                         primary_col=Sum('scores__score', filter=Q(scores__column=primary_col))
                     )
 
-                    # 根据排序方向选择最佳提交
-                    if is_desc:  # 降序，分数越高越好
-                        best_submission = annotated_submissions.order_by('-primary_col', 'created_when').first()
-                    else:  # 升序，分数越低越好
-                        best_submission = annotated_submissions.order_by('primary_col', 'created_when').first()
+                    # 过滤掉detailed_results中task为null的提交（如果启用了该选项）
+                    if filter_null_tasks:
+                        # 首先获取所有可能的最佳提交
+                        if is_desc:  # 降序，分数越高越好
+                            potential_best_submissions = annotated_submissions.order_by('-primary_col', 'created_when')
+                        else:  # 升序，分数越低越好
+                            potential_best_submissions = annotated_submissions.order_by('primary_col', 'created_when')
+
+                        # 找到第一个没有null task的提交
+                        best_submission = None
+                        for submission in potential_best_submissions:
+                            # 检查提交的detailed_results
+                            has_null_task = False
+                            if hasattr(submission, 'detailed_results') and submission.detailed_results:
+                                for result in submission.detailed_results:
+                                    if isinstance(result, dict) and result.get('task') is None:
+                                        has_null_task = True
+                                        break
+
+                            if not has_null_task:
+                                best_submission = submission
+                                break
+
+                        # 如果所有提交都有null task，则使用第一个（保持原有行为）
+                        if best_submission is None and potential_best_submissions.exists():
+                            best_submission = potential_best_submissions.first()
+                            if verbose:
+                                self.stdout.write(self.style.WARNING(f"    所有提交都有null task，使用第一个: ID={best_submission.id}"))
+                    else:
+                        # 使用原有逻辑
+                        if is_desc:  # 降序，分数越高越好
+                            best_submission = annotated_submissions.order_by('-primary_col', 'created_when').first()
+                        else:  # 升序，分数越低越好
+                            best_submission = annotated_submissions.order_by('primary_col', 'created_when').first()
 
                     if best_submission:
                         if verbose:
