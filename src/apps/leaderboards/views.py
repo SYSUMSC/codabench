@@ -184,9 +184,19 @@ def overall_leaderboard(request):
             }
         ]
 
+    # 为每个组织创建一个字典，用于跟踪每个排行榜（题目）的最高分及其提交时间
+    # 结构: {org_id: {leaderboard_id: {'score': score, 'timestamp': timestamp, 'submission_id': sub_id, 'detailed_scores': [...]}}}}
+    org_leaderboard_best_scores = {org_id: {} for org_id in top_20_orgs}
+
+    # 按时间排序收集所有提交
+    # 为每个组织创建一个列表，用于存储按时间排序的提交记录
+    # 结构: {org_id: [{timestamp, submission_id, leaderboard_id, score, detailed_scores}]}
+    org_submissions_by_time = {org_id: [] for org_id in top_20_orgs}
+
     # 收集每个组织的提交时间和得分，使用实际提交时间而不是按小时采样
     for sub in timeline_submissions:
         org_id = sub.organization_id
+        leaderboard_id = sub.leaderboard_id
         score = sub.scores.aggregate(total=Sum('score'))['total'] or 0
         # 使用实际提交时间，保留分钟和秒，格式化为 YYYY-MM-DD HH:MM:SS
         timestamp = sub.created_when.strftime('%Y-%m-%d %H:%M:%S')
@@ -219,24 +229,58 @@ def overall_leaderboard(request):
         # 计算小题分数之和，确保与总分一致
         submission_score_sum = sum(item['score'] for item in detailed_scores) if detailed_scores else float(score)
 
-        # 添加到该组织的时间线数据中
-        org_timeline_data[org_id].append({
+        # 将提交记录添加到该组织的时间排序列表中
+        org_submissions_by_time[org_id].append({
             'timestamp': timestamp,
-            'score': float(score),  # 当前提交的分数
-            'total_score': submission_score_sum,  # 使用小题分数之和作为总分
-            'submission_id': sub.id,  # 添加提交ID以便于追踪
-            'detailed_scores': detailed_scores  # 添加小题分数详情，用于调试
+            'submission_id': sub.id,
+            'leaderboard_id': leaderboard_id,
+            'score': float(score),
+            'detailed_scores': detailed_scores,
+            'total_score': submission_score_sum
         })
 
         print(f"Submission {sub.id} - Score: {float(score)}, Detailed scores sum: {submission_score_sum}, Org total: {org_total_score}")
+
+    # 为每个组织处理提交记录，按时间排序并计算每个时间点的总分
+    for org_id in top_20_orgs:
+        # 按时间排序提交记录
+        org_submissions_by_time[org_id].sort(key=lambda x: x['timestamp'])
+
+        # 处理每个提交记录，更新最高分并计算总分
+        for submission in org_submissions_by_time[org_id]:
+            timestamp = submission['timestamp']
+            leaderboard_id = submission['leaderboard_id']
+            score = submission['score']
+            submission_id = submission['submission_id']
+            detailed_scores = submission['detailed_scores']
+
+            # 更新该组织在该排行榜的最高分
+            if leaderboard_id not in org_leaderboard_best_scores[org_id] or score > org_leaderboard_best_scores[org_id][leaderboard_id]['score']:
+                org_leaderboard_best_scores[org_id][leaderboard_id] = {
+                    'score': score,
+                    'timestamp': timestamp,
+                    'submission_id': submission_id,
+                    'detailed_scores': detailed_scores
+                }
+
+            # 计算当前时间点的总分（所有排行榜最高分的总和）
+            total_score = sum(item['score'] for item in org_leaderboard_best_scores[org_id].values())
+
+            # 添加到该组织的时间线数据中
+            org_timeline_data[org_id].append({
+                'timestamp': timestamp,
+                'score': score,  # 当前提交的分数
+                'total_score': total_score,  # 所有排行榜最高分的总和
+                'submission_id': submission_id,  # 添加提交ID以便于追踪
+                'detailed_scores': detailed_scores,  # 添加小题分数详情，用于调试
+                'leaderboard_id': leaderboard_id  # 添加排行榜ID以便于追踪
+            })
 
     # 为每个组织处理时间线数据，使用实际提交时间而不是按小时分组
     for org_id in org_timeline_data:
         # 按时间排序
         org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
 
-        # 计算每个提交时间点的累计总分
-        current_sum_score = 0
         processed_data = []
 
         # 处理每个提交时间点
@@ -246,23 +290,23 @@ def overall_leaderboard(request):
                 processed_data.append(point)
                 continue
 
-            # 累加当前分数，得到截止到此时的总分
-            current_sum_score += point['score']
-
             # 获取小题分数详情
             detailed_scores = point.get('detailed_scores', [])
-            # 计算小题分数之和
-            total_score = sum(item['score'] for item in detailed_scores) if detailed_scores else point.get('score', 0)
+
+            # 使用total_score作为累计最高分
+            # total_score已经在前面的处理中计算为所有排行榜最高分的总和
+            total_score = point.get('total_score', 0)
 
             # 添加到处理后的数据中，包含当前提交分数和累计总分
             processed_data.append({
                 'timestamp': point['timestamp'],
-                'score': point['score'],
-                'cumulative_sum': current_sum_score,
+                'score': point['score'],  # 当前提交的分数
+                'cumulative_max': total_score,  # 使用total_score作为累计最高分
                 'submission_id': point.get('submission_id', None),
                 'detailed_scores': detailed_scores,  # 保留小题分数详情
                 'is_key_time': point.get('is_key_time', False),  # 保留关键时间点标记
-                'total_score': total_score  # 使用小题分数之和作为总分
+                'total_score': total_score,  # 使用total_score作为总分
+                'leaderboard_id': point.get('leaderboard_id', None)  # 保留排行榜ID
             })
 
         # 替换原始数据
@@ -409,7 +453,7 @@ def overall_leaderboard(request):
                 'data': [
                     {
                         'x': point['timestamp'],  # 实际时间点
-                        'y': float(point.get('cumulative_max', 0)),  # 使用累计最高分作为图表显示值
+                        'y': float(point.get('cumulative_max', 0)),  # 使用累计总分作为图表显示值
                         'submission_id': point.get('submission_id', None),  # 提交ID
                         'is_key_time': point.get('is_key_time', False),  # 是否为关键时间点
                         'total_score': float(point.get('total_score', 0)),  # 当前提交的总分（小题分数之和）
