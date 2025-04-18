@@ -118,7 +118,12 @@ def overall_leaderboard(request):
     start_date = datetime(2025, 4, 18, 12, 0, 0)
     # 设置结束时间：2025年4月24日 20:00
     end_date = datetime(2025, 4, 24, 20, 0, 0)
+    # 计算实际结束时间（取结束时间和当前时间的较大值）
+    actual_end_date = max(end_date, datetime.now())
+
+    # 格式化时间戳
     start_timestamp = start_date.strftime('%Y-%m-%d %H:%M:%S')
+    end_timestamp = end_date.strftime('%Y-%m-%d %H:%M:%S')
 
     # 获取这些组织的所有已完成且上榜的提交记录，并且只获取起始时间之后、结束时间之前的提交
     timeline_submissions = Submission.objects.filter(
@@ -139,11 +144,21 @@ def overall_leaderboard(request):
         org_total_score = org_entry['total_points'] if org_entry else 0
 
         # 添加起始时间点，初始分数为0
-        org_timeline_data[org_id] = [{
-            'timestamp': start_timestamp,
-            'score': 0.0,
-            'debug_total_score': float(org_total_score)  # 添加调试信息
-        }]
+        # 添加两个数据点确保图表正确显示起始时间
+        org_timeline_data[org_id] = [
+            # 起始时间前一小时，分数为0
+            {
+                'timestamp': (start_date - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'),
+                'score': 0.0,
+                'debug_total_score': float(org_total_score)  # 添加调试信息
+            },
+            # 起始时间点，分数为0
+            {
+                'timestamp': start_timestamp,
+                'score': 0.0,
+                'debug_total_score': float(org_total_score)  # 添加调试信息
+            }
+        ]
 
     # 收集每个组织的提交时间和得分
     for sub in timeline_submissions:
@@ -231,13 +246,14 @@ def overall_leaderboard(request):
             org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
             org_total_score = float(org_entry['total_points']) if org_entry else 0
 
-            # 添加一个测试数据点，显示最终得分
-            test_time = datetime(2025, 4, 20, 12, 0, 0)
-            test_timestamp = test_time.strftime('%Y-%m-%d %H:%M:%S')
+            # 添加一个数据点，显示最终得分
+            # 使用结束时间前一小时作为最终得分点
+            final_score_time = end_date - timedelta(hours=1)
+            final_score_timestamp = final_score_time.strftime('%Y-%m-%d %H:%M:%S')
 
-            # 添加测试数据点
+            # 添加最终得分点
             org_timeline_data[org_id].append({
-                'timestamp': test_timestamp,
+                'timestamp': final_score_timestamp,
                 'score': org_total_score,
                 'cumulative_max': org_total_score
             })
@@ -245,8 +261,8 @@ def overall_leaderboard(request):
             last_point = org_timeline_data[org_id][-1]
             last_time = datetime.strptime(last_point['timestamp'], '%Y-%m-%d %H:%M:%S')
 
-            # 使用设定的结束时间作为图表的结束时间
-            chart_end_time = min(end_date, datetime.now()).replace(minute=0, second=0, microsecond=0)
+            # 使用实际结束时间作为图表的结束时间
+            chart_end_time = actual_end_date.replace(minute=0, second=0, microsecond=0)
 
             # 如果最后一个点不是结束时间，添加到结束时间的数据点
             if last_time < chart_end_time:
