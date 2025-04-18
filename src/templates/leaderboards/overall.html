@@ -3,6 +3,12 @@
 {% block content %}
 <div class="ui container">
   <h1 class="ui header">总体排行榜（队伍）</h1>
+
+  <!-- 前10名队伍得分时间线图表 -->
+  <div class="ui segment chart-container">
+    <h3 class="ui header" style="margin: 0.5em;">前10名队伍得分时间线</h3>
+    <canvas id="scoreTimelineChart" width="800" height="150" style="width: 100%; height: 150px; max-height: 150px;"></canvas>
+  </div>
   <table class="ui celled table">
     <thead>
       <tr>
@@ -109,10 +115,26 @@
   .ui.modal .ui.table {
     margin-top: 0;
   }
+
+  #scoreTimelineChart {
+    width: 100% !important;
+    height: 150px !important;
+    max-height: 150px !important;
+  }
+
+  .ui.segment.chart-container {
+    padding: 0.5em;
+    height: auto !important;
+    max-height: 220px !important;
+    overflow: hidden;
+  }
 </style>
+<link rel="stylesheet" href="https://cdn.mengze.vip/npm/chart.js@3.9.1/dist/chart.min.css">
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.mengze.vip/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.mengze.vip/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <script>
   $(document).ready(function() {
     // 点击分数显示详细得分弹窗
@@ -121,6 +143,96 @@
       var orgId = $(this).data('org-id');
       $('#modal-org-' + orgId).modal('show');
     });
+
+    // 防止图表自动调整大小
+    $(window).on('resize', function() {
+      $('#scoreTimelineChart').css({
+        'height': '150px',
+        'max-height': '150px'
+      });
+    });
+
+    // 初始化得分时间线图表
+    var ctx = document.getElementById('scoreTimelineChart').getContext('2d');
+    var chartData = {{ chart_data|safe }};
+
+    if (chartData.datasets && chartData.datasets.length > 0) {
+      // 强制设置画布高度
+      $('#scoreTimelineChart').css({
+        'height': '150px',
+        'max-height': '150px'
+      });
+
+      var scoreTimelineChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+          responsive: false,
+          maintainAspectRatio: true,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: {
+            title: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' 分';
+                }
+              }
+            },
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 12,
+                padding: 8,
+                font: {
+                  size: 11
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'day',
+                displayFormats: {
+                  day: 'MM-dd'
+                },
+                tooltipFormat: 'yyyy-MM-dd HH:mm:ss'
+              },
+              title: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  size: 10
+                }
+              }
+            },
+            y: {
+              title: {
+                display: false
+              },
+              beginAtZero: true,
+              ticks: {
+                font: {
+                  size: 10
+                }
+              }
+            }
+          }
+        }
+      });
+    } else {
+      // 如果没有数据，显示提示信息
+      $('#scoreTimelineChart').parent().append('<div class="ui info message">暂无得分时间线数据</div>');
+      $('#scoreTimelineChart').hide();
+    }
   });
 </script>
 {% endblock %}

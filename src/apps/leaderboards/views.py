@@ -1,9 +1,11 @@
 from django.shortcuts import render
-from django.db.models import Sum
+from django.db.models import Sum, Max
 from competitions.models import Submission, Competition
 from django.apps import apps
 from leaderboards.models import Leaderboard
 from profiles.models import Membership
+import json
+from datetime import datetime, timedelta
 
 def overall_leaderboard(request):
     """
@@ -108,7 +110,73 @@ def overall_leaderboard(request):
     # 按总分降序排序
     overall_leaderboard_list.sort(key=lambda x: x['total_points'], reverse=True)
 
+    # 获取前10名队伍的得分时间线数据
+    top_10_orgs = [entry['organization'].id for entry in overall_leaderboard_list[:10]]
+
+    # 获取这些组织的所有已完成且上榜的提交记录
+    timeline_submissions = Submission.objects.filter(
+        organization_id__in=top_10_orgs,
+        leaderboard__isnull=False,
+        status='Finished'
+    ).select_related('organization').order_by('created_when')
+
+    # 按组织和时间分组，记录每个组织随时间的得分变化
+    org_timeline_data = {}
+
+    # 初始化每个组织的时间线数据
+    for org_id in top_10_orgs:
+        org_timeline_data[org_id] = []
+
+    # 收集每个组织的提交时间和得分
+    for sub in timeline_submissions:
+        org_id = sub.organization_id
+        score = sub.scores.aggregate(total=Sum('score'))['total'] or 0
+        timestamp = sub.created_when.strftime('%Y-%m-%d %H:%M:%S')
+
+        # 添加到该组织的时间线数据中
+        org_timeline_data[org_id].append({
+            'timestamp': timestamp,
+            'score': float(score)
+        })
+
+    # 为每个组织按时间排序并计算累计最高分
+    for org_id in org_timeline_data:
+        # 按时间排序
+        org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
+
+        # 计算累计最高分
+        current_max = 0
+        for point in org_timeline_data[org_id]:
+            if point['score'] > current_max:
+                current_max = point['score']
+            point['cumulative_max'] = current_max
+
+    # 准备图表数据
+    chart_data = {
+        'labels': [],  # 时间标签
+        'datasets': []  # 每个组织的数据集
+    }
+
+    # 为前10名队伍创建数据集
+    for i, entry in enumerate(overall_leaderboard_list[:10]):
+        org_id = entry['organization'].id
+        org_name = entry['organization'].name
+
+        # 如果该组织有时间线数据
+        if org_timeline_data[org_id]:
+            # 创建该组织的数据集
+            dataset = {
+                'label': org_name,
+                'data': [{'x': point['timestamp'], 'y': point['cumulative_max']} for point in org_timeline_data[org_id]],
+                'borderColor': f'hsl({(i * 36) % 360}, 70%, 50%)',  # 使用HSL颜色空间生成不同颜色
+                'backgroundColor': f'hsla({(i * 36) % 360}, 70%, 50%, 0.1)',
+                'fill': False,
+                'tension': 0.4  # 使线条更平滑
+            }
+            chart_data['datasets'].append(dataset)
+
     context = {
         'leaderboard_list': overall_leaderboard_list,
+        'chart_data': json.dumps(chart_data)
     }
     return render(request, 'leaderboards/overall.html', context)
