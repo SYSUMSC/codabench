@@ -6,7 +6,7 @@
 
   <!-- 前10名队伍得分时间线图表 -->
   <div class="ui segment chart-container">
-    <h3 class="ui header" style="margin: 0.5em;">前10名队伍得分小时统计（从4.18 12:00开始，精确到小时）</h3>
+    <h3 class="ui header" style="margin: 0.5em;">前10名队伍得分小时统计（4.18 12:00 至 2025年4月24日 20:00）</h3>
     <div id="scoreTimelineChart" style="width: 100%; height: 300px;"></div>
   </div>
   <table class="ui celled table">
@@ -188,6 +188,19 @@
 
       // 设置图表选项
       var option = {
+        // 添加缩放和滑动功能
+        dataZoom: [
+          {
+            type: 'inside',
+            start: 0,
+            end: 100
+          },
+          {
+            type: 'slider',
+            start: 0,
+            end: 100
+          }
+        ],
         tooltip: {
           trigger: 'axis',
           formatter: function(params) {
@@ -235,8 +248,15 @@
               // 返回格式化的日期和小时： MM-DD HH:00
               return dateParts[1] + '-' + dateParts[2] + ' ' + hour + ':00';
             },
-            fontSize: 10
-          }
+            fontSize: 10,
+            interval: function(index, value) {
+              // 每12小时显示一个标签，减少标签数量
+              return index % 12 === 0;
+            }
+          },
+          // 限制显示的数据范围
+          min: '2024-04-18 12:00',
+          max: '2025-04-24 20:00'
         },
         yAxis: {
           type: 'value',
