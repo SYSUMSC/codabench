@@ -235,8 +235,8 @@ def overall_leaderboard(request):
         # 按时间排序
         org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
 
-        # 计算每个提交时间点的累计最高分
-        current_max_score = 0
+        # 计算每个提交时间点的累计总分
+        current_sum_score = 0
         processed_data = []
 
         # 处理每个提交时间点
@@ -246,20 +246,19 @@ def overall_leaderboard(request):
                 processed_data.append(point)
                 continue
 
-            # 更新当前最高分
-            if point['score'] > current_max_score:
-                current_max_score = point['score']
+            # 累加当前分数，得到截止到此时的总分
+            current_sum_score += point['score']
 
             # 获取小题分数详情
             detailed_scores = point.get('detailed_scores', [])
             # 计算小题分数之和
             total_score = sum(item['score'] for item in detailed_scores) if detailed_scores else point.get('score', 0)
 
-            # 添加到处理后的数据中，包含当前提交分数和累计最高分
+            # 添加到处理后的数据中，包含当前提交分数和累计总分
             processed_data.append({
                 'timestamp': point['timestamp'],
                 'score': point['score'],
-                'cumulative_max': current_max_score,
+                'cumulative_sum': current_sum_score,
                 'submission_id': point.get('submission_id', None),
                 'detailed_scores': detailed_scores,  # 保留小题分数详情
                 'is_key_time': point.get('is_key_time', False),  # 保留关键时间点标记
