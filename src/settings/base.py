@@ -106,7 +106,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wsgi.application'
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -247,7 +247,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour='2', minute='0', day_of_month='1', month_of_year="*/3")  # Every 3 month at 02:00 UTC on the 1st
     },
 }
-CELERY_TIMEZONE = 'UTC'
+CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
 # ============================================================================
