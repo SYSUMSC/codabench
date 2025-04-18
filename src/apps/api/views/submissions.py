@@ -271,9 +271,9 @@ class SubmissionViewSet(ModelViewSet):
         if request.method == 'DELETE':
             # Check if the leaderboard rule allows deletion
             if submission.phase.leaderboard.submission_rule not in [Leaderboard.ADD_DELETE, Leaderboard.ADD_DELETE_MULTIPLE]:
-                # If user is the owner or an organization member, allow them to remove from leaderboard
+                # If user is the owner, an organization member, or an admin, allow them to remove from leaderboard
                 # regardless of the leaderboard rule
-                if not (request.user == submission.owner or is_org_member):
+                if not (request.user == submission.owner or is_org_member or request.user.is_superuser or request.user.is_staff):
                     raise PermissionDenied("You are not allowed to remove a submission on this phase")
             submission.leaderboard = None
             submission.save()
