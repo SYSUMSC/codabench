@@ -163,17 +163,17 @@ class Command(BaseCommand):
                             # 确保该提交有所有列的得分
                             for column in columns:
                                 # 检查该提交是否已有该列的得分
-                                score_exists = SubmissionScore.objects.filter(
-                                    column=column,
-                                    submission__id=best_submission.id
-                                ).exists()
+                                score_exists = best_submission.scores.filter(column=column).exists()
 
                                 # 如果没有该列的得分，尝试从该组织的其他提交中找到最佳得分
                                 if not score_exists and force_all_columns:
                                     # 获取该组织在该列上的所有得分
+                                    # 首先获取所有提交的ID
+                                    submission_ids = lb_submissions.values_list('id', flat=True)
+                                    # 然后找到这些提交关联的得分
                                     column_scores = SubmissionScore.objects.filter(
                                         column=column,
-                                        submission__in=lb_submissions
+                                        submissions__id__in=submission_ids
                                     )
 
                                     if column_scores.exists():
@@ -190,6 +190,9 @@ class Command(BaseCommand):
                                                 score=best_score.score
                                             )
                                             best_submission.scores.add(new_score)
+                                            # 如果有父提交，也添加到父提交
+                                            if best_submission.parent:
+                                                best_submission.parent.scores.add(new_score)
 
                                             if verbose:
                                                 self.stdout.write(f'      为提交 ID={best_submission.id} 添加列 {column.title} 的得分: {best_score.score}')
