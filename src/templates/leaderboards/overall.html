@@ -76,7 +76,7 @@
 
   <!-- Modals for team details (outside of table) -->
   {% for entry in leaderboard_list %}
-  <div class="ui modal" id="modal-org-{{ entry.organization.id }}" style="max-width: 600px;">
+  <div class="ui modal" id="modal-org-{{ entry.organization.id }}" style="max-width: 600px; margin: 0 auto !important;">
     <i class="close icon"></i>
     <div class="header">
       {{ entry.organization.name }} 的详细得分
@@ -148,18 +148,22 @@
   }
 
   /* 修复模态框垂直居中问题 */
-  .ui.dimmer {
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
+  .ui.modal {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    max-height: 80vh;
+    overflow-y: auto;
   }
 
-  .ui.modal {
-    margin: 0 !important;
-    top: auto !important;
-    left: auto !important;
-    transform: none !important;
-    position: relative;
+  /* 特别针对队伍详情模态框 */
+  [id^="modal-org-"] {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin-top: 0 !important;
   }
 
   #scoreTimelineChart {
@@ -200,14 +204,31 @@
     $('.ui.modal').modal({
       closable: true,
       detachable: false,
-      observeChanges: true
+      observeChanges: true,
+      centered: false,  // 禁用默认居中，使用我们的CSS居中
+      dimmerSettings: {
+        opacity: 0.8
+      }
     });
 
     // 点击分数显示详细得分弹窗
     $('.score-details').on('click', function(e) {
       e.preventDefault();
       var orgId = $(this).data('org-id');
-      $('#modal-org-' + orgId).modal('show');
+      var $modal = $('#modal-org-' + orgId);
+
+      // 显示模态框
+      $modal.modal('show');
+
+      // 强制居中定位
+      setTimeout(function() {
+        $modal.css({
+          'top': '50%',
+          'left': '50%',
+          'transform': 'translate(-50%, -50%)',
+          'margin-top': '0'
+        });
+      }, 10);
     });
 
     // 确保关闭按钮正常工作
