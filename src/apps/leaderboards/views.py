@@ -3,6 +3,7 @@ from django.db.models import Sum
 from competitions.models import Submission, Competition
 from django.apps import apps
 from leaderboards.models import Leaderboard
+from profiles.models import Membership
 
 def overall_leaderboard(request):
     """
@@ -85,10 +86,23 @@ def overall_leaderboard(request):
         # 按排行榜标题排序
         detailed_scores.sort(key=lambda x: x['leaderboard_title'])
 
+        # 获取该组织的活跃成员（排除未接受邀请的）
+        active_members = organization.membership_set.filter(
+            group__in=Membership.ALL_GROUP  # 排除INVITED状态的成员
+        ).select_related('user')
+
+        # 提取成员信息
+        members_info = [{
+            'name': member.user.name or member.user.username,
+            'username': member.user.username,
+            'slug': member.user.slug
+        } for member in active_members]
+
         overall_leaderboard_list.append({
             'organization': organization,
             'total_points': total_score,  # 使用总分作为总积分
-            'detailed_scores': detailed_scores  # 添加详细得分信息
+            'detailed_scores': detailed_scores,  # 添加详细得分信息
+            'members': members_info  # 添加成员信息
         })
 
     # 按总分降序排序

@@ -9,6 +9,7 @@
         <th>排名</th>
         <th>头像</th>
         <th>队伍名称</th>
+        <th>队伍成员</th>
         <th>总积分</th>
       </tr>
     </thead>
@@ -24,6 +25,17 @@
           {% endif %}
         </td>
         <td><a href="{{ entry.organization.url }}">{{ entry.organization.name }}</a></td>
+        <td>
+          <div class="ui list">
+            {% for member in entry.members %}
+              <div class="item">
+                <a href="/profiles/user/{{ member.slug }}/">{{ member.name }}</a>
+              </div>
+            {% empty %}
+              <div class="item">暂无成员</div>
+            {% endfor %}
+          </div>
+        </td>
         <td>
           <a href="#" class="score-details ui blue label" data-org-id="{{ entry.organization.id }}" data-org-name="{{ entry.organization.name }}">
             {{ entry.total_points|floatformat:2 }}
@@ -68,7 +80,7 @@
       </tr>
       {% empty %}
       <tr>
-        <td colspan="4">暂无数据</td>
+        <td colspan="5">暂无数据</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -86,6 +98,10 @@
     display: inline-block;
     min-width: 80px;
     text-align: center;
+  }
+
+  .ui.list .item {
+    margin-bottom: 0.25em;
   }
 
   .ui.modal .content {
