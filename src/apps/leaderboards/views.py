@@ -116,6 +116,7 @@ def overall_leaderboard(request):
 
     # 设置起始时间：2024年4月18日 12:00
     start_date = datetime(2024, 4, 18, 12, 0, 0)
+    start_timestamp = start_date.strftime('%Y-%m-%d %H:%M:%S')
 
     # 获取这些组织的所有已完成且上榜的提交记录，并且只获取起始时间之后的提交
     timeline_submissions = Submission.objects.filter(
@@ -128,9 +129,12 @@ def overall_leaderboard(request):
     # 按组织和时间分组，记录每个组织随时间的得分变化
     org_timeline_data = {}
 
-    # 初始化每个组织的时间线数据
+    # 初始化每个组织的时间线数据，为每个组织添加起始时间点，初始分数为0
     for org_id in top_10_orgs:
-        org_timeline_data[org_id] = []
+        org_timeline_data[org_id] = [{
+            'timestamp': start_timestamp,
+            'score': 0.0
+        }]
 
     # 收集每个组织的提交时间和得分
     for sub in timeline_submissions:
@@ -164,6 +168,33 @@ def overall_leaderboard(request):
         org_timeline_data[org_id] = list(hourly_data.values())
         org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
 
+        # 填充缺失的小时数据点，确保时间线连续
+        if len(org_timeline_data[org_id]) > 1:
+            filled_data = [org_timeline_data[org_id][0]]  # 从第一个点开始
+
+            for i in range(1, len(org_timeline_data[org_id])):
+                current_point = org_timeline_data[org_id][i]
+                prev_point = org_timeline_data[org_id][i-1]
+
+                # 计算当前点和前一个点之间的时间差
+                current_time = datetime.strptime(current_point['timestamp'], '%Y-%m-%d %H:%M:%S')
+                prev_time = datetime.strptime(prev_point['timestamp'], '%Y-%m-%d %H:%M:%S')
+                hour_diff = int((current_time - prev_time).total_seconds() / 3600)
+
+                # 如果时间差大于1小时，填充中间的小时数据点
+                if hour_diff > 1:
+                    for h in range(1, hour_diff):
+                        fill_time = prev_time + timedelta(hours=h)
+                        fill_timestamp = fill_time.strftime('%Y-%m-%d %H:%M:%S')
+                        filled_data.append({
+                            'timestamp': fill_timestamp,
+                            'score': prev_point['score']  # 使用前一个点的分数
+                        })
+
+                filled_data.append(current_point)
+
+            org_timeline_data[org_id] = filled_data
+
         # 计算累计最高分
         current_max = 0
         for point in org_timeline_data[org_id]:
@@ -184,6 +215,26 @@ def overall_leaderboard(request):
                 'score': point['score'],
                 'cumulative_max': point['cumulative_max']
             })
+
+        # 确保数据包含当前小时，使图表显示最新数据
+        if len(org_timeline_data[org_id]) > 0:
+            last_point = org_timeline_data[org_id][-1]
+            last_time = datetime.strptime(last_point['timestamp'], '%Y-%m-%d %H:%M:%S')
+            current_time = datetime.now().replace(minute=0, second=0, microsecond=0)
+
+            # 如果最后一个点不是当前小时，添加当前小时的数据点
+            if last_time < current_time:
+                # 填充从最后一个点到当前小时的所有小时数据点
+                hour_diff = int((current_time - last_time).total_seconds() / 3600)
+
+                for h in range(1, hour_diff + 1):
+                    fill_time = last_time + timedelta(hours=h)
+                    fill_timestamp = fill_time.strftime('%Y-%m-%d %H:%M:%S')
+                    org_timeline_data[org_id].append({
+                        'timestamp': fill_timestamp,
+                        'score': last_point['score'],
+                        'cumulative_max': last_point['cumulative_max']
+                    })
 
     # 准备图表数据
     chart_data = {
