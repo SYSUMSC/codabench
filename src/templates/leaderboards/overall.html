@@ -171,7 +171,8 @@
             line: {
               tension: 0.3,  // 线条弹性（平滑度）
               borderWidth: 2,  // 线条宽度
-              fill: false  // 不填充线条下方区域
+              fill: false,  // 不填充线条下方区域
+              cubicInterpolationMode: 'monotone'  // 使用单调插值模式，确保线条平滑
             },
             point: {
               radius: 4,  // 数据点半径
@@ -179,6 +180,7 @@
               borderWidth: 2  // 数据点边框宽度
             }
           },
+          spanGaps: true,  // 跨越空白点，连接数据点
           responsive: false,
           maintainAspectRatio: true,
           interaction: {

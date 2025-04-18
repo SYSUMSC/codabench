@@ -151,6 +151,21 @@ def overall_leaderboard(request):
                 current_max = point['score']
             point['cumulative_max'] = current_max
 
+        # 确保有足够的数据点来形成连续的线条
+        # 如果只有一个数据点，复制该点以形成线条
+        if len(org_timeline_data[org_id]) == 1:
+            point = org_timeline_data[org_id][0]
+            # 复制该点，并将时间向后移动一天
+            from datetime import datetime
+            timestamp = datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S')
+            new_timestamp = (timestamp.replace(hour=23, minute=59, second=59)).strftime('%Y-%m-%d %H:%M:%S')
+
+            org_timeline_data[org_id].append({
+                'timestamp': new_timestamp,
+                'score': point['score'],
+                'cumulative_max': point['cumulative_max']
+            })
+
     # 准备图表数据
     chart_data = {
         'labels': [],  # 时间标签
