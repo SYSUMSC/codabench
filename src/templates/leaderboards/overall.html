@@ -322,8 +322,17 @@
               var point = param.data;
               var scoreDisplay = param.value[1].toFixed(2) + ' 分';
 
-              // 如果有实际提交分数且与显示分数不同，显示两者
-              if (point.submissionId && point.actualScore !== param.value[1]) {
+              // 如果有总分信息，显示总分
+              if (point.total_score) {
+                scoreDisplay = point.total_score.toFixed(2) + ' 分 (总分)';
+
+                // 如果有实际提交分数，显示实际提交分数
+                if (point.submissionId && point.actualScore) {
+                  scoreDisplay += ' [本次提交: ' + point.actualScore.toFixed(2) + ' 分]';
+                }
+              }
+              // 如果没有总分信息，但有实际提交分数且与显示分数不同，显示两者
+              else if (point.submissionId && point.actualScore !== param.value[1]) {
                 scoreDisplay += ' (本次提交: ' + point.actualScore.toFixed(2) + ' 分)';
               }
 
@@ -397,8 +406,8 @@
         yAxis: {
           type: 'value',
           min: 0,
-          // 设置最大值为500，确保所有分数都能正确显示
-          max: 500,
+          // 设置最大值为1000，确保所有分数都能正确显示
+          max: 1000,
           // 设置刻度间隔为100
           interval: 100,
           axisLabel: {

@@ -160,10 +160,15 @@ def overall_leaderboard(request):
         # 使用实际提交时间，保留分钟和秒，格式化为 YYYY-MM-DD HH:MM:SS
         timestamp = sub.created_when.strftime('%Y-%m-%d %H:%M:%S')
 
+        # 获取该组织的总分，用于显示在图表中
+        org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
+        org_total_score = float(org_entry['total_points']) if org_entry else 0
+
         # 添加到该组织的时间线数据中
         org_timeline_data[org_id].append({
             'timestamp': timestamp,
             'score': float(score),
+            'total_score': org_total_score,  # 添加组织总分
             'submission_id': sub.id  # 添加提交ID以便于追踪
         })
 
@@ -274,10 +279,9 @@ def overall_leaderboard(request):
             org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
             org_total_score = float(org_entry['total_points']) if org_entry else 0
 
-            # 获取最后一个点的时间和分数
+            # 获取最后一个点的时间
             last_point = org_timeline_data[org_id][-1]
             last_time = datetime.strptime(last_point['timestamp'], '%Y-%m-%d %H:%M:%S')
-            last_score = last_point.get('cumulative_max', last_point.get('score', 0))
 
             # 使用实际结束时间作为图表的结束时间
             chart_end_time = actual_end_date
@@ -287,8 +291,9 @@ def overall_leaderboard(request):
                 # 直接添加结束时间点，不需要每小时填充
                 org_timeline_data[org_id].append({
                     'timestamp': chart_end_time.strftime('%Y-%m-%d %H:%M:%S'),
-                    'score': last_score,
-                    'cumulative_max': last_score,
+                    'score': last_point.get('score', 0),
+                    'cumulative_max': last_point.get('cumulative_max', 0),
+                    'total_score': org_total_score,  # 添加组织总分
                     'is_key_time': True  # 标记为关键时间点
                 })
 
@@ -312,10 +317,11 @@ def overall_leaderboard(request):
                 'data': [
                     {
                         'x': point['timestamp'],  # 实际时间点
-                        'y': float(point.get('cumulative_max', 0)),  # 累计最高分作为显示分数
+                        'y': float(point.get('total_score', point.get('cumulative_max', 0))),  # 优先使用总分，如果没有则使用累计最高分
                         'actual_score': float(point.get('score', 0)),  # 实际提交分数
                         'submission_id': point.get('submission_id', None),  # 提交ID
-                        'is_key_time': point.get('is_key_time', False)  # 是否为关键时间点
+                        'is_key_time': point.get('is_key_time', False),  # 是否为关键时间点
+                        'total_score': float(point.get('total_score', 0))  # 组织总分
                     } for point in org_timeline_data[org_id]
                 ],
                 'borderColor': f'hsl({(i * 36) % 360}, 70%, 50%)',  # 使用HSL颜色空间生成不同颜色
