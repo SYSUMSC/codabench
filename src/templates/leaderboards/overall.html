@@ -147,6 +147,21 @@
     margin-top: 0;
   }
 
+  /* 修复模态框垂直居中问题 */
+  .ui.dimmer {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ui.modal {
+    margin: 0 !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    position: relative;
+  }
+
   #scoreTimelineChart {
     width: 100% !important;
     height: 350px !important;
