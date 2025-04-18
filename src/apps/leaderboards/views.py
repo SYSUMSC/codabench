@@ -134,9 +134,15 @@ def overall_leaderboard(request):
 
     # 初始化每个组织的时间线数据，为每个组织添加起始时间点，初始分数为0
     for org_id in top_10_orgs:
+        # 获取该组织的总分，用于调试
+        org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
+        org_total_score = org_entry['total_points'] if org_entry else 0
+
+        # 添加起始时间点，初始分数为0
         org_timeline_data[org_id] = [{
             'timestamp': start_timestamp,
-            'score': 0.0
+            'score': 0.0,
+            'debug_total_score': float(org_total_score)  # 添加调试信息
         }]
 
     # 收集每个组织的提交时间和得分
@@ -221,6 +227,21 @@ def overall_leaderboard(request):
 
         # 确保数据包含到结束时间的数据点，使图表显示完整数据
         if len(org_timeline_data[org_id]) > 0:
+            # 获取该组织的总分，用于添加最终得分点
+            org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
+            org_total_score = float(org_entry['total_points']) if org_entry else 0
+
+            # 添加一个测试数据点，显示最终得分
+            test_time = datetime(2025, 4, 20, 12, 0, 0)
+            test_timestamp = test_time.strftime('%Y-%m-%d %H:%M:%S')
+
+            # 添加测试数据点
+            org_timeline_data[org_id].append({
+                'timestamp': test_timestamp,
+                'score': org_total_score,
+                'cumulative_max': org_total_score
+            })
+
             last_point = org_timeline_data[org_id][-1]
             last_time = datetime.strptime(last_point['timestamp'], '%Y-%m-%d %H:%M:%S')
 
@@ -259,7 +280,8 @@ def overall_leaderboard(request):
             # 创建该组织的数据集
             dataset = {
                 'label': org_name,
-                'data': [{'x': point['timestamp'], 'y': point['cumulative_max']} for point in org_timeline_data[org_id]],
+                # 确保分数数据是浮点数并且有效
+                'data': [{'x': point['timestamp'], 'y': float(point['cumulative_max'] or 0)} for point in org_timeline_data[org_id]],
                 'borderColor': f'hsl({(i * 36) % 360}, 70%, 50%)',  # 使用HSL颜色空间生成不同颜色
                 'backgroundColor': f'hsla({(i * 36) % 360}, 70%, 50%, 0.1)',
                 'fill': False,

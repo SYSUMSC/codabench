@@ -162,7 +162,14 @@
           // 格式化为 YYYY-MM-DD HH:00 保留小时信息
           var formattedDate = date.toISOString().replace(/T(\d+):\d+:\d+\.\d+Z/, ' $1:00');
           allDates.push(formattedDate);
-          seriesData.push([formattedDate, point.y]);
+
+          // 确保分数是有效的数字
+          var score = parseFloat(point.y);
+          if (isNaN(score)) {
+            score = 0;
+          }
+
+          seriesData.push([formattedDate, score]);
         });
 
         // 添加到系列中
@@ -179,6 +186,21 @@
           },
           itemStyle: {
             color: dataset.borderColor
+          },
+          // 确保数据点正确显示
+          emphasis: {
+            itemStyle: {
+              borderWidth: 3,
+              shadowBlur: 10,
+              shadowColor: 'rgba(0, 0, 0, 0.3)'
+            }
+          },
+          // 添加标签显示得分
+          label: {
+            show: false,
+            position: 'top',
+            formatter: '{c}',
+            fontSize: 10
           }
         });
       });
@@ -188,6 +210,15 @@
 
       // 设置图表选项
       var option = {
+        // 添加标题
+        title: {
+          text: '队伍得分小时统计',
+          left: 'center',
+          textStyle: {
+            fontSize: 14
+          },
+          show: false
+        },
         // 添加缩放和滑动功能
         dataZoom: [
           {
@@ -260,8 +291,14 @@
         },
         yAxis: {
           type: 'value',
+          min: 0,
+          // 设置最大值为500，确保所有分数都能正确显示
+          max: 500,
+          // 设置刻度间隔为100
+          interval: 100,
           axisLabel: {
-            fontSize: 10
+            fontSize: 10,
+            formatter: '{value} 分'
           }
         },
         series: series
@@ -269,6 +306,10 @@
 
       // 设置图表选项并渲染
       myChart.setOption(option);
+
+      // 打印调试信息，查看数据是否正确
+      console.log('Chart data:', originalData);
+      console.log('Series data:', series);
 
       // 窗口大小变化时，重新调整图表大小
       window.addEventListener('resize', function() {
