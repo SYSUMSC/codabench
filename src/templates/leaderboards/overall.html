@@ -65,50 +65,50 @@
           {% endif %}
         </td>
         {% endif %}
-          <div class="ui modal" id="modal-org-{{ entry.organization.id }}" style="max-width: 600px;">
-            <div class="header">
-              {{ entry.organization.name }} 的详细得分
-            </div>
-            <div class="content">
-              <table class="ui celled table">
-                <thead>
-                  <tr>
-                    <th class="twelve wide">比赛</th>
-                    <th class="four wide">得分</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for score in entry.detailed_scores %}
-                  <tr>
-                    <td>{{ score.competition_title }}</td>
-                    <td>{{ score.score|floatformat:2 }}</td>
-                  </tr>
-                  {% empty %}
-                  <tr>
-                    <td colspan="2" class="center aligned">暂无详细得分数据</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th class="right aligned"><strong>总分</strong></th>
-                    <th><strong>{{ entry.total_points|floatformat:2 }}</strong></th>
-                  </tr>
-                  {% if show_avg_submission_time and entry.avg_submission_time %}
-                  <tr class="positive">
-                    <th class="right aligned"><strong>平均提交时间</strong> <i class="info circle icon" title="当总分相同时，平均提交时间越早的队伍排名越靠前"></i></th>
-                    <th><strong>{{ entry.avg_submission_time|date:"Y-m-d H:i:s" }}</strong></th>
-                  </tr>
-                  {% endif %}
-                </tfoot>
-              </table>
-            </div>
-            <div class="actions">
-              <div class="ui cancel button">关闭</div>
-            </div>
-          </div>
-        </td>
       </tr>
+      <!-- Modal for team details -->
+      <div class="ui modal" id="modal-org-{{ entry.organization.id }}" style="max-width: 600px;">
+        <div class="header">
+          {{ entry.organization.name }} 的详细得分
+        </div>
+        <div class="content">
+          <table class="ui celled table">
+            <thead>
+              <tr>
+                <th class="twelve wide">比赛</th>
+                <th class="four wide">得分</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for score in entry.detailed_scores %}
+              <tr>
+                <td>{{ score.competition_title }}</td>
+                <td>{{ score.score|floatformat:2 }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="2" class="center aligned">暂无详细得分数据</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr>
+                <th class="right aligned"><strong>总分</strong></th>
+                <th><strong>{{ entry.total_points|floatformat:2 }}</strong></th>
+              </tr>
+              {% if show_avg_submission_time and entry.avg_submission_time %}
+              <tr class="positive">
+                <th class="right aligned"><strong>平均提交时间</strong> <i class="info circle icon" title="当总分相同时，平均提交时间越早的队伍排名越靠前"></i></th>
+                <th><strong>{{ entry.avg_submission_time|date:"Y-m-d H:i:s" }}</strong></th>
+              </tr>
+              {% endif %}
+            </tfoot>
+          </table>
+        </div>
+        <div class="actions">
+          <div class="ui cancel button">关闭</div>
+        </div>
+      </div>
       {% empty %}
       <tr>
         <td colspan="{% if show_avg_submission_time %}6{% else %}5{% endif %}">暂无数据</td>
