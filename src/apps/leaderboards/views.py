@@ -367,6 +367,6 @@ def overall_leaderboard(request):
         'leaderboard_list': overall_leaderboard_list,
         'chart_data': json.dumps(chart_data),
         'actual_end_date': actual_end_date.strftime('%Y-%m-%d %H:%M:%S'),
-        'show_avg_submission_time': True  # 添加标志以便模板可以显示平均提交时间
+        'show_avg_submission_time': False  # 添加标志以便模板可以显示平均提交时间
     }
     return render(request, 'leaderboards/overall.html', context)
