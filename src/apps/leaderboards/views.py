@@ -6,6 +6,7 @@ from leaderboards.models import Leaderboard
 from profiles.models import Membership
 import json
 from datetime import datetime, timedelta
+import pytz
 
 def overall_leaderboard(request):
     """
@@ -113,11 +114,15 @@ def overall_leaderboard(request):
     # 获取前10名队伍的得分时间线数据
     top_10_orgs = [entry['organization'].id for entry in overall_leaderboard_list[:10]]
 
-    # 获取这些组织的所有已完成且上榜的提交记录
+    # 设置起始时间：2024年4月18日 12:00
+    start_date = datetime(2024, 4, 18, 12, 0, 0)
+
+    # 获取这些组织的所有已完成且上榜的提交记录，并且只获取起始时间之后的提交
     timeline_submissions = Submission.objects.filter(
         organization_id__in=top_10_orgs,
         leaderboard__isnull=False,
-        status='Finished'
+        status='Finished',
+        created_when__gte=start_date
     ).select_related('organization').order_by('created_when')
 
     # 按组织和时间分组，记录每个组织随时间的得分变化
@@ -131,7 +136,8 @@ def overall_leaderboard(request):
     for sub in timeline_submissions:
         org_id = sub.organization_id
         score = sub.scores.aggregate(total=Sum('score'))['total'] or 0
-        timestamp = sub.created_when.strftime('%Y-%m-%d %H:%M:%S')
+        # 保留小时信息，格式化为 YYYY-MM-DD HH:00:00
+        timestamp = sub.created_when.replace(minute=0, second=0, microsecond=0).strftime('%Y-%m-%d %H:%M:%S')
 
         # 添加到该组织的时间线数据中
         org_timeline_data[org_id].append({
@@ -139,9 +145,23 @@ def overall_leaderboard(request):
             'score': float(score)
         })
 
-    # 为每个组织按时间排序并计算累计最高分
+    # 为每个组织按小时分组并计算每小时的最高分
     for org_id in org_timeline_data:
         # 按时间排序
+        org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
+
+        # 按小时分组并计算每小时的最高分
+        hourly_data = {}
+        for point in org_timeline_data[org_id]:
+            hour_key = point['timestamp']  # 已经格式化为整点小时
+            if hour_key not in hourly_data or point['score'] > hourly_data[hour_key]['score']:
+                hourly_data[hour_key] = {
+                    'timestamp': hour_key,
+                    'score': point['score']
+                }
+
+        # 将小时数据转换回列表并按时间排序
+        org_timeline_data[org_id] = list(hourly_data.values())
         org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
 
         # 计算累计最高分
@@ -155,10 +175,9 @@ def overall_leaderboard(request):
         # 如果只有一个数据点，复制该点以形成线条
         if len(org_timeline_data[org_id]) == 1:
             point = org_timeline_data[org_id][0]
-            # 复制该点，并将时间向后移动一天
-            from datetime import datetime
+            # 复制该点，并将时间向后移动一小时
             timestamp = datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S')
-            new_timestamp = (timestamp.replace(hour=23, minute=59, second=59)).strftime('%Y-%m-%d %H:%M:%S')
+            new_timestamp = (timestamp + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
 
             org_timeline_data[org_id].append({
                 'timestamp': new_timestamp,
