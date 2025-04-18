@@ -118,8 +118,8 @@ def overall_leaderboard(request):
     start_date = datetime(2025, 4, 18, 12, 0, 0)
     # 设置结束时间：2025年4月24日 20:00
     end_date = datetime(2025, 4, 24, 20, 0, 0)
-    # 计算实际结束时间（取结束时间和当前时间的较大值）
-    actual_end_date = max(end_date, datetime.now())
+    # 计算实际结束时间（取结束时间和当前时间的较小值）
+    actual_end_date = min(end_date, datetime.now())
 
     # 格式化时间戳
     start_timestamp = start_date.strftime('%Y-%m-%d %H:%M:%S')
