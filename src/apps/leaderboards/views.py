@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.db.models import Sum, Max
+from django.db.models import Sum, Max, Avg
 from competitions.models import Submission, Competition
 from django.apps import apps
 from leaderboards.models import Leaderboard
@@ -26,6 +26,9 @@ def overall_leaderboard(request):
     # 按组织和排行榜（题目）分组，取出每个组织在每个排行榜的最高得分
     # 结构：{ organization_id: { leaderboard_id: best_score, ... }, ... }
     org_leaderboard_scores = {}
+    # 记录每个组织在每个排行榜的最佳提交
+    # 结构：{ organization_id: { leaderboard_id: submission, ... }, ... }
+    org_best_submissions = {}
     # 获取所有排行榜信息，用于后续显示详细得分
     leaderboards = {}
 
@@ -57,12 +60,32 @@ def overall_leaderboard(request):
         if lb_id not in org_leaderboard_scores[org_id] or score > org_leaderboard_scores[org_id][lb_id]:
             org_leaderboard_scores[org_id][lb_id] = score
 
-    # 计算每个组织的总分（所有排行榜最高分的总和）
+            # 初始化组织的最佳提交字典
+            if org_id not in org_best_submissions:
+                org_best_submissions[org_id] = {}
+
+            # 记录该组织在该排行榜的最佳提交
+            org_best_submissions[org_id][lb_id] = sub
+
+    # 计算每个组织的总分（所有排行榜最高分的总和）和平均提交时间
     org_total_scores = {}
+    org_avg_submission_times = {}
+
     for org_id, lb_scores in org_leaderboard_scores.items():
         # 对每个组织，将其在所有排行榜中的最高得分求和
         total_score = sum(lb_scores.values())
         org_total_scores[org_id] = total_score
+
+        # 计算该组织的平均提交时间（使用最佳提交的时间）
+        if org_id in org_best_submissions:
+            best_submissions = org_best_submissions[org_id].values()
+            # 提取每个最佳提交的创建时间
+            submission_times = [sub.created_when for sub in best_submissions]
+            if submission_times:
+                # 计算平均提交时间（转换为时间戳以便计算平均值）
+                avg_timestamp = sum(dt.timestamp() for dt in submission_times) / len(submission_times)
+                # 将平均时间戳转回datetime对象
+                org_avg_submission_times[org_id] = datetime.fromtimestamp(avg_timestamp)
 
     # 获取组织对象
     Organization = apps.get_model('profiles', 'Organization')
@@ -101,18 +124,22 @@ def overall_leaderboard(request):
             'slug': member.user.slug
         } for member in active_members]
 
+        # 获取该组织的平均提交时间
+        avg_submission_time = org_avg_submission_times.get(org_id)
+
         overall_leaderboard_list.append({
             'organization': organization,
             'total_points': total_score,  # 使用总分作为总积分
             'detailed_scores': detailed_scores,  # 添加详细得分信息
-            'members': members_info  # 添加成员信息
+            'members': members_info,  # 添加成员信息
+            'avg_submission_time': avg_submission_time  # 添加平均提交时间
         })
 
-    # 按总分降序排序
-    overall_leaderboard_list.sort(key=lambda x: x['total_points'], reverse=True)
+    # 按总分降序排序，总分相同时按平均提交时间升序排序（越早提交排名越靠前）
+    overall_leaderboard_list.sort(key=lambda x: (-x['total_points'], x['avg_submission_time'] if x['avg_submission_time'] else datetime.max))
 
-    # 获取前10名队伍的得分时间线数据
-    top_10_orgs = [entry['organization'].id for entry in overall_leaderboard_list[:10]]
+    # 获取前20名队伍的得分时间线数据
+    top_20_orgs = [entry['organization'].id for entry in overall_leaderboard_list[:20]]
 
     # 设置起始时间：2025年4月18日 12:00
     start_date = datetime(2025, 4, 18, 12, 0, 0)
@@ -125,7 +152,7 @@ def overall_leaderboard(request):
 
     # 获取这些组织的所有已完成且上榜的提交记录，并且只获取起始时间之后、结束时间之前的提交
     timeline_submissions = Submission.objects.filter(
-        organization_id__in=top_10_orgs,
+        organization_id__in=top_20_orgs,
         leaderboard__isnull=False,
         status='Finished',
         created_when__gte=start_date,
@@ -136,7 +163,7 @@ def overall_leaderboard(request):
     org_timeline_data = {}
 
     # 初始化每个组织的时间线数据，为每个组织添加起始时间点，初始分数为0
-    for org_id in top_10_orgs:
+    for org_id in top_20_orgs:
         # 获取该组织的总分，用于调试
         org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
         org_total_score = org_entry['total_points'] if org_entry else 0
@@ -303,8 +330,8 @@ def overall_leaderboard(request):
         'datasets': []  # 每个组织的数据集
     }
 
-    # 为前10名队伍创建数据集
-    for i, entry in enumerate(overall_leaderboard_list[:10]):
+    # 为前20名队伍创建数据集
+    for i, entry in enumerate(overall_leaderboard_list[:20]):
         org_id = entry['organization'].id
         org_name = entry['organization'].name
 
@@ -339,6 +366,7 @@ def overall_leaderboard(request):
     context = {
         'leaderboard_list': overall_leaderboard_list,
         'chart_data': json.dumps(chart_data),
-        'actual_end_date': actual_end_date.strftime('%Y-%m-%d %H:%M:%S')
+        'actual_end_date': actual_end_date.strftime('%Y-%m-%d %H:%M:%S'),
+        'show_avg_submission_time': True  # 添加标志以便模板可以显示平均提交时间
     }
     return render(request, 'leaderboards/overall.html', context)
