@@ -118,12 +118,8 @@ def overall_leaderboard(request):
     start_date = datetime(2025, 4, 18, 12, 0, 0)
     # 设置结束时间：2025年4月24日 20:00
     end_date = datetime(2025, 4, 24, 20, 0, 0)
-    # 计算实际结束时间（取结束时间和当前时间的较小值）
-    actual_end_date = min(end_date, datetime.now())
-
     # 格式化时间戳
     start_timestamp = start_date.strftime('%Y-%m-%d %H:%M:%S')
-    end_timestamp = end_date.strftime('%Y-%m-%d %H:%M:%S')
 
     # 获取这些组织的所有已完成且上榜的提交记录，并且只获取起始时间之后、结束时间之前的提交
     timeline_submissions = Submission.objects.filter(
@@ -144,18 +140,13 @@ def overall_leaderboard(request):
         org_total_score = org_entry['total_points'] if org_entry else 0
 
         # 添加起始时间点，初始分数为0
-        # 添加两个数据点确保图表正确显示起始时间
+        # 只添加12:00的起始时间点
         org_timeline_data[org_id] = [
-            # 起始时间前一小时，分数为0
-            {
-                'timestamp': (start_date - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'),
-                'score': 0.0,
-                'debug_total_score': float(org_total_score)  # 添加调试信息
-            },
             # 起始时间点，分数为0
             {
                 'timestamp': start_timestamp,
                 'score': 0.0,
+                'cumulative_max': 0.0,
                 'debug_total_score': float(org_total_score)  # 添加调试信息
             }
         ]
@@ -246,39 +237,35 @@ def overall_leaderboard(request):
             org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
             org_total_score = float(org_entry['total_points']) if org_entry else 0
 
-            # 添加一个数据点，显示最终得分
-            # 使用结束时间前一小时作为最终得分点
-            final_score_time = end_date - timedelta(hours=1)
-            final_score_timestamp = final_score_time.strftime('%Y-%m-%d %H:%M:%S')
-
-            # 添加最终得分点
-            org_timeline_data[org_id].append({
-                'timestamp': final_score_timestamp,
-                'score': org_total_score,
-                'cumulative_max': org_total_score
-            })
-
+            # 获取最后一个点的时间和分数
             last_point = org_timeline_data[org_id][-1]
             last_time = datetime.strptime(last_point['timestamp'], '%Y-%m-%d %H:%M:%S')
+            last_score = last_point.get('cumulative_max', last_point.get('score', 0))
 
-            # 使用实际结束时间作为图表的结束时间
-            chart_end_time = actual_end_date.replace(minute=0, second=0, microsecond=0)
+            # 使用结束时间作为图表的结束时间
+            chart_end_time = end_date.replace(minute=0, second=0, microsecond=0)
 
-            # 如果最后一个点不是结束时间，添加到结束时间的数据点
-            if last_time < chart_end_time:
-                # 填充从最后一个点到结束时间的所有小时数据点
-                hour_diff = int((chart_end_time - last_time).total_seconds() / 3600)
+            # 填充从最后一个点到结束时间的所有小时数据点
+            current_time = last_time
+            while current_time < chart_end_time:
+                # 向前移动一小时
+                current_time = current_time + timedelta(hours=1)
+                # 确保不超过结束时间
+                if current_time <= chart_end_time:
+                    timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
+                    org_timeline_data[org_id].append({
+                        'timestamp': timestamp,
+                        'score': last_score,
+                        'cumulative_max': last_score
+                    })
 
-                for h in range(1, hour_diff + 1):
-                    fill_time = last_time + timedelta(hours=h)
-                    # 确保不超过结束时间
-                    if fill_time <= chart_end_time:
-                        fill_timestamp = fill_time.strftime('%Y-%m-%d %H:%M:%S')
-                        org_timeline_data[org_id].append({
-                            'timestamp': fill_timestamp,
-                            'score': last_point['score'],
-                            'cumulative_max': last_point['cumulative_max']
-                        })
+            # 确保最后一个点是结束时间点
+            if org_timeline_data[org_id][-1]['timestamp'] != chart_end_time.strftime('%Y-%m-%d %H:%M:%S'):
+                org_timeline_data[org_id].append({
+                    'timestamp': chart_end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'score': last_score,
+                    'cumulative_max': last_score
+                })
 
     # 准备图表数据
     chart_data = {
