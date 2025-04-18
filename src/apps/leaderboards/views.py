@@ -153,89 +153,124 @@ def overall_leaderboard(request):
             }
         ]
 
-    # 收集每个组织的提交时间和得分
+    # 收集每个组织的提交时间和得分，使用实际提交时间而不是按小时采样
     for sub in timeline_submissions:
         org_id = sub.organization_id
         score = sub.scores.aggregate(total=Sum('score'))['total'] or 0
-        # 保留小时信息，格式化为 YYYY-MM-DD HH:00:00
-        timestamp = sub.created_when.replace(minute=0, second=0, microsecond=0).strftime('%Y-%m-%d %H:%M:%S')
+        # 使用实际提交时间，保留分钟和秒，格式化为 YYYY-MM-DD HH:MM:SS
+        timestamp = sub.created_when.strftime('%Y-%m-%d %H:%M:%S')
 
         # 添加到该组织的时间线数据中
         org_timeline_data[org_id].append({
             'timestamp': timestamp,
-            'score': float(score)
+            'score': float(score),
+            'submission_id': sub.id  # 添加提交ID以便于追踪
         })
 
-    # 为每个组织按小时分组并计算每小时的最高分
+    # 为每个组织处理时间线数据，使用实际提交时间而不是按小时分组
     for org_id in org_timeline_data:
         # 按时间排序
         org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
 
-        # 按小时分组并计算每小时的最高分
-        hourly_data = {}
-        for point in org_timeline_data[org_id]:
-            hour_key = point['timestamp']  # 已经格式化为整点小时
-            if hour_key not in hourly_data or point['score'] > hourly_data[hour_key]['score']:
-                hourly_data[hour_key] = {
-                    'timestamp': hour_key,
-                    'score': point['score']
-                }
+        # 计算每个提交时间点的累计最高分
+        current_max_score = 0
+        processed_data = []
 
-        # 将小时数据转换回列表并按时间排序
-        org_timeline_data[org_id] = list(hourly_data.values())
-        org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
+        # 处理每个提交时间点
+        for i, point in enumerate(org_timeline_data[org_id]):
+            # 如果是起始点（分数为0），直接添加
+            if i == 0 and 'debug_total_score' in point:
+                processed_data.append(point)
+                continue
 
-        # 填充缺失的小时数据点，确保时间线连续
+            # 更新当前最高分
+            if point['score'] > current_max_score:
+                current_max_score = point['score']
+
+            # 添加到处理后的数据中，包含当前提交分数和累计最高分
+            processed_data.append({
+                'timestamp': point['timestamp'],
+                'score': point['score'],
+                'cumulative_max': current_max_score,
+                'submission_id': point.get('submission_id', None)
+            })
+
+        # 替换原始数据
+        org_timeline_data[org_id] = processed_data
+
+        # 确保时间线连续，在关键时间点添加数据点
         if len(org_timeline_data[org_id]) > 1:
             filled_data = [org_timeline_data[org_id][0]]  # 从第一个点开始
+
+            # 定义关键时间点（比赛开始时间和结束时间）
+            key_times = [
+                datetime(2025, 4, 18, 11, 0, 0),  # 比赛开始前1小时
+                datetime(2025, 4, 18, 12, 0, 0),  # 比赛开始时间
+                datetime(2025, 4, 24, 20, 0, 0)   # 比赛结束时间
+            ]
 
             for i in range(1, len(org_timeline_data[org_id])):
                 current_point = org_timeline_data[org_id][i]
                 prev_point = org_timeline_data[org_id][i-1]
 
-                # 计算当前点和前一个点之间的时间差
+                # 解析时间点
                 current_time = datetime.strptime(current_point['timestamp'], '%Y-%m-%d %H:%M:%S')
                 prev_time = datetime.strptime(prev_point['timestamp'], '%Y-%m-%d %H:%M:%S')
-                hour_diff = int((current_time - prev_time).total_seconds() / 3600)
 
-                # 如果时间差大于1小时，填充中间的小时数据点
-                if hour_diff > 1:
-                    for h in range(1, hour_diff):
-                        fill_time = prev_time + timedelta(hours=h)
-                        fill_timestamp = fill_time.strftime('%Y-%m-%d %H:%M:%S')
+                # 检查是否有关键时间点在两个提交时间之间
+                for key_time in key_times:
+                    if prev_time < key_time < current_time:
+                        # 在关键时间点添加一个数据点，使用前一个点的分数
                         filled_data.append({
-                            'timestamp': fill_timestamp,
-                            'score': prev_point['score']  # 使用前一个点的分数
+                            'timestamp': key_time.strftime('%Y-%m-%d %H:%M:%S'),
+                            'score': prev_point.get('cumulative_max', prev_point['score']),
+                            'cumulative_max': prev_point.get('cumulative_max', prev_point['score']),
+                            'is_key_time': True  # 标记为关键时间点
                         })
 
+                # 添加当前点
                 filled_data.append(current_point)
 
+            # 替换原始数据
             org_timeline_data[org_id] = filled_data
 
-        # 计算累计最高分
-        current_max = 0
+        # 确保所有点都有cumulative_max属性
+        # 注意：在前面的处理中，我们已经计算了cumulative_max，这里只是确保所有点都有该属性
         for point in org_timeline_data[org_id]:
-            if point['score'] > current_max:
-                current_max = point['score']
-            point['cumulative_max'] = current_max
+            if 'cumulative_max' not in point:
+                if 'score' in point:
+                    point['cumulative_max'] = point['score']
+                else:
+                    point['cumulative_max'] = 0
 
         # 确保有足够的数据点来形成连续的线条
-        # 如果只有一个数据点，复制该点以形成线条
+        # 如果只有一个数据点，添加关键时间点
         if len(org_timeline_data[org_id]) == 1:
             point = org_timeline_data[org_id][0]
-            # 复制该点，并将时间向后移动一小时
-            timestamp = datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S')
-            new_timestamp = (timestamp + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+            # 添加比赛结束时间点
+            end_time = datetime(2025, 4, 24, 20, 0, 0)
 
-            org_timeline_data[org_id].append({
-                'timestamp': new_timestamp,
-                'score': point['score'],
-                'cumulative_max': point['cumulative_max']
-            })
+            # 确保结束时间点在当前点之后
+            current_time = datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S')
+            if current_time < end_time:
+                org_timeline_data[org_id].append({
+                    'timestamp': end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'score': point.get('cumulative_max', point.get('score', 0)),
+                    'cumulative_max': point.get('cumulative_max', point.get('score', 0)),
+                    'is_key_time': True
+                })
+            # 如果当前点已经在结束时间之后，添加一个小时后的点
+            else:
+                new_time = current_time + timedelta(hours=1)
+                org_timeline_data[org_id].append({
+                    'timestamp': new_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'score': point.get('cumulative_max', point.get('score', 0)),
+                    'cumulative_max': point.get('cumulative_max', point.get('score', 0))
+                })
 
         # 确保数据包含到结束时间的数据点，使图表显示完整数据
         if len(org_timeline_data[org_id]) > 0:
-            # 获取该组织的总分，用于添加最终得分点
+            # 获取该组织的总分
             org_entry = next((entry for entry in overall_leaderboard_list if entry['organization'].id == org_id), None)
             org_total_score = float(org_entry['total_points']) if org_entry else 0
 
@@ -245,28 +280,16 @@ def overall_leaderboard(request):
             last_score = last_point.get('cumulative_max', last_point.get('score', 0))
 
             # 使用实际结束时间作为图表的结束时间
-            chart_end_time = actual_end_date.replace(minute=0, second=0, microsecond=0)
+            chart_end_time = actual_end_date
 
-            # 填充从最后一个点到结束时间的所有小时数据点
-            current_time = last_time
-            while current_time < chart_end_time:
-                # 向前移动一小时
-                current_time = current_time + timedelta(hours=1)
-                # 确保不超过结束时间
-                if current_time <= chart_end_time:
-                    timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
-                    org_timeline_data[org_id].append({
-                        'timestamp': timestamp,
-                        'score': last_score,
-                        'cumulative_max': last_score
-                    })
-
-            # 确保最后一个点是结束时间点
-            if org_timeline_data[org_id][-1]['timestamp'] != chart_end_time.strftime('%Y-%m-%d %H:%M:%S'):
+            # 如果最后一个点的时间早于结束时间，添加结束时间点
+            if last_time < chart_end_time:
+                # 直接添加结束时间点，不需要每小时填充
                 org_timeline_data[org_id].append({
                     'timestamp': chart_end_time.strftime('%Y-%m-%d %H:%M:%S'),
                     'score': last_score,
-                    'cumulative_max': last_score
+                    'cumulative_max': last_score,
+                    'is_key_time': True  # 标记为关键时间点
                 })
 
     # 准备图表数据
@@ -282,19 +305,27 @@ def overall_leaderboard(request):
 
         # 如果该组织有时间线数据
         if org_timeline_data[org_id]:
-            # 创建该组织的数据集
+            # 创建该组织的数据集，增强数据点信息
             dataset = {
                 'label': org_name,
-                # 确保分数数据是浮点数并且有效
-                'data': [{'x': point['timestamp'], 'y': float(point['cumulative_max'] or 0)} for point in org_timeline_data[org_id]],
+                # 增强数据点信息，包含实际得分和累计最高分
+                'data': [
+                    {
+                        'x': point['timestamp'],  # 实际时间点
+                        'y': float(point.get('cumulative_max', 0)),  # 累计最高分作为显示分数
+                        'actual_score': float(point.get('score', 0)),  # 实际提交分数
+                        'submission_id': point.get('submission_id', None),  # 提交ID
+                        'is_key_time': point.get('is_key_time', False)  # 是否为关键时间点
+                    } for point in org_timeline_data[org_id]
+                ],
                 'borderColor': f'hsl({(i * 36) % 360}, 70%, 50%)',  # 使用HSL颜色空间生成不同颜色
                 'backgroundColor': f'hsla({(i * 36) % 360}, 70%, 50%, 0.1)',
                 'fill': False,
-                'tension': 0.4,  # 使线条更平滑
+                'tension': 0.3,  # 线条平滑度
                 'showLine': True,  # 显示线条
-                'pointRadius': 4,  # 数据点半径
+                'pointRadius': 3,  # 数据点半径
                 'pointHoverRadius': 6,  # 鼠标悬停时数据点半径
-                'lineTension': 0.3  # 线条张力（平滑度）
+                'pointStyle': 'circle'  # 数据点样式
             }
             chart_data['datasets'].append(dataset)
 
