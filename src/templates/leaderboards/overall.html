@@ -7,7 +7,7 @@
   <!-- 前10名队伍得分时间线图表 -->
   <div class="ui segment chart-container">
     <h3 class="ui header" style="margin: 0.5em;">前10名队伍得分时间线</h3>
-    <div id="scoreTimelineChart" style="width: 100%; height: 300px;"></div>
+    <div id="scoreTimelineChart" style="width: 100%; height: 350px;"></div>
   </div>
   <table class="ui celled table">
     <thead>
@@ -118,19 +118,21 @@
 
   #scoreTimelineChart {
     width: 100% !important;
-    height: 300px !important;
+    height: 350px !important;
   }
 
   .ui.segment.chart-container {
     padding: 0.5em;
     height: auto !important;
     overflow: hidden;
+    margin-bottom: 1.5em;
   }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/theme/macarons.js"></script>
 <script>
   $(document).ready(function() {
     // 点击分数显示详细得分弹窗
@@ -142,7 +144,16 @@
 
     // 初始化ECharts实例
     var chartContainer = document.getElementById('scoreTimelineChart');
-    var myChart = echarts.init(chartContainer);
+    var myChart = echarts.init(chartContainer, 'macarons');
+
+    // 添加加载动画
+    myChart.showLoading({
+      text: '正在加载数据...',
+      color: '#2185d0',
+      textColor: '#000',
+      maskColor: 'rgba(255, 255, 255, 0.8)',
+      zlevel: 0
+    });
 
     // 获取原始数据
     var originalData = {{ chart_data|safe }};
@@ -172,12 +183,36 @@
           smooth: true,
           symbol: 'circle',
           symbolSize: 6,
+          showSymbol: false,  // 默认不显示符号，鼠标悬停时显示
+          emphasis: {
+            focus: 'series',
+            itemStyle: {
+              shadowBlur: 10,
+              shadowColor: 'rgba(0, 0, 0, 0.3)'
+            }
+          },
           lineStyle: {
             width: 2,
             color: dataset.borderColor
           },
           itemStyle: {
-            color: dataset.borderColor
+            color: dataset.borderColor,
+            borderWidth: 2,
+            borderColor: '#fff'
+          },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [{
+                offset: 0, color: dataset.borderColor.replace(')', ', 0.3)').replace('rgb', 'rgba')
+              }, {
+                offset: 1, color: dataset.borderColor.replace(')', ', 0.05)').replace('rgb', 'rgba')
+              }]
+            }
           }
         });
       });
@@ -190,12 +225,24 @@
         tooltip: {
           trigger: 'axis',
           formatter: function(params) {
-            var result = params[0].axisValue + '<br/>';
+            var date = new Date(params[0].axisValue);
+            var formattedDate = date.getFullYear() + '-' +
+                              (date.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                              date.getDate().toString().padStart(2, '0');
+            var result = formattedDate + '<br/>';
+
             params.forEach(function(param) {
               result += param.marker + ' ' + param.seriesName + ': ' + param.value[1].toFixed(2) + ' 分<br/>';
             });
             return result;
-          }
+          },
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderColor: '#ccc',
+          borderWidth: 1,
+          textStyle: {
+            color: '#333'
+          },
+          extraCssText: 'box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);'
         },
         legend: {
           data: originalData.datasets.map(function(dataset) { return dataset.label; }),
@@ -205,7 +252,12 @@
           },
           itemWidth: 12,
           itemHeight: 8,
-          padding: 8
+          padding: 8,
+          type: 'scroll',
+          pageIconSize: 10,
+          pageTextStyle: {
+            fontSize: 10
+          }
         },
         grid: {
           left: '3%',
@@ -224,26 +276,94 @@
               return (date.getMonth() + 1) + '-' + date.getDate();
             },
             fontSize: 10
+          },
+          splitLine: {
+            show: false
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#ddd'
+            }
           }
         },
         yAxis: {
           type: 'value',
           axisLabel: {
-            fontSize: 10
+            fontSize: 10,
+            formatter: function(value) {
+              return value.toFixed(1);
+            }
+          },
+          splitLine: {
+            lineStyle: {
+              color: '#eee',
+              type: 'dashed'
+            }
           }
         },
-        series: series
+        series: series,
+        animation: true,
+        animationDuration: 1000,
+        animationEasing: 'cubicOut'
       };
 
       // 设置图表选项并渲染
+      myChart.hideLoading();
       myChart.setOption(option);
+
+      // 添加工具栏
+      myChart.setOption({
+        toolbox: {
+          show: true,
+          feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
+            saveAsImage: {
+              name: '队伍得分时间线',
+              pixelRatio: 2
+            }
+          },
+          right: 15,
+          top: 0
+        }
+      });
 
       // 窗口大小变化时，重新调整图表大小
       window.addEventListener('resize', function() {
         myChart.resize();
       });
+
+      // 添加图表点击事件
+      myChart.on('click', function(params) {
+        // 当点击图表上的数据点时，高亮该系列
+        var highlightSeries = [];
+        series.forEach(function(s, index) {
+          if (index === params.seriesIndex) {
+            highlightSeries.push(s);
+          } else {
+            var newSeries = JSON.parse(JSON.stringify(s));
+            newSeries.lineStyle = { width: 1, color: '#ddd', opacity: 0.5 };
+            newSeries.itemStyle = { color: '#ddd', opacity: 0.5 };
+            if (newSeries.areaStyle) {
+              newSeries.areaStyle.opacity = 0.1;
+              newSeries.areaStyle.color = '#f5f5f5';
+            }
+            highlightSeries.push(newSeries);
+          }
+        });
+
+        // 如果再次点击同一个系列，恢复原样式
+        if (myChart.getOption().series[0].lineStyle.color === '#ddd') {
+          myChart.setOption({ series: series }, true);
+        } else {
+          myChart.setOption({ series: highlightSeries }, true);
+        }
+      });
     } else {
       // 如果没有数据，显示提示信息
+      myChart.hideLoading();
       $('#scoreTimelineChart').parent().append('<div class="ui info message">暂无得分时间线数据</div>');
       $('#scoreTimelineChart').hide();
     }
