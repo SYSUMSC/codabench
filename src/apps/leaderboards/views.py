@@ -118,6 +118,8 @@ def overall_leaderboard(request):
     start_date = datetime(2025, 4, 18, 12, 0, 0)
     # 设置结束时间：2025年4月24日 20:00
     end_date = datetime(2025, 4, 24, 20, 0, 0)
+    # 计算实际结束时间（取结束时间和当前时间的较小值）
+    actual_end_date = min(end_date, datetime.now())
     # 格式化时间戳
     start_timestamp = start_date.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -242,8 +244,8 @@ def overall_leaderboard(request):
             last_time = datetime.strptime(last_point['timestamp'], '%Y-%m-%d %H:%M:%S')
             last_score = last_point.get('cumulative_max', last_point.get('score', 0))
 
-            # 使用结束时间作为图表的结束时间
-            chart_end_time = end_date.replace(minute=0, second=0, microsecond=0)
+            # 使用实际结束时间作为图表的结束时间
+            chart_end_time = actual_end_date.replace(minute=0, second=0, microsecond=0)
 
             # 填充从最后一个点到结束时间的所有小时数据点
             current_time = last_time
@@ -296,8 +298,10 @@ def overall_leaderboard(request):
             }
             chart_data['datasets'].append(dataset)
 
+    # 将实际结束时间添加到上下文中
     context = {
         'leaderboard_list': overall_leaderboard_list,
-        'chart_data': json.dumps(chart_data)
+        'chart_data': json.dumps(chart_data),
+        'actual_end_date': actual_end_date.strftime('%Y-%m-%d %H:%M:%S')
     }
     return render(request, 'leaderboards/overall.html', context)
