@@ -142,7 +142,10 @@
 
     // 初始化ECharts实例
     var chartContainer = document.getElementById('scoreTimelineChart');
-    var myChart = echarts.init(chartContainer);
+    var myChart = echarts.init(chartContainer, null, {
+      renderer: 'canvas',  // 使用canvas渲染器，性能更好
+      useDirtyRect: true   // 使用脚脏矩形优化，提高性能
+    });
 
     // 获取原始数据
     var originalData = {{ chart_data|safe }};
@@ -268,17 +271,19 @@
             type: 'inside',
             start: 0,
             end: 100,
-            rangeMode: ['value', 'value'],
-            filterMode: 'none',  // 不过滤数据点，确保所有数据点都显示
+            xAxisIndex: 0,  // 指定作用于第一个 X 轴
             zoomOnMouseWheel: true,
-            moveOnMouseMove: true
+            moveOnMouseMove: true,
+            preventDefaultMouseMove: false,  // 允许默认的鼠标移动行为
+            throttle: 100,  // 防止过快触发
+            zoomLock: false,  // 不锁定缩放
+            filterMode: 'filter'  // 使用过滤模式，比 none 模式性能更好
           },
           {
             type: 'slider',
             start: 0,
             end: 100,
-            rangeMode: ['value', 'value'],
-            filterMode: 'none',  // 不过滤数据点，确保所有数据点都显示
+            xAxisIndex: 0,  // 指定作用于第一个 X 轴
             bottom: 10,
             height: 20,
             handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
@@ -289,7 +294,11 @@
               shadowColor: 'rgba(0, 0, 0, 0.6)',
               shadowOffsetX: 2,
               shadowOffsetY: 2
-            }
+            },
+            realtime: true,  // 实时更新
+            throttle: 100,   // 防止过快触发
+            zoomLock: false, // 不锁定缩放
+            filterMode: 'filter'  // 使用过滤模式，比 none 模式性能更好
           }
         ],
         tooltip: {
@@ -468,22 +477,43 @@
       myChart.setOption(option);
 
       // 添加缩放结束事件处理，确保数据始终可见
+      var lastZoomStart = 0;
+      var lastZoomEnd = 100;
+
       myChart.on('datazoom', function(params) {
-        // 强制刷新图表，确保所有数据点都显示
-        setTimeout(function() {
-          myChart.setOption({
-            series: series
-          }, false);
-        }, 100);
+        // 获取当前缩放状态
+        var currentOption = myChart.getOption();
+        var dataZoomStart = currentOption.dataZoom[0].start;
+        var dataZoomEnd = currentOption.dataZoom[0].end;
+
+        // 如果缩放状态没有变化，不做任何处理
+        if (dataZoomStart === lastZoomStart && dataZoomEnd === lastZoomEnd) {
+          return;
+        }
+
+        // 更新上次缩放状态
+        lastZoomStart = dataZoomStart;
+        lastZoomEnd = dataZoomEnd;
+      });
+
+      // 添加窗口调整事件
+      window.addEventListener('resize', function() {
+        myChart.resize();
       });
 
       // 打印调试信息，查看数据是否正确
       console.log('Chart data:', originalData);
       console.log('Series data:', series);
 
-      // 窗口大小变化时，重新调整图表大小
-      window.addEventListener('resize', function() {
-        myChart.resize();
+      // 添加双击事件来重置缩放
+      chartContainer.addEventListener('dblclick', function() {
+        myChart.dispatchAction({
+          type: 'dataZoom',
+          start: 0,
+          end: 100
+        });
+        lastZoomStart = 0;
+        lastZoomEnd = 100;
       });
     } else {
       // 如果没有数据，显示提示信息
