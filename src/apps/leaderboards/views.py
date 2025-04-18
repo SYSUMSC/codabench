@@ -114,8 +114,8 @@ def overall_leaderboard(request):
     # 获取前10名队伍的得分时间线数据
     top_10_orgs = [entry['organization'].id for entry in overall_leaderboard_list[:10]]
 
-    # 设置起始时间：2024年4月18日 12:00
-    start_date = datetime(2024, 4, 18, 12, 0, 0)
+    # 设置起始时间：2025年4月18日 12:00
+    start_date = datetime(2025, 4, 18, 12, 0, 0)
     # 设置结束时间：2025年4月24日 20:00
     end_date = datetime(2025, 4, 24, 20, 0, 0)
     start_timestamp = start_date.strftime('%Y-%m-%d %H:%M:%S')
