@@ -175,7 +175,9 @@
                     if (self.organizations.length === 0){
                         // Don't hide the dropdown, we need to show the 'add team' option
                         // $('#organization_dropdown').hide()
-                        toastr.warning('You need to create or join a team before you can make submissions')
+                        toastr.warning('您需要创建或加入一个队伍才能提交。点击下拉菜单中的"添加新队伍"选项或者联系队长邀请您加入队伍。')
+                        // Add a visible warning message above the dropdown
+                        $('.ui.form').prepend('<div class="ui warning message"><div class="header">注意</div><p>您当前没有队伍，需要创建或加入一个队伍才能提交。</p></div>')
                     }
                     self.update()
                 })
@@ -415,7 +417,7 @@
                     }
                 }
             }
-            return form_json === {} ? null : form_json
+            return Object.keys(form_json).length === 0 ? null : form_json
         }
 
         self.upload = function () {
@@ -473,38 +475,59 @@
                         })
                         .fail(function (response) {
                             try {
-                                let errors = JSON.parse(response.responseText)
-                                let error_str = Object.keys( errors ).map(function (key) { return errors[key] }).join("; ")
-                                toastr.error("Submission Failed: ".concat(error_str))
+                                // Check for "Not found" error which often means the user doesn't have a team
+                                if (response.responseText && response.responseText.includes("Not found")) {
+                                    toastr.error("提交失败: 无法找到您的队伍。请确保您已创建或加入了一个队伍，并且队伍状态正常。")
+                                } else {
+                                    let errors = JSON.parse(response.responseText)
+                                    let error_str = Object.keys( errors ).map(function (key) { return errors[key] }).join("; ")
+                                    toastr.error("提交失败: ".concat(error_str))
+                                }
                             } catch (e) {
-                                toastr.error("Submission Failed")
+                                // If we can't parse the response, check if it's the "Not found" error
+                                if (response.responseText && response.responseText.includes("Not found")) {
+                                    toastr.error("提交失败: 无法找到您的队伍。请确保您已创建或加入了一个队伍，并且队伍状态正常。")
+                                } else {
+                                    toastr.error("提交失败，请稍后再试")
+                                }
                             }
                         })
                 })
                 .fail(function (response) {
                     if (response) {
                         try {
-                            let errors = JSON.parse(response.responseText)
+                            // Check for "Not found" error which often means the user doesn't have a team
+                            if (response.responseText && response.responseText.includes("Not found")) {
+                                toastr.error("提交失败: 无法找到您的队伍。请确保您已创建或加入了一个队伍，并且队伍状态正常。")
+                                self.update({errors: {"organization": "无法找到您的队伍"}})
+                            } else {
+                                let errors = JSON.parse(response.responseText)
 
-                            // Clean up errors to not be arrays but plain text
-                            Object.keys(errors).map(function (key, index) {
-                                errors[key] = errors[key].join('; ')
-                            })
+                                // Clean up errors to not be arrays but plain text
+                                Object.keys(errors).map(function (key, index) {
+                                    errors[key] = errors[key].join('; ')
+                                })
 
-                            // Create a string to concatenate all error messages
-                            let errorMessages = "Error in submission upload:\n"
-                            Object.keys(errors).forEach(function (key) {
-                                errorMessages += key + ": " + errors[key] + "\n"
-                            })
+                                // Create a string to concatenate all error messages
+                                let errorMessages = "提交上传错误:\n"
+                                Object.keys(errors).forEach(function (key) {
+                                    errorMessages += key + ": " + errors[key] + "\n"
+                                })
 
-                            toastr.error(errorMessages)
-                            self.update({errors: errors})
-
+                                toastr.error(errorMessages)
+                                self.update({errors: errors})
+                            }
                         } catch (e) {
-                            toastr.error("Error in submission upload\n"+e)
+                            // If we can't parse the response, check if it's the "Not found" error
+                            if (response.responseText && response.responseText.includes("Not found")) {
+                                toastr.error("提交失败: 无法找到您的队伍。请确保您已创建或加入了一个队伍，并且队伍状态正常。")
+                                self.update({errors: {"organization": "无法找到您的队伍"}})
+                            } else {
+                                toastr.error("提交上传错误\n"+e)
+                            }
                         }
                     } else {
-                        toastr.error("Something went wrong, please try again later")
+                        toastr.error("出现错误，请稍后再试")
                     }
 
                 })
