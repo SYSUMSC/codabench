@@ -332,130 +332,111 @@ def overall_leaderboard(request):
         # 替换原始数据
         org_timeline_data[org_id] = processed_data
 
-        # 确保时间线连续，按小时添加数据点
+        # 确保时间线连续，按小时添加数据点，同时保留所有实际提交时间点
         if len(org_timeline_data[org_id]) > 0:
-            filled_data = []  # 创建新的数据列表
+            filled_data = []
 
-            # 获取第一个点的时间和最后一个点的时间
+            # 获取第一个点和最后一个点的时间
             first_point = org_timeline_data[org_id][0]
             last_point = org_timeline_data[org_id][-1]
 
-            # 解析时间点
             first_time = datetime.strptime(first_point['timestamp'], '%Y-%m-%d %H:%M:%S')
             last_time = datetime.strptime(last_point['timestamp'], '%Y-%m-%d %H:%M:%S')
 
-            # 确保起始时间不晚于比赛开始时间
             start_time = min(first_time, datetime(2025, 4, 18, 11, 0, 0))
-            # 确保结束时间不早于比赛结束时间或当前时间（取较小值）
             end_time = max(last_time, min(datetime(2025, 4, 24, 20, 0, 0), datetime.now()))
 
-            # 将起始时间向前取整到整点小时
             start_hour = datetime(start_time.year, start_time.month, start_time.day, start_time.hour, 0, 0)
-
-            # 将结束时间向后取整到整点小时，并加一小时确保包含结束时间
             if end_time.minute > 0 or end_time.second > 0:
                 end_hour = datetime(end_time.year, end_time.month, end_time.day, end_time.hour, 0, 0) + timedelta(hours=1)
             else:
                 end_hour = datetime(end_time.year, end_time.month, end_time.day, end_time.hour, 0, 0)
 
-            # 添加起始点（如果是第一个点且有debug_total_score）
+            # 关键时间点
+            key_times = [
+                datetime(2025, 4, 18, 11, 0, 0),
+                datetime(2025, 4, 18, 12, 0, 0),
+                datetime(2025, 4, 24, 20, 0, 0)
+            ]
+
+            # 构建实际提交点的map
+            actual_point_map = {point['timestamp']: point for point in org_timeline_data[org_id]}
+            all_actual_timestamps = set(actual_point_map.keys())
+
+            # 先添加起始点
             if 'debug_total_score' in first_point:
                 filled_data.append(first_point)
 
-            # 创建一个字典，用于快速查找每个时间点的数据
-            time_point_map = {}
-            for point in org_timeline_data[org_id]:
-                time_point_map[point['timestamp']] = point
-
-            # 创建一个有序的时间点列表
-            all_timestamps = sorted([datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S') for point in org_timeline_data[org_id]])
-
-            # 定义关键时间点（比赛开始时间和结束时间）
-            key_times = [
-                datetime(2025, 4, 18, 11, 0, 0),  # 比赛开始前1小时
-                datetime(2025, 4, 18, 12, 0, 0),  # 比赛开始时间
-                datetime(2025, 4, 24, 20, 0, 0)   # 比赛结束时间
-            ]
-
-            # 生成每小时的时间点
+            # 生成每小时插值点
             current_hour = start_hour
-            last_point_data = None  # 用于记录上一个有效数据点
-
+            last_point_data = None
             while current_hour <= end_hour:
-                # 格式化当前小时为字符串
                 current_hour_str = current_hour.strftime('%Y-%m-%d %H:%M:%S')
+                # 如果该小时有实际提交点，跳过（实际点后面会统一合并，且优先）
+                if current_hour_str in all_actual_timestamps:
+                    current_hour += timedelta(hours=1)
+                    continue
 
-                # 检查当前小时是否有实际数据点
-                if current_hour_str in time_point_map:
-                    # 如果有，直接使用该数据点
-                    point_data = time_point_map[current_hour_str]
-                    filled_data.append(point_data)
-                    last_point_data = point_data
-                else:
-                    # 如果没有，找到最近的前一个数据点
-                    prev_time = None
-                    for timestamp in all_timestamps:
-                        if timestamp < current_hour:
-                            prev_time = timestamp
-                        else:
-                            break
-
-                    # 如果找到了前一个数据点，使用其数据
-                    if prev_time:
-                        prev_time_str = prev_time.strftime('%Y-%m-%d %H:%M:%S')
-                        prev_point = time_point_map[prev_time_str]
-
-                        # 获取小题分数详情
-                        detailed_scores = prev_point.get('detailed_scores', [])
-                        # 计算小题分数之和
-                        total_score = prev_point.get('total_score', 0)
-
-                        # 创建新的数据点
-                        new_point = {
-                            'timestamp': current_hour_str,
-                            'score': prev_point.get('score', 0),
-                            'cumulative_max': prev_point.get('cumulative_max', 0),
-                            'is_key_time': current_hour in key_times,  # 检查是否为关键时间点
-                            'detailed_scores': detailed_scores,
-                            'total_score': total_score,
-                            'submission_id': None,  # 插入的小时点没有提交ID
-                            'is_hourly_point': True  # 标记为按小时插入的点
-                        }
-                        filled_data.append(new_point)
-                        last_point_data = new_point
-                    elif last_point_data:
-                        # 如果没有前一个数据点但有上一个处理过的点，使用上一个点的数据
-                        new_point = {
-                            'timestamp': current_hour_str,
-                            'score': last_point_data.get('score', 0),
-                            'cumulative_max': last_point_data.get('cumulative_max', 0),
-                            'is_key_time': current_hour in key_times,
-                            'detailed_scores': last_point_data.get('detailed_scores', []),
-                            'total_score': last_point_data.get('total_score', 0),
-                            'submission_id': None,
-                            'is_hourly_point': True
-                        }
-                        filled_data.append(new_point)
+                # 找到最近的前一个实际点
+                prev_time = None
+                for ts in sorted(all_actual_timestamps):
+                    if ts < current_hour_str:
+                        prev_time = ts
                     else:
-                        # 如果既没有前一个数据点也没有上一个处理过的点，创建一个零分数据点
-                        new_point = {
-                            'timestamp': current_hour_str,
-                            'score': 0,
-                            'cumulative_max': 0,
-                            'is_key_time': current_hour in key_times,
-                            'detailed_scores': [],
-                            'total_score': 0,
-                            'submission_id': None,
-                            'is_hourly_point': True
-                        }
-                        filled_data.append(new_point)
-                        last_point_data = new_point
+                        break
 
-                # 移动到下一个小时
+                if prev_time:
+                    prev_point = actual_point_map[prev_time]
+                    detailed_scores = prev_point.get('detailed_scores', [])
+                    total_score = prev_point.get('total_score', 0)
+                    new_point = {
+                        'timestamp': current_hour_str,
+                        'score': prev_point.get('score', 0),
+                        'cumulative_max': prev_point.get('cumulative_max', 0),
+                        'is_key_time': current_hour in key_times,
+                        'detailed_scores': detailed_scores,
+                        'total_score': total_score,
+                        'submission_id': None,
+                        'is_hourly_point': True
+                    }
+                    filled_data.append(new_point)
+                    last_point_data = new_point
+                elif last_point_data:
+                    new_point = {
+                        'timestamp': current_hour_str,
+                        'score': last_point_data.get('score', 0),
+                        'cumulative_max': last_point_data.get('cumulative_max', 0),
+                        'is_key_time': current_hour in key_times,
+                        'detailed_scores': last_point_data.get('detailed_scores', []),
+                        'total_score': last_point_data.get('total_score', 0),
+                        'submission_id': None,
+                        'is_hourly_point': True
+                    }
+                    filled_data.append(new_point)
+                else:
+                    new_point = {
+                        'timestamp': current_hour_str,
+                        'score': 0,
+                        'cumulative_max': 0,
+                        'is_key_time': current_hour in key_times,
+                        'detailed_scores': [],
+                        'total_score': 0,
+                        'submission_id': None,
+                        'is_hourly_point': True
+                    }
+                    filled_data.append(new_point)
+                    last_point_data = new_point
+
                 current_hour += timedelta(hours=1)
 
-            # 替换原始数据
-            org_timeline_data[org_id] = filled_data
+            # 合并所有实际提交点和插值点，实际提交点优先
+            all_points_map = {point['timestamp']: point for point in filled_data}
+            # 用实际提交点覆盖插值点
+            for ts, point in actual_point_map.items():
+                all_points_map[ts] = point
+            # 按时间排序
+            merged_points = [all_points_map[ts] for ts in sorted(all_points_map.keys())]
+            org_timeline_data[org_id] = merged_points
 
         # 确保所有点都有cumulative_max属性
         # 注意：在前面的处理中，我们已经计算了cumulative_max，这里只是确保所有点都有该属性
