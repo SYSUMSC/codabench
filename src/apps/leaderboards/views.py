@@ -296,6 +296,28 @@ def overall_leaderboard(request):
                 'is_actual_submission': True  # 标记为实际提交点
             })
 
+        # === 补齐所有队伍在所有实际出现过的时间点 ===
+        all_actual_timestamps = set()
+        for org_id2 in org_timeline_data:
+            all_actual_timestamps.update(point['timestamp'] for point in org_timeline_data[org_id2])
+        all_actual_timestamps = sorted(all_actual_timestamps)
+
+        for org_id2 in org_timeline_data:
+            timeline = org_timeline_data[org_id2]
+            time2point = {point['timestamp']: point for point in timeline}
+            filled_timeline = []
+            last_point = None
+            for ts in all_actual_timestamps:
+                if ts in time2point:
+                    last_point = time2point[ts]
+                    filled_timeline.append(last_point)
+                elif last_point is not None:
+                    clone_point = last_point.copy()
+                    clone_point['timestamp'] = ts
+                    clone_point['is_actual_submission'] = False
+                    filled_timeline.append(clone_point)
+            org_timeline_data[org_id2] = filled_timeline
+        # === 补齐结束 ===
     # 为每个组织处理时间线数据，按小时插入数据点
     for org_id in org_timeline_data:
         # 按时间排序
