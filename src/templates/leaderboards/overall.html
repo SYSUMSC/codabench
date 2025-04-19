@@ -90,6 +90,33 @@
         </td>
         {% endif %}
       </tr>
+      {% if forloop.counter == 7 %}
+      <tr class="prize-divider first-prize-divider">
+        <td colspan="{% if show_avg_submission_time %}6{% else %}5{% endif %}" class="center aligned">
+          <div class="ui horizontal divider">
+            <i class="trophy icon gold-trophy"></i> 一等奖分界线 - 7支队伍，荣誉证书 + 奖品（每人一个华为充电宝）
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+      {% if forloop.counter == 20 %}
+      <tr class="prize-divider second-prize-divider">
+        <td colspan="{% if show_avg_submission_time %}6{% else %}5{% endif %}" class="center aligned">
+          <div class="ui horizontal divider">
+            <i class="trophy icon silver-trophy"></i> 二等奖分界线 - 13支队伍，荣誉证书 + 奖品（每人一个华为无线鼠标）
+          </div>
+        </td>
+      </tr>
+      {% endif %}
+      {% if forloop.counter == 40 %}
+      <tr class="prize-divider third-prize-divider">
+        <td colspan="{% if show_avg_submission_time %}6{% else %}5{% endif %}" class="center aligned">
+          <div class="ui horizontal divider">
+            <i class="trophy icon bronze-trophy"></i> 三等奖分界线 - 20支队伍，荣誉证书 + 奖品（每人一个笔记本）
+          </div>
+        </td>
+      </tr>
+      {% endif %}
       {% empty %}
       <tr>
         <td colspan="{% if show_avg_submission_time %}6{% else %}5{% endif %}">暂无数据</td>
@@ -171,6 +198,41 @@
   .info.circle.icon {
     color: #2185d0;
     cursor: help;
+  }
+
+  /* 奖项分界线样式 */
+  .prize-divider td {
+    padding: 0.5em !important;
+    background-color: #f9fafb !important;
+  }
+
+  .prize-divider .ui.horizontal.divider {
+    margin: 0.5em 0;
+    font-weight: bold;
+  }
+
+  .first-prize-divider .ui.horizontal.divider {
+    color: #D4AF37;
+  }
+
+  .second-prize-divider .ui.horizontal.divider {
+    color: #A9A9A9;
+  }
+
+  .third-prize-divider .ui.horizontal.divider {
+    color: #CD7F32;
+  }
+
+  .gold-trophy {
+    color: #D4AF37 !important;
+  }
+
+  .silver-trophy {
+    color: #A9A9A9 !important;
+  }
+
+  .bronze-trophy {
+    color: #CD7F32 !important;
   }
 </style>
 {% endblock %}
