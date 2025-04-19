@@ -4,6 +4,7 @@ from competitions.models import Submission, Competition
 from django.apps import apps
 from leaderboards.models import Leaderboard
 from profiles.models import Membership
+from django.core.cache import cache
 import json
 from datetime import datetime, timedelta
 import pytz
@@ -16,6 +17,18 @@ def overall_leaderboard(request):
       - 每个排行榜（题目）内，按组织取最高得分
       - 对每个组织，将其在所有排行榜（题目）中的最高得分求和作为总分
     """
+    # 创建缓存键，基于当前时间（精确到分钟）
+    # 这样每分钟会生成一个新的缓存键，确保数据每分钟更新一次
+    now = datetime.now()
+    cache_key = f'overall_leaderboard_{now.strftime("%Y%m%d_%H%M")}'
+
+    # 尝试从缓存中获取数据
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        print(f"Using cached leaderboard data from key: {cache_key}")
+        return render(request, 'leaderboards/overall.html', cached_data)
+
+    # 如果缓存中没有数据，则计算新数据
     # 筛选出满足条件的提交，且要求提交所属组织不为空
     submissions = Submission.objects.filter(
         leaderboard__isnull=False,
@@ -282,7 +295,7 @@ def overall_leaderboard(request):
                 'leaderboard_id': leaderboard_id  # 添加排行榜ID以便于追踪
             })
 
-    # 为每个组织处理时间线数据，使用实际提交时间而不是按小时分组
+    # 为每个组织处理时间线数据，按小时插入数据点
     for org_id in org_timeline_data:
         # 按时间排序
         org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
@@ -318,9 +331,43 @@ def overall_leaderboard(request):
         # 替换原始数据
         org_timeline_data[org_id] = processed_data
 
-        # 确保时间线连续，在关键时间点添加数据点
-        if len(org_timeline_data[org_id]) > 1:
-            filled_data = [org_timeline_data[org_id][0]]  # 从第一个点开始
+        # 确保时间线连续，按小时添加数据点
+        if len(org_timeline_data[org_id]) > 0:
+            filled_data = []  # 创建新的数据列表
+
+            # 获取第一个点的时间和最后一个点的时间
+            first_point = org_timeline_data[org_id][0]
+            last_point = org_timeline_data[org_id][-1]
+
+            # 解析时间点
+            first_time = datetime.strptime(first_point['timestamp'], '%Y-%m-%d %H:%M:%S')
+            last_time = datetime.strptime(last_point['timestamp'], '%Y-%m-%d %H:%M:%S')
+
+            # 确保起始时间不晚于比赛开始时间
+            start_time = min(first_time, datetime(2025, 4, 18, 11, 0, 0))
+            # 确保结束时间不早于比赛结束时间或当前时间（取较小值）
+            end_time = max(last_time, min(datetime(2025, 4, 24, 20, 0, 0), datetime.now()))
+
+            # 将起始时间向前取整到整点小时
+            start_hour = datetime(start_time.year, start_time.month, start_time.day, start_time.hour, 0, 0)
+
+            # 将结束时间向后取整到整点小时，并加一小时确保包含结束时间
+            if end_time.minute > 0 or end_time.second > 0:
+                end_hour = datetime(end_time.year, end_time.month, end_time.day, end_time.hour, 0, 0) + timedelta(hours=1)
+            else:
+                end_hour = datetime(end_time.year, end_time.month, end_time.day, end_time.hour, 0, 0)
+
+            # 添加起始点（如果是第一个点且有debug_total_score）
+            if 'debug_total_score' in first_point:
+                filled_data.append(first_point)
+
+            # 创建一个字典，用于快速查找每个时间点的数据
+            time_point_map = {}
+            for point in org_timeline_data[org_id]:
+                time_point_map[point['timestamp']] = point
+
+            # 创建一个有序的时间点列表
+            all_timestamps = sorted([datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S') for point in org_timeline_data[org_id]])
 
             # 定义关键时间点（比赛开始时间和结束时间）
             key_times = [
@@ -329,34 +376,82 @@ def overall_leaderboard(request):
                 datetime(2025, 4, 24, 20, 0, 0)   # 比赛结束时间
             ]
 
-            for i in range(1, len(org_timeline_data[org_id])):
-                current_point = org_timeline_data[org_id][i]
-                prev_point = org_timeline_data[org_id][i-1]
+            # 生成每小时的时间点
+            current_hour = start_hour
+            last_point_data = None  # 用于记录上一个有效数据点
 
-                # 解析时间点
-                current_time = datetime.strptime(current_point['timestamp'], '%Y-%m-%d %H:%M:%S')
-                prev_time = datetime.strptime(prev_point['timestamp'], '%Y-%m-%d %H:%M:%S')
+            while current_hour <= end_hour:
+                # 格式化当前小时为字符串
+                current_hour_str = current_hour.strftime('%Y-%m-%d %H:%M:%S')
 
-                # 检查是否有关键时间点在两个提交时间之间
-                for key_time in key_times:
-                    if prev_time < key_time < current_time:
-                        # 在关键时间点添加一个数据点，使用前一个点的分数
+                # 检查当前小时是否有实际数据点
+                if current_hour_str in time_point_map:
+                    # 如果有，直接使用该数据点
+                    point_data = time_point_map[current_hour_str]
+                    filled_data.append(point_data)
+                    last_point_data = point_data
+                else:
+                    # 如果没有，找到最近的前一个数据点
+                    prev_time = None
+                    for timestamp in all_timestamps:
+                        if timestamp < current_hour:
+                            prev_time = timestamp
+                        else:
+                            break
+
+                    # 如果找到了前一个数据点，使用其数据
+                    if prev_time:
+                        prev_time_str = prev_time.strftime('%Y-%m-%d %H:%M:%S')
+                        prev_point = time_point_map[prev_time_str]
+
+                        # 获取小题分数详情
                         detailed_scores = prev_point.get('detailed_scores', [])
                         # 计算小题分数之和
-                        total_score = sum(item['score'] for item in detailed_scores) if detailed_scores else prev_point.get('score', 0)
+                        total_score = prev_point.get('total_score', 0)
 
-                        filled_data.append({
-                            'timestamp': key_time.strftime('%Y-%m-%d %H:%M:%S'),
-                            'score': prev_point.get('cumulative_max', prev_point['score']),
-                            'cumulative_max': prev_point.get('cumulative_max', prev_point['score']),
-                            'is_key_time': True,  # 标记为关键时间点
-                            'detailed_scores': detailed_scores,  # 保留前一个点的小题分数详情
-                            'total_score': total_score,  # 使用小题分数之和作为总分
-                            'submission_id': None  # 关键时间点没有提交ID
-                        })
+                        # 创建新的数据点
+                        new_point = {
+                            'timestamp': current_hour_str,
+                            'score': prev_point.get('score', 0),
+                            'cumulative_max': prev_point.get('cumulative_max', 0),
+                            'is_key_time': current_hour in key_times,  # 检查是否为关键时间点
+                            'detailed_scores': detailed_scores,
+                            'total_score': total_score,
+                            'submission_id': None,  # 插入的小时点没有提交ID
+                            'is_hourly_point': True  # 标记为按小时插入的点
+                        }
+                        filled_data.append(new_point)
+                        last_point_data = new_point
+                    elif last_point_data:
+                        # 如果没有前一个数据点但有上一个处理过的点，使用上一个点的数据
+                        new_point = {
+                            'timestamp': current_hour_str,
+                            'score': last_point_data.get('score', 0),
+                            'cumulative_max': last_point_data.get('cumulative_max', 0),
+                            'is_key_time': current_hour in key_times,
+                            'detailed_scores': last_point_data.get('detailed_scores', []),
+                            'total_score': last_point_data.get('total_score', 0),
+                            'submission_id': None,
+                            'is_hourly_point': True
+                        }
+                        filled_data.append(new_point)
+                    else:
+                        # 如果既没有前一个数据点也没有上一个处理过的点，创建一个零分数据点
+                        new_point = {
+                            'timestamp': current_hour_str,
+                            'score': 0,
+                            'cumulative_max': 0,
+                            'is_key_time': current_hour in key_times,
+                            'detailed_scores': [],
+                            'total_score': 0,
+                            'submission_id': None,
+                            'is_hourly_point': True
+                        }
+                        filled_data.append(new_point)
+                        last_point_data = new_point
 
-                # 添加当前点
-                filled_data.append(current_point)
+                # 移动到下一个小时
+                current_hour += timedelta(hours=1)
 
             # 替换原始数据
             org_timeline_data[org_id] = filled_data
@@ -484,4 +579,9 @@ def overall_leaderboard(request):
         'actual_end_date': actual_end_date.strftime('%Y-%m-%d %H:%M:%S'),
         'show_avg_submission_time': False  # 添加标志以便模板可以显示平均提交时间
     }
+
+    # 将计算结果缓存60秒
+    cache.set(cache_key, context, 60)
+    print(f"Cached leaderboard data with key: {cache_key}, TTL: 60 seconds")
+
     return render(request, 'leaderboards/overall.html', context)

@@ -33,6 +33,9 @@
   <!-- 前20名队伍得分时间线图表 -->
   <div class="ui segment chart-container">
     <h3 class="ui header" style="margin: 0.5em;">前20名队伍得分时间线（2025年4月18日 12:00 至 {{ actual_end_date }}）</h3>
+    <div class="ui info message" style="margin: 0.5em;">
+      <p>注意：图表按小时显示数据点，便于比较不同队伍在同一时间点的得分情况。</p>
+    </div>
     <div id="scoreTimelineChart" style="width: 100%; height: 350px;"></div>
   </div>
   <table class="ui celled table">
@@ -306,6 +309,7 @@
           // 添加额外属性以供工具提示使用
           dataPoint.submissionId = point.submission_id || null;
           dataPoint.isKeyTime = point.is_key_time || false;
+          dataPoint.is_hourly_point = point.is_hourly_point || false;
           // 添加小题分数详情，仅用于控制台调试
           if (point.detailed_scores && point.detailed_scores.length > 0) {
             dataPoint.detailedScores = point.detailed_scores;
@@ -328,6 +332,8 @@
               return 'emptyCircle';  // 关键时间点使用空心圆
             } else if (point.submissionId) {
               return 'circle';  // 有提交ID的点使用实心圆
+            } else if (point.is_hourly_point) {
+              return 'emptyCircle';  // 整点小时使用空心圆
             } else {
               return 'circle';  // 其他点也显示圆形，但尺寸较小
             }
@@ -339,6 +345,8 @@
               return 6;  // 关键时间点的大小
             } else if (point.submissionId) {
               return 5;  // 有提交ID的点的大小
+            } else if (point.is_hourly_point) {
+              return 4;  // 整点小时的大小
             } else {
               return 3;  // 其他点使用较小的圆点
             }
@@ -480,6 +488,8 @@
                 specialMark = ' <span style="color:#999;font-style:italic;">[关键时间点]</span>';
               } else if (point.submissionId) {
                 specialMark = ' <span style="color:#999;font-style:italic;">[提交时间]</span>';
+              } else if (point.is_hourly_point) {
+                specialMark = ' <span style="color:#999;font-style:italic;">[整点小时]</span>';
               }
 
               result += '<div>' + param.marker + ' ' + param.seriesName + ': ' + scoreDisplay + specialMark + '</div>';
