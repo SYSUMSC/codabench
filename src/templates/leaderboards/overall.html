@@ -36,7 +36,7 @@
     <div class="ui info message" style="margin: 0.5em;">
       <p>注意：图表按小时显示数据点，便于比较不同队伍在同一时间点的得分情况。</p>
     </div>
-    <div id="scoreTimelineChart" style="width: 100%; height: 350px;"></div>
+    <div id="scoreTimelineChart" style="width: 100%; height: 350px; padding: 0 10px; min-width: 1000px;"></div>
   </div>
   <table class="ui celled table">
     <thead>
@@ -142,13 +142,20 @@
     width: 100% !important;
     height: 350px !important;
     position: relative;
-    overflow: visible !important;
+    overflow: visible !important; /* 允许内容溢出显示 */
+  }
+
+  /* 允许图表容器水平滚动 */
+  .ui.segment.chart-container {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
   }
 
   .ui.segment.chart-container {
-    padding: 0.5em;
+    padding: 1em;
     height: auto !important;
-    overflow: visible;
+    overflow-x: auto; /* 允许水平滚动 */
+    overflow-y: hidden; /* 防止垂直滚动条 */
     margin-bottom: 1.5em;
   }
 
@@ -588,15 +595,15 @@
           ]
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
+          left: '6%',
+          right: '6%',
+          bottom: '10%',
           top: '50px',
           containLabel: true
         },
         xAxis: {
           type: 'time',  // 使用时间类型坐标轴，更好地处理实际提交时间
-          boundaryGap: false,
+          boundaryGap: ['3%', '3%'],  // 添加边界空白防止溢出
           scale: true,
           axisLabel: {
             formatter: function(value) {
@@ -697,7 +704,7 @@
             }
           }(),
           // 添加空白空间，防止溢出
-          boundaryGap: ['20%', '30%'],
+          boundaryGap: ['10%', '10%'],
           // 确保数据不会超出图表边界
           scale: true,
           axisLabel: {
