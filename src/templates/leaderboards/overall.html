@@ -307,6 +307,15 @@
             score = 0;
           }
 
+          // 确保分数不会下降，使用前一个点的最高分数
+          if (seriesData.length > 0) {
+            var lastPoint = seriesData[seriesData.length - 1];
+            if (score < lastPoint[1]) {
+              console.log('Fixing decreasing score:', score, '->', lastPoint[1], 'at', point.x);
+              score = lastPoint[1];
+            }
+          }
+
           // 添加额外信息到数据点
           var dataPoint = [timestamp, score];
 

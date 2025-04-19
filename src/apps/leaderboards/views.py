@@ -307,16 +307,40 @@ def overall_leaderboard(request):
             time2point = {point['timestamp']: point for point in timeline}
             filled_timeline = []
             last_point = None
+            max_score = 0  # 跟踪最高分数，确保分数不会下降
+            max_total_score = 0  # 跟踪最高总分，确保总分不会下降
+
             for ts in all_actual_timestamps:
                 if ts in time2point:
-                    last_point = time2point[ts]
-                    filled_timeline.append(last_point)
+                    current_point = time2point[ts]
+                    # 更新最高分数记录
+                    current_score = current_point.get('score', 0)
+                    current_total_score = current_point.get('total_score', 0)
+
+                    # 如果是实际提交，使用实际分数
+                    if current_point.get('is_actual_submission', False):
+                        max_score = max(max_score, current_score)
+                        max_total_score = max(max_total_score, current_total_score)
+                        last_point = current_point
+                        filled_timeline.append(current_point)
+                    else:
+                        # 如果不是实际提交，确保分数不会下降
+                        clone_point = current_point.copy()
+                        clone_point['score'] = max(max_score, current_score)
+                        clone_point['total_score'] = max(max_total_score, current_total_score)
+                        last_point = clone_point
+                        filled_timeline.append(clone_point)
                 elif last_point is not None:
+                    # 创建填充点，使用最高分数
                     clone_point = last_point.copy()
                     clone_point['timestamp'] = ts
                     clone_point['is_actual_submission'] = False
-                    clone_point['is_filled_point'] = True  # Mark as a filled point
+                    clone_point['is_filled_point'] = True  # 标记为填充点
+                    # 确保使用最高分数
+                    clone_point['score'] = max_score
+                    clone_point['total_score'] = max_total_score
                     filled_timeline.append(clone_point)
+
             org_timeline_data[org_id2] = filled_timeline
         # === 补齐结束 ===
     # 为每个组织处理时间线数据，按小时插入数据点
@@ -325,6 +349,7 @@ def overall_leaderboard(request):
         org_timeline_data[org_id].sort(key=lambda x: x['timestamp'])
 
         processed_data = []
+        max_cumulative_score = 0  # 跟踪最高累计分数
 
         # 处理每个提交时间点
         for i, point in enumerate(org_timeline_data[org_id]):
@@ -340,16 +365,20 @@ def overall_leaderboard(request):
             # total_score已经在前面的处理中计算为所有排行榜最高分的总和
             total_score = point.get('total_score', 0)
 
+            # 确保累计分数不会下降
+            max_cumulative_score = max(max_cumulative_score, total_score)
+
             # 添加到处理后的数据中，包含当前提交分数和累计总分
             processed_data.append({
                 'timestamp': point['timestamp'],
                 'score': point['score'],  # 当前提交的分数
-                'cumulative_max': total_score,  # 使用total_score作为累计最高分
+                'cumulative_max': max_cumulative_score,  # 使用最高累计分数
                 'submission_id': point.get('submission_id', None),
                 'detailed_scores': detailed_scores,  # 保留小题分数详情
                 'is_key_time': point.get('is_key_time', False),  # 保留关键时间点标记
-                'total_score': total_score,  # 使用total_score作为总分
-                'leaderboard_id': point.get('leaderboard_id', None)  # 保留排行榜ID
+                'total_score': max_cumulative_score,  # 使用最高累计分数作为总分
+                'leaderboard_id': point.get('leaderboard_id', None),  # 保留排行榜ID
+                'is_filled_point': point.get('is_filled_point', False)  # 保留填充点标记
             })
 
         # 替换原始数据
@@ -411,20 +440,32 @@ def overall_leaderboard(request):
                 if prev_time:
                     prev_point = actual_point_map[prev_time]
                     detailed_scores = prev_point.get('detailed_scores', [])
+
+                    # 确保使用最高分数
+                    score = prev_point.get('score', 0)
                     total_score = prev_point.get('total_score', 0)
+                    cumulative_max = prev_point.get('cumulative_max', total_score)
+
+                    # 确保累计分数不会下降
+                    if last_point_data:
+                        cumulative_max = max(cumulative_max, last_point_data.get('cumulative_max', 0))
+                        total_score = max(total_score, last_point_data.get('total_score', 0))
+
                     new_point = {
                         'timestamp': current_hour_str,
-                        'score': prev_point.get('score', 0),
-                        'cumulative_max': prev_point.get('cumulative_max', 0),
+                        'score': score,
+                        'cumulative_max': cumulative_max,
                         'is_key_time': current_hour in key_times,
                         'detailed_scores': detailed_scores,
                         'total_score': total_score,
                         'submission_id': None,
-                        'is_hourly_point': True
+                        'is_hourly_point': True,
+                        'is_filled_point': True  # 标记为填充点
                     }
                     filled_data.append(new_point)
                     last_point_data = new_point
                 elif last_point_data:
+                    # 使用前一个点的数据，确保分数不会下降
                     new_point = {
                         'timestamp': current_hour_str,
                         'score': last_point_data.get('score', 0),
@@ -433,10 +474,12 @@ def overall_leaderboard(request):
                         'detailed_scores': last_point_data.get('detailed_scores', []),
                         'total_score': last_point_data.get('total_score', 0),
                         'submission_id': None,
-                        'is_hourly_point': True
+                        'is_hourly_point': True,
+                        'is_filled_point': True  # 标记为填充点
                     }
                     filled_data.append(new_point)
                 else:
+                    # 如果没有前置数据，使用零分
                     new_point = {
                         'timestamp': current_hour_str,
                         'score': 0,
@@ -445,7 +488,8 @@ def overall_leaderboard(request):
                         'detailed_scores': [],
                         'total_score': 0,
                         'submission_id': None,
-                        'is_hourly_point': True
+                        'is_hourly_point': True,
+                        'is_filled_point': True  # 标记为填充点
                     }
                     filled_data.append(new_point)
                     last_point_data = new_point
@@ -491,7 +535,10 @@ def overall_leaderboard(request):
                     'is_key_time': True,
                     'detailed_scores': detailed_scores,  # 保留小题分数详情
                     'total_score': total_score,  # 使用小题分数之和作为总分
-                    'submission_id': None  # 关键时间点没有提交ID
+                    'submission_id': None,  # 关键时间点没有提交ID
+                    'is_filled_point': True,  # 标记为填充点
+                    'is_hourly_point': False,  # 不是整点小时点
+                    'is_actual_submission': False  # 不是实际提交点
                 })
             # 如果当前点已经在结束时间之后，添加一个小时后的点
             else:
@@ -507,7 +554,10 @@ def overall_leaderboard(request):
                     'detailed_scores': detailed_scores,  # 保留小题分数详情
                     'is_key_time': False,  # 不是关键时间点
                     'total_score': total_score,  # 使用小题分数之和作为总分
-                    'submission_id': None  # 没有提交ID
+                    'submission_id': None,  # 没有提交ID
+                    'is_filled_point': True,  # 标记为填充点
+                    'is_hourly_point': False,  # 不是整点小时点
+                    'is_actual_submission': False  # 不是实际提交点
                 })
 
         # 确保数据包含到结束时间的数据点，使图表显示完整数据
@@ -536,7 +586,10 @@ def overall_leaderboard(request):
                     'cumulative_max': last_point.get('cumulative_max', 0),
                     'total_score': total_score,  # 使用小题分数之和作为总分
                     'is_key_time': True,  # 标记为关键时间点
-                    'detailed_scores': detailed_scores  # 保留前一个点的小题分数详情
+                    'detailed_scores': detailed_scores,  # 保留前一个点的小题分数详情
+                    'is_filled_point': True,  # 标记为填充点
+                    'is_hourly_point': False,  # 不是整点小时点
+                    'is_actual_submission': False  # 不是实际提交点
                 })
 
     # 准备图表数据
@@ -563,7 +616,11 @@ def overall_leaderboard(request):
                         'submission_id': point.get('submission_id', None),  # 提交ID
                         'is_key_time': point.get('is_key_time', False),  # 是否为关键时间点
                         'total_score': float(point.get('total_score', 0)),  # 当前提交的总分（小题分数之和）
-                        'detailed_scores': point.get('detailed_scores', [])  # 小题分数数组，用于调试
+                        'detailed_scores': point.get('detailed_scores', []),  # 小题分数数组，用于调试
+                        'is_filled_point': point.get('is_filled_point', False),  # 是否为填充点
+                        'is_hourly_point': point.get('is_hourly_point', False),  # 是否为整点小时点
+                        'is_actual_submission': point.get('is_actual_submission', False),  # 是否为实际提交点
+                        'score': float(point.get('score', 0))  # 当前提交的分数
                     } for point in org_timeline_data[org_id]
                 ],
                 'borderColor': f'hsl({(i * 36) % 360}, 70%, 50%)',  # 使用HSL颜色空间生成不同颜色
