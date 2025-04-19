@@ -288,11 +288,12 @@ def overall_leaderboard(request):
             # 添加到该组织的时间线数据中
             org_timeline_data[org_id].append({
                 'timestamp': timestamp,
-                'score': score,  # 当前提交的分数
-                'total_score': total_score,  # 所有排行榜最高分的总和
+                'score': float(score),  # 当前提交的分数，确保是浮点数
+                'total_score': float(total_score),  # 所有排行榜最高分的总和，确保是浮点数
                 'submission_id': submission_id,  # 添加提交ID以便于追踪
-                'detailed_scores': detailed_scores,  # 添加小题分数详情，用于调试
-                'leaderboard_id': leaderboard_id  # 添加排行榜ID以便于追踪
+                'detailed_scores': detailed_scores,  # 添加小题分数详情
+                'leaderboard_id': leaderboard_id,  # 添加排行榜ID以便于迟踪
+                'is_actual_submission': True  # 标记为实际提交点
             })
 
     # 为每个组织处理时间线数据，按小时插入数据点

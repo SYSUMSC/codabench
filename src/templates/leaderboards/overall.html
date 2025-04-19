@@ -310,16 +310,22 @@
           dataPoint.submissionId = point.submission_id || null;
           dataPoint.isKeyTime = point.is_key_time || false;
           dataPoint.is_hourly_point = point.is_hourly_point || false;
-          // 添加小题分数详情，仅用于控制台调试
+          dataPoint.isActualSubmission = point.is_actual_submission || false;
+          dataPoint.score = point.score || 0; // 保存原始分数
+
+          // 添加小题分数详情
           if (point.detailed_scores && point.detailed_scores.length > 0) {
             dataPoint.detailedScores = point.detailed_scores;
-            console.log('Detailed scores for point at ' + point.x + ':', point.detailed_scores);
+            if (point.submission_id) {
+              console.log('Detailed scores for submission ' + point.submission_id + ' at ' + point.x + ':', point.detailed_scores);
+            }
           }
 
           seriesData.push(dataPoint);
         });
 
         // 添加到系列中
+        // 添加到系列中 - 主线（累计最高分）
         series.push({
           name: dataset.label,
           type: 'line',
@@ -344,7 +350,7 @@
             if (point.isKeyTime) {
               return 6;  // 关键时间点的大小
             } else if (point.submissionId) {
-              return 5;  // 有提交ID的点的大小
+              return 8;  // 有提交ID的点的大小 - 增大以更明显
             } else if (point.is_hourly_point) {
               return 4;  // 整点小时的大小
             } else {
@@ -371,6 +377,45 @@
             }
           }
         });
+
+        // 添加实际提交点的散点图 - 只显示实际提交点
+        var submissionPoints = [];
+        seriesData.forEach(function(point) {
+          if (point.isActualSubmission || (point.submissionId && point.score > 0)) {
+            submissionPoints.push(point);
+          }
+        });
+
+        // 输出调试信息
+        if (submissionPoints.length > 0) {
+          console.log('找到实际提交点:', submissionPoints.length, '个点');
+        } else {
+          console.warn('没有找到实际提交点!');
+        }
+
+        if (submissionPoints.length > 0) {
+          series.push({
+            name: dataset.label + ' (实际提交)',
+            type: 'scatter',
+            data: submissionPoints,
+            symbol: 'diamond',
+            symbolSize: 10,
+            itemStyle: {
+              color: dataset.borderColor,
+              borderColor: '#fff',
+              borderWidth: 1
+            },
+            emphasis: {
+              itemStyle: {
+                borderWidth: 2,
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            },
+            // 不在图例中显示
+            showInLegend: false
+          });
+        }
       });
 
       // 获取唯一的日期并排序
@@ -477,8 +522,23 @@
                 scoreDisplay = point.total_score.toFixed(2) + ' 分 (总分)';
               }
 
-              // 如果有小题分数详情，在控制台输出调试信息
-              if (point.detailedScores && point.detailedScores.length > 0) {
+              // 如果是实际提交点，显示当前提交的分数
+              if ((param.seriesName.includes('实际提交') || point.isActualSubmission) && point.score) {
+                scoreDisplay = point.score.toFixed(2) + ' 分 (当前提交)';
+                // 添加颜色标记使其更突出
+                scoreDisplay = '<span style="color:#ff5722;font-weight:bold;">' + scoreDisplay + '</span>';
+              }
+
+              // 如果有小题分数详情，添加到工具提示中
+              var detailedScoresHtml = '';
+              if (point.detailedScores && point.detailedScores.length > 0 && point.submissionId) {
+                detailedScoresHtml = '<div style="margin-top:5px;border-top:1px dashed #ccc;padding-top:5px;">';
+                detailedScoresHtml += '<div style="font-weight:bold;margin-bottom:3px;">小题分数详情:</div>';
+                point.detailedScores.forEach(function(detail) {
+                  detailedScoresHtml += '<div style="margin-left:10px;font-size:12px;">' +
+                    detail.column_title + ': ' + detail.score.toFixed(2) + ' 分</div>';
+                });
+                detailedScoresHtml += '</div>';
                 console.log('当前点的小题分数详情:', point.detailedScores);
               }
 
@@ -492,7 +552,8 @@
                 specialMark = ' <span style="color:#999;font-style:italic;">[整点小时]</span>';
               }
 
-              result += '<div>' + param.marker + ' ' + param.seriesName + ': ' + scoreDisplay + specialMark + '</div>';
+              result += '<div>' + param.marker + ' ' + param.seriesName.replace(' (实际提交)', '') + ': ' +
+                scoreDisplay + specialMark + '</div>' + detailedScoresHtml;
             });
 
             return result;
@@ -513,7 +574,18 @@
           },
           itemWidth: 12,
           itemHeight: 8,
-          padding: 8
+          padding: 8,
+          // 自定义图例选择器，过滤掉实际提交的系列
+          selector: [
+            {
+              type: 'all',
+              title: '全选'
+            },
+            {
+              type: 'inverse',
+              title: '反选'
+            }
+          ]
         },
         grid: {
           left: '3%',
@@ -687,6 +759,19 @@
       // 打印调试信息，查看数据是否正确
       console.log('Chart data:', originalData);
       console.log('Series data:', series);
+
+      // 检查是否有实际提交点
+      var hasSubmissionPoints = false;
+      series.forEach(function(s) {
+        if (s.type === 'scatter') {
+          hasSubmissionPoints = true;
+          console.log('Found submission points for:', s.name, s.data.length);
+        }
+      });
+
+      if (!hasSubmissionPoints) {
+        console.warn('No actual submission points found in the data!');
+      }
 
       // 添加双击事件来重置缩放
       chartContainer.addEventListener('dblclick', function() {
