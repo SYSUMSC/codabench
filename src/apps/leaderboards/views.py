@@ -315,6 +315,7 @@ def overall_leaderboard(request):
                     clone_point = last_point.copy()
                     clone_point['timestamp'] = ts
                     clone_point['is_actual_submission'] = False
+                    clone_point['is_filled_point'] = True  # Mark as a filled point
                     filled_timeline.append(clone_point)
             org_timeline_data[org_id2] = filled_timeline
         # === 补齐结束 ===

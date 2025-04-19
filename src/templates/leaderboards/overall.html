@@ -318,6 +318,7 @@
           dataPoint.isKeyTime = point.is_key_time || false;
           dataPoint.is_hourly_point = point.is_hourly_point || false;
           dataPoint.isActualSubmission = point.is_actual_submission || false;
+          dataPoint.isFilledPoint = point.is_filled_point || false; // 标记是否为补齐的点
           dataPoint.score = point.score || 0; // 保存原始分数
 
           // 添加小题分数详情
@@ -345,6 +346,8 @@
               return 'emptyCircle';  // 关键时间点使用空心圆
             } else if (point.submissionId) {
               return 'circle';  // 有提交ID的点使用实心圆
+            } else if (point.isFilledPoint) {
+              return 'triangle';  // 补齐的点使用三角形
             } else if (point.is_hourly_point) {
               return 'emptyCircle';  // 整点小时使用空心圆
             } else {
@@ -358,6 +361,8 @@
               return 6;  // 关键时间点的大小
             } else if (point.submissionId) {
               return 8;  // 有提交ID的点的大小 - 增大以更明显
+            } else if (point.isFilledPoint) {
+              return 6;  // 补齐的点的大小
             } else if (point.is_hourly_point) {
               return 4;  // 整点小时的大小
             } else {
@@ -535,6 +540,11 @@
                 // 添加颜色标记使其更突出
                 scoreDisplay = '<span style="color:#ff5722;font-weight:bold;">' + scoreDisplay + '</span>';
               }
+              // 如果是补齐的点，显示不同的标记
+              else if (point.isFilledPoint) {
+                scoreDisplay = point.score.toFixed(2) + ' 分 (补齐数据)';
+                scoreDisplay = '<span style="color:#2196F3;font-style:italic;">' + scoreDisplay + '</span>';
+              }
 
               // 如果有小题分数详情，添加到工具提示中
               var detailedScoresHtml = '';
@@ -555,6 +565,8 @@
                 specialMark = ' <span style="color:#999;font-style:italic;">[关键时间点]</span>';
               } else if (point.submissionId) {
                 specialMark = ' <span style="color:#999;font-style:italic;">[提交时间]</span>';
+              } else if (point.isFilledPoint) {
+                specialMark = ' <span style="color:#2196F3;font-style:italic;">[补齐数据]</span>';
               } else if (point.is_hourly_point) {
                 specialMark = ' <span style="color:#999;font-style:italic;">[整点小时]</span>';
               }
