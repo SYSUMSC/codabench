@@ -36,7 +36,9 @@
     <div class="ui info message" style="margin: 0.5em;">
       <p>注意：图表按小时显示数据点，便于比较不同队伍在同一时间点的得分情况。</p>
     </div>
-    <div id="scoreTimelineChart" style="width: 100%; height: 350px; padding: 0 10px; min-width: 1000px;"></div>
+    <!-- 添加图例容器 -->
+    <div id="chartLegendContainer" class="chart-legend-container"></div>
+    <div id="scoreTimelineChart" style="width: 100%; height: 450px; padding: 0 10px; min-width: 1000px;"></div>
   </div>
   <table class="ui celled table">
     <thead>
@@ -189,6 +191,40 @@
   .chart-container {
     position: relative !important;
     margin-bottom: 2em !important;
+  }
+
+  /* 图例容器样式 */
+  .chart-legend-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #eee;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  /* 图例项容器样式 */
+  .legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100%;
+  }
+
+  /* 图例项样式 */
+  .legend-item {
+    margin: 5px 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.7);
+    transition: background-color 0.2s;
+  }
+
+  .legend-item:hover {
+    background-color: rgba(240, 240, 240, 0.9);
   }
 
   /* 确保图例不会与图表重叠 */
@@ -768,76 +804,20 @@
         },
         legend: {
           data: originalData.datasets.map(function(dataset) { return dataset.label; }),
-          // 始终使用垂直布局，避免队伍名称水平溢出
-          orient: 'vertical',
-          // 放在右侧
-          right: 10,
-          // 垂直布局时放在中间
-          top: 'middle',
-          // 垂直布局时的最大高度，超出时显示滚动条
-          height: '80%',
-          // 调整图例文本样式
-          textStyle: {
-            fontSize: 11,
-            width: 100,
-            overflow: 'truncate',
-            lineHeight: 15
-          },
-          itemWidth: 15,
-          itemHeight: 10,
-          itemGap: 8, // 增加图例项之间的间距
-          padding: [5, 10, 5, 5],
-          // 格式化图例文本，对过长的队伍名称进行截断
-          formatter: function(name) {
-            // 如果队伍名称过长，截断并添加省略号
-            if (name.length > 10) {
-              return name.substring(0, 8) + '...';
-            }
-            return name;
-          },
-          // 自定义图例选择器，过滤掉实际提交的系列
-          selector: [
-            {
-              type: 'all',
-              title: '全选'
-            },
-            {
-              type: 'inverse',
-              title: '反选'
-            }
-          ],
-          // 选择器位置
-          selectorPosition: 'start',
-          // 选择器样式
-          selectorItemGap: 10,
-          selectorLabel: {
-            fontSize: 11
-          },
-          // 添加工具提示，当鼠标悬停在被截断的队伍名称上时显示完整名称
-          tooltip: {
-            show: true,
-            formatter: function(params) {
-              return params.name;
-            }
-          },
-          // 添加背景色以增强可读性
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          borderColor: '#ccc',
-          borderWidth: 1,
-          borderRadius: 4,
-          shadowBlur: 5,
-          shadowColor: 'rgba(0, 0, 0, 0.1)',
-          shadowOffsetX: 2,
-          shadowOffsetY: 2
+          // 使用水平布局，放在图表上方
+          orient: 'horizontal',
+          // 使用外部容器
+          selector: true,
+          show: false, // 隐藏默认图例，使用自定义容器
         },
         grid: {
-          left: '6%',
-          // 给右侧的垂直图例留出更多空间
-          right: '20%',
+          left: '5%',
+          // 使用全宽，因为图例已经移到上方
+          right: '5%',
           bottom: '10%',
           // 给顶部留出空间
           top: '50px',
-          // 不包含坐标轴标签，以给图表留出更多空间
+          // 包含坐标轴标签
           containLabel: true
         },
         xAxis: {
@@ -971,46 +951,127 @@
       setTimeout(function() {
         myChart.resize();
 
-        // 添加自定义样式到图例容器
+        // 创建自定义图例
         setTimeout(function() {
-          // 找到图例容器并添加自定义类
-          var legendContainer = document.querySelector('.echarts-legend');
+          // 获取图例容器
+          var legendContainer = document.getElementById('chartLegendContainer');
           if (legendContainer) {
-            legendContainer.classList.add('echarts-legend-vertical');
-            // 添加背景色和边框
-            legendContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-            legendContainer.style.border = '1px solid #eee';
-            legendContainer.style.borderRadius = '4px';
-            legendContainer.style.padding = '8px';
-            legendContainer.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+            // 清空容器
+            legendContainer.innerHTML = '';
+
+            // 创建全选/反选按钮
+            var selectorsDiv = document.createElement('div');
+            selectorsDiv.className = 'legend-selectors';
+            selectorsDiv.style.marginBottom = '10px';
+            selectorsDiv.style.textAlign = 'center';
+
+            var selectAllBtn = document.createElement('button');
+            selectAllBtn.className = 'ui mini button';
+            selectAllBtn.innerText = '全选';
+            selectAllBtn.style.marginRight = '5px';
+            selectAllBtn.onclick = function() {
+              // 全选所有系列
+              originalData.datasets.forEach(function(dataset, i) {
+                myChart.dispatchAction({
+                  type: 'legendSelect',
+                  name: dataset.label
+                });
+                // 更新复选框状态
+                var checkbox = document.getElementById('legend-checkbox-' + i);
+                if (checkbox) checkbox.checked = true;
+              });
+            };
+
+            var invertSelectionBtn = document.createElement('button');
+            invertSelectionBtn.className = 'ui mini button';
+            invertSelectionBtn.innerText = '反选';
+            invertSelectionBtn.onclick = function() {
+              // 反选所有系列
+              originalData.datasets.forEach(function(dataset, i) {
+                var checkbox = document.getElementById('legend-checkbox-' + i);
+                if (checkbox) {
+                  checkbox.checked = !checkbox.checked;
+                  myChart.dispatchAction({
+                    type: checkbox.checked ? 'legendSelect' : 'legendUnSelect',
+                    name: dataset.label
+                  });
+                }
+              });
+            };
+
+            selectorsDiv.appendChild(selectAllBtn);
+            selectorsDiv.appendChild(invertSelectionBtn);
+            legendContainer.appendChild(selectorsDiv);
+
+            // 创建图例项容器
+            var legendItemsDiv = document.createElement('div');
+            legendItemsDiv.className = 'legend-items';
+            legendItemsDiv.style.display = 'flex';
+            legendItemsDiv.style.flexWrap = 'wrap';
+            legendItemsDiv.style.justifyContent = 'center';
+
+            // 为每个队伍创建图例项
+            originalData.datasets.forEach(function(dataset, i) {
+              var itemDiv = document.createElement('div');
+              itemDiv.className = 'legend-item';
+              itemDiv.style.margin = '5px 10px';
+              itemDiv.style.display = 'flex';
+              itemDiv.style.alignItems = 'center';
+              itemDiv.style.cursor = 'pointer';
+
+              // 创建复选框
+              var checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
+              checkbox.id = 'legend-checkbox-' + i;
+              checkbox.checked = true;
+              checkbox.style.marginRight = '5px';
+              checkbox.onchange = function() {
+                // 切换系列显示/隐藏
+                myChart.dispatchAction({
+                  type: this.checked ? 'legendSelect' : 'legendUnSelect',
+                  name: dataset.label
+                });
+              };
+
+              // 创建颜色标记
+              var colorMarker = document.createElement('span');
+              colorMarker.style.display = 'inline-block';
+              colorMarker.style.width = '15px';
+              colorMarker.style.height = '10px';
+              colorMarker.style.backgroundColor = getTeamColor(i);
+              colorMarker.style.marginRight = '5px';
+
+              // 创建文本标签
+              var label = document.createElement('span');
+              label.innerText = dataset.label.length > 10 ? dataset.label.substring(0, 8) + '...' : dataset.label;
+              label.title = dataset.label; // 添加完整名称作为提示
+
+              // 添加到图例项
+              itemDiv.appendChild(checkbox);
+              itemDiv.appendChild(colorMarker);
+              itemDiv.appendChild(label);
+
+              // 点击整个图例项切换复选框
+              itemDiv.onclick = function(e) {
+                if (e.target !== checkbox) {
+                  checkbox.checked = !checkbox.checked;
+                  // 触发复选框的change事件
+                  var event = new Event('change');
+                  checkbox.dispatchEvent(event);
+                }
+              };
+
+              legendItemsDiv.appendChild(itemDiv);
+            });
+
+            legendContainer.appendChild(legendItemsDiv);
           }
 
-          // 找到图例选择器容器并添加自定义类
-          var selectorContainer = document.querySelector('.echarts-legend-selector');
-          if (selectorContainer) {
-            selectorContainer.classList.add('echarts-legend-selector-vertical');
-            // 调整选择器样式
-            selectorContainer.style.marginBottom = '10px';
-            selectorContainer.style.display = 'flex';
-            selectorContainer.style.justifyContent = 'center';
-          }
-
-          // 给图表容器添加垂直图例类
+          // 给图表容器添加样式
           var chartContainer = document.querySelector('.chart-container');
           if (chartContainer) {
             chartContainer.style.position = 'relative';
           }
-
-          // 给所有图例项添加样式以防溢出
-          var legendItems = document.querySelectorAll('.echarts-legend-item');
-          legendItems.forEach(function(item) {
-            item.style.textOverflow = 'ellipsis';
-            item.style.overflow = 'hidden';
-            item.style.whiteSpace = 'nowrap';
-            item.style.maxWidth = '120px';
-            item.style.display = 'block';
-            item.style.marginBottom = '5px';
-          });
         }, 200);
       }, 100);
 
