@@ -179,16 +179,26 @@
     padding-right: 5px;
   }
 
-  /* 当图例垂直显示时，增加图表高度和宽度 */
-  .chart-container-with-vertical-legend #scoreTimelineChart {
-    height: 400px !important;
+  /* 增加图表高度和宽度 */
+  #scoreTimelineChart {
+    height: 500px !important;
     min-width: 1200px !important; /* 确保有足够的水平空间 */
   }
 
-  /* 当图例垂直显示时，调整图表容器样式 */
-  .chart-container-with-vertical-legend {
-    padding-right: 160px !important; /* 为垂直图例留出空间 */
+  /* 调整图表容器样式 */
+  .chart-container {
     position: relative !important;
+    margin-bottom: 2em !important;
+  }
+
+  /* 确保图例不会与图表重叠 */
+  .echarts-legend {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid #eee !important;
+    border-radius: 4px !important;
+    padding: 5px !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
   }
 
   /* 图例选择器样式优化 */
@@ -373,6 +383,34 @@
       useDirtyRect: true   // 使用脚脏矩形优化，提高性能
     });
 
+    // 定义图表颜色函数，使用高对比度的颜色数组
+    function getTeamColor(index) {
+      // 预定义高对比度颜色数组
+      var colors = [
+        '#FF3B30', // 红色
+        '#34C759', // 绿色
+        '#007AFF', // 蓝色
+        '#FF9500', // 橙色
+        '#AF52DE', // 紫色
+        '#5AC8FA', // 浅蓝色
+        '#FFCC00', // 黄色
+        '#FF2D55', // 粉色
+        '#5856D6', // 深蓝色
+        '#32ADE6', // 天蓝色
+        '#FF6B22', // 深橙色
+        '#00C7BE', // 青色
+        '#8E8E93', // 灰色
+        '#C69C6D', // 棕色
+        '#53A245', // 深绿色
+        '#D6456E', // 深粉色
+        '#A2845E', // 浅棕色
+        '#147EFB', // 深蓝色
+        '#8B572A', // 深棕色
+        '#4CD964'  // 浅绿色
+      ];
+      return colors[index % colors.length];
+    }
+
     // 获取原始数据
     var originalData = {{ chart_data|safe }};
 
@@ -501,11 +539,16 @@
           sampling: 'average',  // 使用平均值采样，减少数据点数量
           animation: false,     // 关闭动画，提高性能
           lineStyle: {
-            width: 2,
-            color: dataset.borderColor
+            width: 3, // 增加线条宽度，使其更易区分
+            color: getTeamColor(i),
+            shadowBlur: 3,
+            shadowColor: 'rgba(0,0,0,0.2)',
+            type: 'solid' // 使用实线而非虚线
           },
           itemStyle: {
-            color: dataset.borderColor
+            color: getTeamColor(i),
+            borderWidth: 2,
+            borderColor: '#fff' // 添加白色边框使数据点更突出
           },
           // 确保数据点正确显示
           emphasis: {
@@ -550,9 +593,9 @@
             symbol: 'diamond',
             symbolSize: 10,
             itemStyle: {
-              color: dataset.borderColor,
+              color: getTeamColor(i),
               borderColor: '#fff',
-              borderWidth: 1
+              borderWidth: 2
             },
             emphasis: {
               itemStyle: {
@@ -724,26 +767,30 @@
         },
         legend: {
           data: originalData.datasets.map(function(dataset) { return dataset.label; }),
-          top: 0,
-          textStyle: {
-            fontSize: 11
-          },
-          itemWidth: 12,
-          itemHeight: 8,
-          padding: 8,
-          // 根据队伍数量决定是否使用垂直布局
-          orient: originalData.datasets.length > 10 ? 'vertical' : 'horizontal',
-          // 垂直布局时放在右侧
-          right: originalData.datasets.length > 10 ? 10 : 'auto',
-          // 水平布局时放在顶部
-          top: originalData.datasets.length > 10 ? 50 : 0,
+          // 始终使用垂直布局，避免队伍名称水平溢出
+          orient: 'vertical',
+          // 放在右侧
+          right: 10,
+          // 垂直布局时放在中间
+          top: 'middle',
           // 垂直布局时的最大高度，超出时显示滚动条
-          height: originalData.datasets.length > 10 ? '250px' : 'auto',
+          height: '80%',
+          // 调整图例文本样式
+          textStyle: {
+            fontSize: 11,
+            width: 100,
+            overflow: 'truncate',
+            lineHeight: 15
+          },
+          itemWidth: 15,
+          itemHeight: 10,
+          itemGap: 8, // 增加图例项之间的间距
+          padding: [5, 10, 5, 5],
           // 格式化图例文本，对过长的队伍名称进行截断
           formatter: function(name) {
             // 如果队伍名称过长，截断并添加省略号
-            if (name.length > 15) {
-              return name.substring(0, 12) + '...';
+            if (name.length > 10) {
+              return name.substring(0, 8) + '...';
             }
             return name;
           },
@@ -759,22 +806,37 @@
             }
           ],
           // 选择器位置
-          selectorPosition: originalData.datasets.length > 10 ? 'start' : 'end',
+          selectorPosition: 'start',
+          // 选择器样式
+          selectorItemGap: 10,
+          selectorLabel: {
+            fontSize: 11
+          },
           // 添加工具提示，当鼠标悬停在被截断的队伍名称上时显示完整名称
           tooltip: {
             show: true,
             formatter: function(params) {
               return params.name;
             }
-          }
+          },
+          // 添加背景色以增强可读性
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          borderColor: '#ccc',
+          borderWidth: 1,
+          borderRadius: 4,
+          shadowBlur: 5,
+          shadowColor: 'rgba(0, 0, 0, 0.1)',
+          shadowOffsetX: 2,
+          shadowOffsetY: 2
         },
         grid: {
           left: '6%',
-          // 当图例垂直放置在右侧时，增加右侧边距
-          right: originalData.datasets.length > 10 ? '15%' : '6%',
+          // 给右侧的垂直图例留出更多空间
+          right: '20%',
           bottom: '10%',
-          // 当图例水平放置在顶部时，增加顶部边距
-          top: originalData.datasets.length > 10 ? '50px' : '80px',
+          // 给顶部留出空间
+          top: '50px',
+          // 不包含坐标轴标签，以给图表留出更多空间
           containLabel: true
         },
         xAxis: {
@@ -909,23 +971,33 @@
         myChart.resize();
 
         // 添加自定义样式到图例容器
-        if (originalData.datasets.length > 10) {
+        setTimeout(function() {
           // 找到图例容器并添加自定义类
           var legendContainer = document.querySelector('.echarts-legend');
           if (legendContainer) {
             legendContainer.classList.add('echarts-legend-vertical');
+            // 添加背景色和边框
+            legendContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+            legendContainer.style.border = '1px solid #eee';
+            legendContainer.style.borderRadius = '4px';
+            legendContainer.style.padding = '8px';
+            legendContainer.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
           }
 
           // 找到图例选择器容器并添加自定义类
           var selectorContainer = document.querySelector('.echarts-legend-selector');
           if (selectorContainer) {
             selectorContainer.classList.add('echarts-legend-selector-vertical');
+            // 调整选择器样式
+            selectorContainer.style.marginBottom = '10px';
+            selectorContainer.style.display = 'flex';
+            selectorContainer.style.justifyContent = 'center';
           }
 
           // 给图表容器添加垂直图例类
           var chartContainer = document.querySelector('.chart-container');
           if (chartContainer) {
-            chartContainer.classList.add('chart-container-with-vertical-legend');
+            chartContainer.style.position = 'relative';
           }
 
           // 给所有图例项添加样式以防溢出
@@ -934,9 +1006,11 @@
             item.style.textOverflow = 'ellipsis';
             item.style.overflow = 'hidden';
             item.style.whiteSpace = 'nowrap';
-            item.style.maxWidth = '150px';
+            item.style.maxWidth = '120px';
+            item.style.display = 'block';
+            item.style.marginBottom = '5px';
           });
-        }
+        }, 200);
       }, 100);
 
       // 添加缩放结束事件处理，确保数据始终可见
