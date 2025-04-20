@@ -172,6 +172,50 @@
     overflow: visible !important; /* 允许内容溢出显示 */
   }
 
+  /* 图例样式优化 */
+  .echarts-legend-vertical {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+
+  /* 当图例垂直显示时，增加图表高度和宽度 */
+  .chart-container-with-vertical-legend #scoreTimelineChart {
+    height: 400px !important;
+    min-width: 1200px !important; /* 确保有足够的水平空间 */
+  }
+
+  /* 当图例垂直显示时，调整图表容器样式 */
+  .chart-container-with-vertical-legend {
+    padding-right: 160px !important; /* 为垂直图例留出空间 */
+    position: relative !important;
+  }
+
+  /* 图例选择器样式优化 */
+  .echarts-legend-selector {
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .echarts-legend-selector .item {
+    margin-right: 8px;
+    margin-bottom: 5px;
+  }
+
+  /* 垂直图例选择器样式 */
+  .echarts-legend-selector-vertical {
+    flex-direction: column;
+  }
+
+  /* 确保图例文本不会溢出 */
+  .echarts-legend-item {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 150px;
+  }
+
   /* 允许图表容器水平滚动 */
   .ui.segment.chart-container {
     overflow-x: auto !important;
@@ -687,6 +731,22 @@
           itemWidth: 12,
           itemHeight: 8,
           padding: 8,
+          // 根据队伍数量决定是否使用垂直布局
+          orient: originalData.datasets.length > 10 ? 'vertical' : 'horizontal',
+          // 垂直布局时放在右侧
+          right: originalData.datasets.length > 10 ? 10 : 'auto',
+          // 水平布局时放在顶部
+          top: originalData.datasets.length > 10 ? 50 : 0,
+          // 垂直布局时的最大高度，超出时显示滚动条
+          height: originalData.datasets.length > 10 ? '250px' : 'auto',
+          // 格式化图例文本，对过长的队伍名称进行截断
+          formatter: function(name) {
+            // 如果队伍名称过长，截断并添加省略号
+            if (name.length > 15) {
+              return name.substring(0, 12) + '...';
+            }
+            return name;
+          },
           // 自定义图例选择器，过滤掉实际提交的系列
           selector: [
             {
@@ -697,13 +757,24 @@
               type: 'inverse',
               title: '反选'
             }
-          ]
+          ],
+          // 选择器位置
+          selectorPosition: originalData.datasets.length > 10 ? 'start' : 'end',
+          // 添加工具提示，当鼠标悬停在被截断的队伍名称上时显示完整名称
+          tooltip: {
+            show: true,
+            formatter: function(params) {
+              return params.name;
+            }
+          }
         },
         grid: {
           left: '6%',
-          right: '6%',
+          // 当图例垂直放置在右侧时，增加右侧边距
+          right: originalData.datasets.length > 10 ? '15%' : '6%',
           bottom: '10%',
-          top: '50px',
+          // 当图例水平放置在顶部时，增加顶部边距
+          top: originalData.datasets.length > 10 ? '50px' : '80px',
           containLabel: true
         },
         xAxis: {
@@ -836,6 +907,36 @@
       // 确保图表完全渲染
       setTimeout(function() {
         myChart.resize();
+
+        // 添加自定义样式到图例容器
+        if (originalData.datasets.length > 10) {
+          // 找到图例容器并添加自定义类
+          var legendContainer = document.querySelector('.echarts-legend');
+          if (legendContainer) {
+            legendContainer.classList.add('echarts-legend-vertical');
+          }
+
+          // 找到图例选择器容器并添加自定义类
+          var selectorContainer = document.querySelector('.echarts-legend-selector');
+          if (selectorContainer) {
+            selectorContainer.classList.add('echarts-legend-selector-vertical');
+          }
+
+          // 给图表容器添加垂直图例类
+          var chartContainer = document.querySelector('.chart-container');
+          if (chartContainer) {
+            chartContainer.classList.add('chart-container-with-vertical-legend');
+          }
+
+          // 给所有图例项添加样式以防溢出
+          var legendItems = document.querySelectorAll('.echarts-legend-item');
+          legendItems.forEach(function(item) {
+            item.style.textOverflow = 'ellipsis';
+            item.style.overflow = 'hidden';
+            item.style.whiteSpace = 'nowrap';
+            item.style.maxWidth = '150px';
+          });
+        }
       }, 100);
 
       // 添加缩放结束事件处理，确保数据始终可见
