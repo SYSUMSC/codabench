@@ -384,6 +384,7 @@
     });
 
     // 定义图表颜色函数，使用高对比度的颜色数组
+    // 根据队伍索引返回一个高对比度的颜色，确保不同队伍的线条颜色易于区分
     function getTeamColor(index) {
       // 预定义高对比度颜色数组
       var colors = [
@@ -420,7 +421,7 @@
       var allDates = [];
 
       // 处理每个数据集
-      originalData.datasets.forEach(function(dataset) {
+      originalData.datasets.forEach(function(dataset, i) {
         var seriesData = [];
 
         // 转换数据格式，使用实际提交时间
@@ -593,7 +594,7 @@
             symbol: 'diamond',
             symbolSize: 10,
             itemStyle: {
-              color: getTeamColor(i),
+              color: getTeamColor(i), // 使用与主线相同的颜色
               borderColor: '#fff',
               borderWidth: 2
             },
