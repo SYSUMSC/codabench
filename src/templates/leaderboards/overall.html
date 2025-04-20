@@ -354,8 +354,8 @@
         + '<thead>'
         + '<tr>'
         + '<th class="eight wide">比赛</th>'
-        + '<th class="four wide">得分</th>'
-        + '<th class="four wide">最新提交时间</th>'
+        + '<th class="四宽">得分</th>'
+        + '<th class="四宽">最新提交时间</th>'
         + '</tr>'
         + '</thead>'
         + '<tbody>';
@@ -734,6 +734,27 @@
         tooltip: {
           trigger: 'axis',
           formatter: function(params) {
+            // 按队伍名称去重
+            const byTeam = {};
+            params.forEach(function(param) {
+              const team = param.seriesName.replace(' (实际提交)', '');
+
+              // 初始化队伍记录
+              if (!byTeam[team]) {
+                byTeam[team] = {
+                  mainSeries: null,  // 主线系列数据
+                  scatterSeries: null // 散点系列数据
+                };
+              }
+
+              // 区分主线系列和散点系列
+              if (param.seriesName.includes('实际提交')) {
+                byTeam[team].scatterSeries = param;
+              } else {
+                byTeam[team].mainSeries = param;
+              }
+            });
+
             // 获取时间并格式化显示
             var formattedTime = '';
 
@@ -771,12 +792,32 @@
 
             var result = '<div style="font-weight:bold;">' + formattedTime + '</div>';
 
-            // 按分数降序排序显示队伍
-            params.sort(function(a, b) {
-              return b.value[1] - a.value[1];
+            // 创建合并后的队伍列表，按分数降序排序
+            var teamList = [];
+            Object.keys(byTeam).forEach(function(team) {
+              var teamData = byTeam[team];
+              // 优先使用主线系列数据
+              var mainParam = teamData.mainSeries;
+              var scatterParam = teamData.scatterSeries;
+
+              if (mainParam) {
+                teamList.push({
+                  team: team,
+                  param: mainParam,
+                  scatterParam: scatterParam
+                });
+              }
             });
 
-            params.forEach(function(param) {
+            // 按分数降序排序队伍列表
+            teamList.sort(function(a, b) {
+              return b.param.value[1] - a.param.value[1];
+            });
+
+            // 为每支队伍构建显示内容
+            teamList.forEach(function(item) {
+              var param = item.param;
+              var scatterParam = item.scatterParam;
               var point = param.data;
               var scoreDisplay = param.value[1].toFixed(2) + ' 分';
 
@@ -785,11 +826,19 @@
                 scoreDisplay = point.total_score.toFixed(2) + ' 分 (总分)';
               }
 
-              // 如果是实际提交点，显示当前提交的分数
-              if ((param.seriesName.includes('实际提交') || point.isActualSubmission) && point.score) {
-                scoreDisplay = point.score.toFixed(2) + ' 分 (当前提交)';
-                // 添加颜色标记使其更突出
-                scoreDisplay = '<span style="color:#ff5722;font-weight:bold;">' + scoreDisplay + '</span>';
+              // 如果有实际提交点的数据，添加当前提交分数信息
+              var currentSubmissionInfo = '';
+              if (scatterParam && scatterParam.data) {
+                var scatterPoint = scatterParam.data;
+                if (scatterPoint.score) {
+                  currentSubmissionInfo = ' <span style="color:#ff5722;font-weight:bold;">当前提交: ' +
+                                          scatterPoint.score.toFixed(2) + ' 分</span>';
+                }
+              }
+              // 如果主线点是提交点
+              else if ((point.isActualSubmission || point.submissionId) && point.score) {
+                currentSubmissionInfo = ' <span style="color:#ff5722;font-weight:bold;">当前提交: ' +
+                                        point.score.toFixed(2) + ' 分</span>';
               }
               // 如果是补齐的点，显示不同的标记
               else if (point.isFilledPoint) {
@@ -807,7 +856,6 @@
                     detail.column_title + ': ' + detail.score.toFixed(2) + ' 分</div>';
                 });
                 detailedScoresHtml += '</div>';
-                console.log('当前点的小题分数详情:', point.detailedScores);
               }
 
               // 添加特殊标记
@@ -822,8 +870,8 @@
                 specialMark = ' <span style="color:#999;font-style:italic;">[整点小时]</span>';
               }
 
-              result += '<div>' + param.marker + ' ' + param.seriesName.replace(' (实际提交)', '') + ': ' +
-                scoreDisplay + specialMark + '</div>' + detailedScoresHtml;
+              result += '<div>' + param.marker + ' ' + item.team + ': ' +
+                scoreDisplay + currentSubmissionInfo + specialMark + '</div>' + detailedScoresHtml;
             });
 
             return result;
