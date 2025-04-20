@@ -342,6 +342,9 @@
         var seriesData = [];
 
         // 转换数据格式，使用实际提交时间
+        // 使用对象来跟踪已处理的时间戳，防止重复
+        var processedTimestamps = {};
+
         dataset.data.forEach(function(point) {
           // 将时间字符串转换为日期对象然后获取时间戳
           var dateObj;
@@ -361,6 +364,15 @@
 
           // 使用时间戳作为数据点的x值
           var timestamp = dateObj.getTime();
+
+          // 检查是否已经处理过这个时间戳
+          if (processedTimestamps[timestamp]) {
+            console.log('跳过重复的时间点:', point.x, '对于队伍', dataset.label);
+            return; // 跳过这个重复的点
+          }
+
+          // 标记这个时间戳已经处理
+          processedTimestamps[timestamp] = true;
           allDates.push(timestamp);
 
           // 确保分数是有效的数字
@@ -463,8 +475,18 @@
 
         // 添加实际提交点的散点图 - 只显示实际提交点
         var submissionPoints = [];
+        var processedSubmissionTimestamps = {}; // 跟踪已处理的提交时间戳
+
         seriesData.forEach(function(point) {
           if (point.isActualSubmission || (point.submissionId && point.score > 0)) {
+            // 检查是否已经处理过这个时间戳
+            if (processedSubmissionTimestamps[point[0]]) {
+              console.log('跳过重复的提交时间点:', point.originalDate, '对于队伍', dataset.label);
+              return; // 跳过这个重复的点
+            }
+
+            // 标记这个时间戳已经处理
+            processedSubmissionTimestamps[point[0]] = true;
             submissionPoints.push(point);
           }
         });

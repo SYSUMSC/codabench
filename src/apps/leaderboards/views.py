@@ -304,7 +304,14 @@ def overall_leaderboard(request):
 
         for org_id2 in org_timeline_data:
             timeline = org_timeline_data[org_id2]
-            time2point = {point['timestamp']: point for point in timeline}
+            # 使用字典来确保每个时间戳只有一个点
+            time2point = {}
+            # 首先处理可能的重复时间戳，保留分数最高的点
+            for point in timeline:
+                ts = point['timestamp']
+                if ts not in time2point or point.get('score', 0) > time2point[ts].get('score', 0):
+                    time2point[ts] = point
+
             filled_timeline = []
             last_point = None
             max_score = 0  # 跟踪最高分数，确保分数不会下降
@@ -341,7 +348,19 @@ def overall_leaderboard(request):
                     clone_point['total_score'] = max_total_score
                     filled_timeline.append(clone_point)
 
-            org_timeline_data[org_id2] = filled_timeline
+            # 确保每个时间戳只出现一次
+            unique_timestamps = set()
+            deduplicated_timeline = []
+
+            for point in filled_timeline:
+                ts = point['timestamp']
+                if ts not in unique_timestamps:
+                    unique_timestamps.add(ts)
+                    deduplicated_timeline.append(point)
+                else:
+                    print(f"跳过重复的时间点: {ts} 对于组织 {org_id2}")
+
+            org_timeline_data[org_id2] = deduplicated_timeline
         # === 补齐结束 ===
     # 为每个组织处理时间线数据，按小时插入数据点
     for org_id in org_timeline_data:
@@ -503,7 +522,20 @@ def overall_leaderboard(request):
                 all_points_map[ts] = point
             # 按时间排序
             merged_points = [all_points_map[ts] for ts in sorted(all_points_map.keys())]
-            org_timeline_data[org_id] = merged_points
+
+            # 确保每个时间戳只出现一次（防止重复）
+            unique_timestamps = set()
+            deduplicated_points = []
+
+            for point in merged_points:
+                ts = point['timestamp']
+                if ts not in unique_timestamps:
+                    unique_timestamps.add(ts)
+                    deduplicated_points.append(point)
+                else:
+                    print(f"跳过重复的时间点: {ts} 对于组织 {org_id}")
+
+            org_timeline_data[org_id] = deduplicated_points
 
         # 确保所有点都有cumulative_max属性
         # 注意：在前面的处理中，我们已经计算了cumulative_max，这里只是确保所有点都有该属性
