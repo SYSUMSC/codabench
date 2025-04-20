@@ -464,6 +464,9 @@
         // 使用对象来跟踪已处理的时间戳，防止重复
         var processedTimestamps = {};
 
+        // 预处理：按时间戳对数据点进行分组，对于相同时间戳的点，只保留分数最高的一个
+        var pointsByTimestamp = {};
+
         dataset.data.forEach(function(point) {
           // 将时间字符串转换为日期对象然后获取时间戳
           var dateObj;
@@ -483,16 +486,31 @@
 
           // 使用时间戳作为数据点的x值
           var timestamp = dateObj.getTime();
+          var score = parseFloat(point.y);
 
-          // 检查是否已经处理过这个时间戳
-          if (processedTimestamps[timestamp]) {
-            console.log('跳过重复的时间点:', point.x, '对于队伍', dataset.label);
-            return; // 跳过这个重复的点
+          // 如果时间戳已存在，比较分数，保留分数最高的点
+          if (pointsByTimestamp[timestamp]) {
+            var existingScore = parseFloat(pointsByTimestamp[timestamp].y);
+            if (score > existingScore) {
+              console.log('替换时间点的较低分数:', point.x, '对于队伍', dataset.label, '旧分数:', existingScore, '新分数:', score);
+              pointsByTimestamp[timestamp] = point;
+            } else {
+              console.log('保留时间点的较高分数:', point.x, '对于队伍', dataset.label, '保留分数:', existingScore, '忽略分数:', score);
+            }
+          } else {
+            pointsByTimestamp[timestamp] = point;
           }
+        });
+
+        // 使用去重后的数据点
+        Object.keys(pointsByTimestamp).forEach(function(timestamp) {
+          var point = pointsByTimestamp[timestamp];
+          var dateObj = new Date(point.x);
+          var numericTimestamp = dateObj.getTime();
 
           // 标记这个时间戳已经处理
-          processedTimestamps[timestamp] = true;
-          allDates.push(timestamp);
+          processedTimestamps[numericTimestamp] = true;
+          allDates.push(numericTimestamp);
 
           // 确保分数是有效的数字
           var score = parseFloat(point.y);
@@ -510,7 +528,7 @@
           }
 
           // 添加额外信息到数据点
-          var dataPoint = [timestamp, score];
+          var dataPoint = [numericTimestamp, score];
 
           // 添加原始时间字符串以便调试
           dataPoint.originalDate = point.x;
@@ -600,18 +618,34 @@
         // 添加实际提交点的散点图 - 只显示实际提交点
         var submissionPoints = [];
         var processedSubmissionTimestamps = {}; // 跟踪已处理的提交时间戳
+        var submissionPointsByTimestamp = {}; // 按时间戳分组的提交点
 
         seriesData.forEach(function(point) {
           if (point.isActualSubmission || (point.submissionId && point.score > 0)) {
             // 检查是否已经处理过这个时间戳
             if (processedSubmissionTimestamps[point[0]]) {
-              console.log('跳过重复的提交时间点:', point.originalDate, '对于队伍', dataset.label);
-              return; // 跳过这个重复的点
+              // 如果已经有这个时间戳的点，比较分数，保留分数最高的
+              var existingPoint = submissionPointsByTimestamp[point[0]];
+              if (point[1] > existingPoint[1]) {
+                console.log('替换重复提交时间点的较低分数:', point.originalDate, '对于队伍', dataset.label,
+                            '旧分数:', existingPoint[1], '新分数:', point[1]);
+                // 移除旧点
+                var index = submissionPoints.indexOf(existingPoint);
+                if (index > -1) {
+                  submissionPoints.splice(index, 1);
+                }
+                // 添加新点
+                submissionPointsByTimestamp[point[0]] = point;
+                submissionPoints.push(point);
+              } else {
+                console.log('跳过重复的提交时间点（保留较高分数）:', point.originalDate, '对于队伍', dataset.label);
+              }
+            } else {
+              // 标记这个时间戳已经处理
+              processedSubmissionTimestamps[point[0]] = true;
+              submissionPointsByTimestamp[point[0]] = point;
+              submissionPoints.push(point);
             }
-
-            // 标记这个时间戳已经处理
-            processedSubmissionTimestamps[point[0]] = true;
-            submissionPoints.push(point);
           }
         });
 
