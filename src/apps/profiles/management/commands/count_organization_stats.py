@@ -277,12 +277,13 @@ class Command(BaseCommand):
 
                 self.stdout.write(self.style.SUCCESS(f'\n数据已导出到 {export_file}'))
 
-                # 导出文件已经在/tmp目录下，可以通过Docker卷映射访问
-                # 提示用户如何从宿主机访问该文件
+                # 导出文件已经在/tmp目录下，提供多种方式访问该文件
                 if export_file.startswith('/tmp/'):
                     self.stdout.write(self.style.SUCCESS(
                         f'\n文件已导出到容器的 {export_file}，'
-                        f'您可以通过以下命令将其复制到宿主机：\n'
+                        f'您可以通过以下命令将其内容输出并保存到宿主机：\n'
+                        f'docker compose exec django cat {export_file} > organization_stats.csv\n\n'
+                        f'或者尝试复制文件（如果遇到问题，请使用上面的方法）：\n'
                         f'docker cp $(docker compose ps -q django):{export_file} .'
                     ))
 
