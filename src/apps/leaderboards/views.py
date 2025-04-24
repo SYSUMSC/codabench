@@ -140,7 +140,8 @@ def overall_leaderboard(request):
         members_info = [{
             'name': member.user.name or member.user.username,
             'username': member.user.username,
-            'slug': member.user.slug
+            'slug': member.user.slug,
+            'education_level': member.user.education_level
         } for member in active_members]
 
         # 获取该组织的平均提交时间
