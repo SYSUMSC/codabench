@@ -74,7 +74,7 @@
         <td>
           {% if entry.members %}
             {% for member in entry.members %}
-              <a href="/profiles/user/{{ member.slug }}/">{{ member.name }}</a>{% if not forloop.last %}, {% endif %}
+              <a href="/profiles/user/{{ member.slug }}/">{{ member.name }}{% if member.real_name %} ({{ member.real_name }}){% endif %}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
           {% else %}
             暂无成员
