@@ -153,11 +153,11 @@ def delete_solution_pdf(request, key):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # Check if user is the creator or a member of the organization with appropriate permissions
+    # Check if user is the creator or a member of the organization
     if solution_pdf.created_by != request.user:
         try:
             membership = solution_pdf.organization.membership_set.get(user=request.user)
-            if membership.group not in Membership.EDITORS_GROUP:
+            if membership.group not in Membership.ALL_GROUP:
                 return Response(
                     {"error": "You do not have permission to delete this solution PDF"},
                     status=status.HTTP_403_FORBIDDEN
