@@ -4,9 +4,11 @@ from django.apps import apps
 from django.utils.timezone import now
 from datetime import datetime
 import csv
+import os
 
 from competitions.models import Submission
 from profiles.models import Organization, Membership
+from solutions.models import SolutionPDF
 
 
 class Command(BaseCommand):
@@ -22,10 +24,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         export_file = options.get('export')
-        
+
         # 计算队伍排名，参考overall_leaderboard的逻辑
         self.stdout.write("正在计算队伍排名...")
-        
+
         # 筛选出满足条件的提交，且要求提交所属组织不为空
         submissions = Submission.objects.filter(
             leaderboard__isnull=False,
@@ -139,45 +141,57 @@ class Command(BaseCommand):
             with open(export_file, 'w', newline='', encoding='utf-8') as csvfile:
                 # 定义CSV字段
                 fieldnames = [
-                    '队伍名次', '队伍名字', 
-                    '成员1姓名', '成员1学号', 
-                    '成员2姓名', '成员2学号', 
-                    '成员3姓名', '成员3学号', 
-                    '队伍积分'
+                    '队伍名次', '队伍名字',
+                    '成员1姓名', '成员1学号',
+                    '成员2姓名', '成员2学号',
+                    '成员3姓名', '成员3学号',
+                    '队伍积分', '提交wp文件名字'
                 ]
-                
+
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writeheader()
-                
+
                 # 写入每个队伍的数据
                 for rank, team in enumerate(top_60_teams, 1):
                     org = team['organization']
                     members = team['members']
-                    
+
                     # 准备成员数据
                     member_data = {}
                     for i, member in enumerate(members[:3], 1):  # 最多取3个成员
                         member_data[f'成员{i}姓名'] = member['real_name']
                         member_data[f'成员{i}学号'] = member['student_id']
-                    
+
                     # 确保所有成员字段都存在，即使队伍成员不足3人
                     for i in range(1, 4):
                         if f'成员{i}姓名' not in member_data:
                             member_data[f'成员{i}姓名'] = ''
                         if f'成员{i}学号' not in member_data:
                             member_data[f'成员{i}学号'] = ''
-                    
+
+                    # 获取队伍的题解PDF文件名
+                    solution_pdf = SolutionPDF.objects.filter(
+                        organization=org,
+                        upload_completed_successfully=True
+                    ).first()
+
+                    solution_filename = "无"
+                    if solution_pdf and solution_pdf.pdf_file:
+                        # 从完整路径中提取文件名
+                        solution_filename = os.path.basename(solution_pdf.pdf_file.name)
+
                     # 写入一行数据
                     row_data = {
                         '队伍名次': rank,
                         '队伍名字': org.name,
                         '队伍积分': team['total_points'],
+                        '提交wp文件名字': solution_filename,
                         **member_data
                     }
                     writer.writerow(row_data)
-                
+
             self.stdout.write(self.style.SUCCESS(f'\n数据已导出到 {export_file}'))
-            
+
             # 提供访问文件的命令
             if export_file.startswith('/tmp/'):
                 self.stdout.write(self.style.SUCCESS(
@@ -185,6 +199,6 @@ class Command(BaseCommand):
                     f'您可以通过以下命令将其内容输出并保存到宿主机：\n'
                     f'docker compose exec django cat {export_file} > team_rankings.csv'
                 ))
-                
+
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'\n导出失败: {str(e)}'))
